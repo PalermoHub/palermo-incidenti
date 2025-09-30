@@ -216,20 +216,6 @@
             border-radius: 8px;
             text-align: center;
             border: 1px solid rgba(148, 163, 184, 0.1);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .year-stat-item:hover {
-            background: rgba(59, 130, 246, 0.3);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-        }
-        
-        .year-stat-item.active {
-            background: rgba(59, 130, 246, 0.4);
-            border-color: #3b82f6;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
         }
         
         .year-stat-year {
@@ -251,10 +237,6 @@
         
         .filter-group {
             margin-bottom: 20px;
-        }
-        
-        .filter-group.hidden {
-            display: none;
         }
         
         .filter-label {
@@ -420,21 +402,6 @@
             margin-bottom: 12px;
             font-size: 13px;
             color: #cbd5e1;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            padding: 8px;
-            border-radius: 8px;
-        }
-        
-        .legend-item:hover {
-            background: rgba(59, 130, 246, 0.2);
-            transform: translateX(5px);
-        }
-        
-        .legend-item.active {
-            background: rgba(59, 130, 246, 0.3);
-            border-left: 3px solid #3b82f6;
-            padding-left: 13px;
         }
         
         .legend-color {
@@ -558,22 +525,22 @@
             color: #94a3b8;
             font-weight: 600;
         }
+		
+		.maplibregl-ctrl-home {
+    background-color: #fff;
+    background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="29" height="29" viewBox="0 0 29 29" fill="%23333"><path d="M14.5 3l-11 9h3v11h5v-7h6v7h5V12h3z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 70%;
+}
 
-        .maplibregl-ctrl-home {
-            background-color: #fff;
-            background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="29" height="29" viewBox="0 0 29 29" fill="%23333"><path d="M14.5 3l-11 9h3v11h5v-7h6v7h5V12h3z"/></svg>');
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: 70%;
-        }
+.maplibregl-ctrl-home:hover {
+    background-color: #f0f0f0;
+}
 
-        .maplibregl-ctrl-home:hover {
-            background-color: #f0f0f0;
-        }
-
-        #total-info {
-            white-space: pre-line;
-        }
+#total-info {
+    white-space: pre-line;
+}
     </style>
 </head>
 <body>
@@ -612,7 +579,7 @@
             </div>
             
             <div class="year-stats">
-                <div class="year-stats-title">📊 Distribuzione per Anno (clicca per filtrare)</div>
+                <div class="year-stats-title">📊 Distribuzione per Anno</div>
                 <div class="year-stats-grid" id="year-stats-grid"></div>
             </div>
         </div>
@@ -622,7 +589,7 @@
                 🔥 Mostra Mappa di Calore
             </button>
 
-            <div class="filter-group hidden">
+            <div class="filter-group">
                 <label class="filter-label">Tipologia Incidente</label>
                 <select id="filter-tipologia">
                     <option value="">Tutte le tipologie</option>
@@ -662,7 +629,7 @@
                     <span class="toggle-icon collapsed" id="toggle-temporale">▼</span>
                 </div>
                 <div class="filter-section-content collapsed" id="content-temporale">
-                    <div class="filter-group hidden">
+                    <div class="filter-group">
                         <label class="filter-label">Anno</label>
                         <select id="filter-anno"></select>
                     </div>
@@ -730,36 +697,22 @@
     </div>
     
     <div class="legend" id="points-legend">
-        <h3>Legenda (clicca per filtrare)</h3>
-        <div class="legend-item" data-tipo="" onclick="filterByTipologia('')" title="Clicca per mostrare tutte le tipologie">
-            <div style="display: flex; align-items: center;">
-                <div style="width: 24px; height: 24px; margin-right: 12px; border-radius: 50%; background: linear-gradient(135deg, #ef4444, #f97316, #f59e0b, #10b981); border: 2px solid rgba(241, 245, 249, 0.3);"></div>
-                <span><strong>Tutte</strong> - Tutte le tipologie</span>
-            </div>
+        <h3>Legenda Tipologia</h3>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #ef4444;"></div>
+            <span><strong>M</strong> - Mortale</span>
         </div>
-        <div class="legend-item" data-tipo="M" onclick="filterByTipologia('M')" title="Clicca per filtrare solo incidenti mortali">
-            <div style="display: flex; align-items: center;">
-                <div class="legend-color" style="background-color: #ef4444;"></div>
-                <span><strong>M</strong> - Mortale</span>
-            </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #f97316;"></div>
+            <span><strong>R</strong> - Riserva</span>
         </div>
-        <div class="legend-item" data-tipo="R" onclick="filterByTipologia('R')" title="Clicca per filtrare solo incidenti con riserva">
-            <div style="display: flex; align-items: center;">
-                <div class="legend-color" style="background-color: #f97316;"></div>
-                <span><strong>R</strong> - Riserva</span>
-            </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #f59e0b;"></div>
+            <span><strong>F</strong> - Feriti</span>
         </div>
-        <div class="legend-item" data-tipo="F" onclick="filterByTipologia('F')" title="Clicca per filtrare solo incidenti con feriti">
-            <div style="display: flex; align-items: center;">
-                <div class="legend-color" style="background-color: #f59e0b;"></div>
-                <span><strong>F</strong> - Feriti</span>
-            </div>
-        </div>
-        <div class="legend-item" data-tipo="C" onclick="filterByTipologia('C')" title="Clicca per filtrare solo incidenti con danni alle cose">
-            <div style="display: flex; align-items: center;">
-                <div class="legend-color" style="background-color: #10b981;"></div>
-                <span><strong>C</strong> - Cose</span>
-            </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #10b981;"></div>
+            <span><strong>C</strong> - Cose</span>
         </div>
     </div>
 
@@ -887,55 +840,6 @@
             toggle.classList.toggle('collapsed');
         }
 
-        function filterByYear(year) {
-            const currentYear = currentFilters['filter-anno'];
-            
-            if (currentYear === String(year)) {
-                currentFilters['filter-anno'] = '';
-            } else {
-                currentFilters['filter-anno'] = String(year);
-            }
-            
-            document.getElementById('filter-anno').value = currentFilters['filter-anno'];
-            
-            updateAllFilters();
-            updateMapData();
-            updateStats();
-            updateYearStats();
-        }
-
-        function filterByTipologia(tipo) {
-            const currentTipo = currentFilters['filter-tipologia'];
-            
-            if (currentTipo === tipo) {
-                currentFilters['filter-tipologia'] = '';
-            } else {
-                currentFilters['filter-tipologia'] = tipo;
-            }
-            
-            document.getElementById('filter-tipologia').value = currentFilters['filter-tipologia'];
-            
-            updateAllFilters();
-            updateMapData();
-            updateStats();
-            updateYearStats();
-            updateLegendActiveState();
-        }
-
-        function updateLegendActiveState() {
-            const selectedTipo = currentFilters['filter-tipologia'];
-            
-            document.querySelectorAll('.legend-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            if (selectedTipo === '') {
-                document.querySelector('.legend-item[data-tipo=""]').classList.add('active');
-            } else {
-                document.querySelector(`.legend-item[data-tipo="${selectedTipo}"]`).classList.add('active');
-            }
-        }
-
         async function init() {
             try {
                 console.log('Inizio caricamento CSV...');
@@ -951,10 +855,6 @@
             } catch (error) {
                 console.error('Errore inizializzazione:', error);
                 document.getElementById('loading').innerHTML = '<div>Errore caricamento</div><small>' + error.message + '</small>';
-                // Nascondi il loading anche in caso di errore
-                setTimeout(() => {
-                    document.getElementById('loading').classList.add('hidden');
-                }, 2000);
             }
         }
 
@@ -988,82 +888,68 @@
             });
         }
 
-        function initMap() {
-            const palermoBounds = [
-                [13.20, 38.00],
-                [13.50, 38.25]
-            ];
-            
-            map = new maplibregl.Map({
-                container: 'map',
-                style: basemapStyles['carto-dark'],
-                center: [13.3614, 38.1157],
-                zoom: 11,
-                minZoom: 9,
-                maxZoom: 18,
-                maxBounds: palermoBounds,
-                hash: true
-            });
 
-            map.addControl(new maplibregl.NavigationControl(), 'top-left');
-            
-            class HomeControl {
-                onAdd(map) {
-                    this._map = map;
-                    this._container = document.createElement('div');
-                    this._container.className = 'maplibregl-ctrl maplibregl-ctrl-group';
-                    this._container.innerHTML = '<button class="maplibregl-ctrl-home" type="button" title="Torna alla vista iniziale"></button>';
-                    
-                    this._container.onclick = () => {
-                        map.flyTo({
-                            center: [13.3614, 38.1157],
-                            zoom: 10,
-                            duration: 1500,
-                            essential: true
-                        });
-                    };
-                    
-                    return this._container;
-                }
-                
-                onRemove() {
-                    this._container.parentNode.removeChild(this._container);
-                    this._map = undefined;
-                }
-            }
-            
-            map.addControl(new HomeControl(), 'top-left');
-            map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
-            map.setPadding({ top: 80, bottom: 80, left: 50, right: 50 });
+function initMap() {
+    const palermoBounds = [
+        [13.20, 38.00],
+        [13.50, 38.25]
+    ];
+    
+    map = new maplibregl.Map({
+        container: 'map',
+        style: basemapStyles['carto-dark'],
+        center: [13.3614, 38.1157],
+        zoom: 11,
+        minZoom: 9,
+        maxZoom: 18,
+        maxBounds: palermoBounds,
+        hash: true
+    });
 
-            map.on('load', () => {
-                console.log('Mappa caricata, creazione layers...');
-                try {
-                    // Imposta il filtro anno a 2023 di default
-                    currentFilters['filter-anno'] = '2023';
-                    
-                    createMapLayers();
-                    populateFilters();
-                    updateStats();
-                    updateYearStats();
-                    updateLegendActiveState();
-                    console.log('Inizializzazione completata!');
-                } catch (error) {
-                    console.error('Errore durante inizializzazione:', error);
-                } finally {
-                    document.getElementById('loading').classList.add('hidden');
-                }
-            });
+    map.addControl(new maplibregl.NavigationControl(), 'top-left');
+    
+    // Controllo personalizzato Home
+    class HomeControl {
+        onAdd(map) {
+            this._map = map;
+            this._container = document.createElement('div');
+            this._container.className = 'maplibregl-ctrl maplibregl-ctrl-group';
+            this._container.innerHTML = '<button class="maplibregl-ctrl-home" type="button" title="Torna alla vista iniziale"></button>';
             
-            // Timeout di sicurezza per nascondere il loading
-            setTimeout(() => {
-                const loading = document.getElementById('loading');
-                if (loading && !loading.classList.contains('hidden')) {
-                    console.log('Timeout sicurezza: nascondo loading');
-                    loading.classList.add('hidden');
-                }
-            }, 5000);
+            this._container.onclick = () => {
+                map.flyTo({
+                    center: [13.3614, 38.1157],
+                    zoom: 10,
+                    duration: 1500,
+                    essential: true
+                });
+            };
+            
+            return this._container;
         }
+        
+        onRemove() {
+            this._container.parentNode.removeChild(this._container);
+            this._map = undefined;
+        }
+    }
+    
+    map.addControl(new HomeControl(), 'top-left');
+    map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
+    map.setPadding({ top: 80, bottom: 80, left: 50, right: 50 });
+
+    map.on('load', () => {
+        console.log('Mappa caricata, creazione layers...');
+        createMapLayers();
+        populateFilters();
+        updateStats();
+        updateYearStats();
+        document.getElementById('loading').classList.add('hidden');
+        console.log('Inizializzazione completata!');
+    });
+}
+	
+
 
         function createGeoJSON() {
             const filteredData = getFilteredData();
@@ -1257,7 +1143,6 @@
 
             updateStats();
             updateYearStats();
-            updateLegendActiveState();
         }
 
         function updateAllFilters() {
@@ -1286,6 +1171,7 @@
                     return String(a).localeCompare(String(b), 'it');
                 });
 
+                // Ordine decrescente per gli anni
                 if (property === 'Anno') {
                     sortedValues.reverse();
                 }
@@ -1332,45 +1218,39 @@
         }
 
         function updateYearStats() {
+            const filteredData = getFilteredData();
             const selectedYear = currentFilters['filter-anno'];
             const yearStats = {};
             
-            const tempFilters = {...currentFilters};
-            delete tempFilters['filter-anno'];
-            
-            const dataForYearCount = allIncidenti.filter(row => {
-                for (const [filterId, property] of Object.entries(filterConfig)) {
-                    if (filterId === 'filter-anno') continue;
-                    const value = tempFilters[filterId];
-                    if (!value) continue;
-
-                    const rowValue = row[property];
-                    
-                    if (property === 'Anno') {
-                        if (Number(rowValue) !== Number(value)) return false;
-                    } else {
-                        if (String(rowValue) !== String(value)) return false;
-                    }
-                }
-                return true;
-            });
-            
-            dataForYearCount.forEach(row => {
+            // Conta gli incidenti per anno
+            filteredData.forEach(row => {
                 const year = row.Anno;
                 if (year) {
                     yearStats[year] = (yearStats[year] || 0) + 1;
                 }
             });
             
-            const sortedYears = Object.keys(yearStats).sort((a, b) => b - a);
-            const gridHtml = sortedYears.map(year => `
-                <div class="year-stat-item ${selectedYear === String(year) ? 'active' : ''}" 
-                     onclick="filterByYear('${year}')"
-                     title="Clicca per filtrare l'anno ${year}">
-                    <div class="year-stat-year">${year}</div>
-                    <div class="year-stat-count">${yearStats[year].toLocaleString('it-IT')}</div>
-                </div>
-            `).join('');
+            let gridHtml = '';
+            
+            if (selectedYear) {
+                // Mostra solo l'anno selezionato
+                const count = yearStats[selectedYear] || 0;
+                gridHtml = `
+                    <div class="year-stat-item" style="flex: none; width: 100%;">
+                        <div class="year-stat-year">${selectedYear}</div>
+                        <div class="year-stat-count">${count.toLocaleString('it-IT')}</div>
+                    </div>
+                `;
+            } else {
+                // Mostra tutti gli anni (dal 2023 al 2015)
+                const sortedYears = Object.keys(yearStats).sort((a, b) => b - a);
+                gridHtml = sortedYears.map(year => `
+                    <div class="year-stat-item">
+                        <div class="year-stat-year">${year}</div>
+                        <div class="year-stat-count">${yearStats[year].toLocaleString('it-IT')}</div>
+                    </div>
+                `).join('');
+            }
             
             document.getElementById('year-stats-grid').innerHTML = gridHtml;
         }
@@ -1390,11 +1270,11 @@
             coords.forEach(coord => bounds.extend(coord));
 
             if (!bounds.isEmpty()) {
-                map.fitBounds(bounds, {
-                    padding: { top: 100, bottom: 100, left: 80, right: 80 },
-                    maxZoom: 17,
-                    duration: 1000
-                });
+map.fitBounds(bounds, {
+    padding: { top: 100, bottom: 100, left: 80, right: 80 },
+    maxZoom: 17,
+    duration: 1000
+});
             }
         }
 
@@ -1527,20 +1407,17 @@
                 select.disabled = false;
             });
             
-            currentFilters['filter-anno'] = '2023';
-            
             updateAllFilters();
             updateMapData();
             updateStats();
             updateYearStats();
-            updateLegendActiveState();
 
             map.flyTo({
-                center: [13.3614, 38.1157],
-                zoom: 11,
-                duration: 1000,
-                padding: { top: 80, bottom: 80, left: 50, right: 50 }
-            });
+    center: [13.3614, 38.1157],
+    zoom: 11,
+    duration: 1000,
+    padding: { top: 80, bottom: 80, left: 50, right: 50 }
+});
         }
 
         init();
