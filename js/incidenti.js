@@ -5,6 +5,14 @@ let currentFilters = {};
 let showHeatmap = false;
 let analyticsCharts = {};
 
+// Register Chart.js plugins globally
+Chart.register(ChartDataLabels);
+
+// Unregister datalabels by default (we'll enable it per chart)
+Chart.defaults.set('plugins.datalabels', {
+    display: false
+});
+
 const colorMap = {
     'M': '#ef4444',  // Rosso - Mortale
     'R': '#a855f7',  // Viola - Riserva  
@@ -955,7 +963,7 @@ function openDetailPanel(properties) {
     const locationFields = [
         { key: 'Circoscrizione', label: 'Circoscrizione' },
         { key: 'Quartiere', label: 'Quartiere' },
-        { key: 'UPL', label: 'Unità Primo Livello' }
+        { key: 'UPL', label: 'Unità di Primo Livello' }
     ];
     
     locationFields.forEach(field => {
@@ -1114,45 +1122,249 @@ function updateAnalytics() {
     updateOrariaCharts(filteredData);
     updateCondizioniCharts(filteredData);
     updateInsights(filteredData);
+    
+    // Add download buttons to all charts
+    setTimeout(() => {
+        addChartDownloadButtons();
+    }, 100);
+}
+
+// Add download buttons to all charts
+function addChartDownloadButtons() {
+    const chartContainers = document.querySelectorAll('.chart-container');
+    
+    chartContainers.forEach(container => {
+        // Check if button already exists
+        if (container.querySelector('.chart-download-btn')) return;
+        
+        const canvas = container.querySelector('canvas');
+        if (!canvas) return;
+        
+        const chartId = canvas.id;
+        const chartTitle = container.querySelector('h3')?.textContent || 'grafico';
+        
+        // Create download button
+        const btn = document.createElement('button');
+        btn.className = 'chart-download-btn';
+        btn.innerHTML = '⬇️ PNG';
+        btn.title = 'Scarica grafico come PNG';
+        
+        btn.onclick = () => {
+            const filename = `${chartTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${new Date().getTime()}`;
+            downloadChartAsPNG(chartId, filename);
+        };
+        
+        container.appendChild(btn);
+    });
+}
+
+// Download Chart as PNG with ODS logo
+async function downloadChartAsPNG(chartId, filename) {
+    const canvas = document.getElementById(chartId);
+    if (!canvas) return;
+    
+    // Create temporary canvas with more space for logo and text
+    const tempCanvas = document.createElement('canvas');
+    const ctx = tempCanvas.getContext('2d');
+    
+    // Set dimensions (add space at bottom for logo and text)
+    const padding = 80;
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height + padding;
+    
+    // Fill white background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+    
+    // Draw chart
+    ctx.drawImage(canvas, 0, 0);
+    
+    // Add ODS logo
+    const logo = new Image();
+    logo.crossOrigin = 'anonymous';
+    logo.src = 'https://palermohub.opendatasicilia.it/lib/images/opendatasicilia.png';
+    
+    logo.onload = function() {
+        // Draw logo at bottom right
+        const logoHeight = 35;
+        const logoWidth = logo.width * (logoHeight / logo.height);
+        const xPos = tempCanvas.width - logoWidth - 10;
+        const yPos = tempCanvas.height - logoHeight - 35;
+        
+        ctx.drawImage(logo, xPos, yPos, logoWidth, logoHeight);
+        
+        // Add text with dark color for visibility on white background
+        ctx.fillStyle = '#1e293b';
+        ctx.font = 'bold 11px Arial';
+        ctx.textAlign = 'left';
+        
+        // Source text
+        ctx.fillText('Fonte: OpenDataSicilia - Incidenti Palermo 2015-2023', 10, tempCanvas.height - 35);
+        
+        // Website link
+        ctx.font = '10px Arial';
+        ctx.fillStyle = '#3b82f6';
+        ctx.fillText('https://opendatasicilia.github.io/incidenti_palermo/', 10, tempCanvas.height - 20);
+        
+        // Download
+        const link = document.createElement('a');
+        link.download = filename + '.png';
+        link.href = tempCanvas.toDataURL('image/png');
+        link.click();
+    };
+    
+    logo.onerror = function() {
+        // Fallback: download without logo but with text
+        ctx.fillStyle = '#1e293b';
+        ctx.font = 'bold 11px Arial';
+        ctx.textAlign = 'left';
+        ctx.fillText('Fonte: OpenDataSicilia - Incidenti Palermo 2015-2023', 10, tempCanvas.height - 35);
+        ctx.font = '10px Arial';
+        ctx.fillStyle = '#3b82f6';
+        ctx.fillText('https://opendatasicilia.github.io/incidenti_palermo/', 10, tempCanvas.height - 20);
+        
+        const link = document.createElement('a');
+        link.download = filename + '.png';
+        link.href = tempCanvas.toDataURL('image/png');
+        link.click();
+    };
 }
 
 // Panoramica Charts
 function updatePanoramicaCharts(data) {
-    // Trend Annuale
+    // Common chart options with labels - REDUCED FONT SIZE
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { 
+                display: true,
+                labels: {
+                    color: '#f1f5f9',
+                    font: { size: 10 }
+                }
+            },
+            datalabels: {
+                display: true,
+                color: '#fff',
+                font: {
+                    weight: 'bold',
+                    size: 9
+                },
+                formatter: (value) => value > 0 ? value : ''
+            }
+        }
+    };
+    
+    // Trend Annuale - MOSTRA TUTTI GLI ANNI 2015-2023
+    const allYears = ['2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'];
+    const selectedYear = currentFilters['filter-anno'];
+    
+    // Conta incidenti per ogni anno usando TUTTI i dati (non solo filtrati)
     const yearData = {};
-    data.forEach(row => {
-        const year = row.Anno;
-        if (year) {
+    
+    // Applica filtri SENZA l'anno per contare correttamente
+    const tempFilters = {...currentFilters};
+    delete tempFilters['filter-anno'];
+    
+    const dataForYearCount = allIncidenti.filter(row => {
+        for (const [filterId, property] of Object.entries(filterConfig)) {
+            if (filterId === 'filter-anno') continue; // Salta il filtro anno
+            const value = tempFilters[filterId];
+            if (!value) continue;
+
+            const rowValue = row[property];
+            
+            if (String(rowValue) !== String(value)) return false;
+        }
+        return true;
+    });
+    
+    // Conta per ogni anno
+    dataForYearCount.forEach(row => {
+        const year = String(row.Anno);
+        if (year && allYears.includes(year)) {
             yearData[year] = (yearData[year] || 0) + 1;
         }
     });
     
-    const years = Object.keys(yearData).sort();
-    const counts = years.map(y => yearData[y]);
+    const counts = allYears.map(y => yearData[y] || 0);
+    
+    // Crea dataset con colori diversi per anno selezionato
+    const pointBackgroundColors = allYears.map(y => y === selectedYear ? '#ef4444' : '#3b82f6');
+    const pointBorderColors = allYears.map(y => y === selectedYear ? '#dc2626' : '#2563eb');
+    const pointRadius = allYears.map(y => y === selectedYear ? 6 : 4);
     
     if (analyticsCharts.trendAnnuale) analyticsCharts.trendAnnuale.destroy();
     analyticsCharts.trendAnnuale = new Chart(document.getElementById('chart-trend-annuale'), {
         type: 'line',
         data: {
-            labels: years,
+            labels: allYears,
             datasets: [{
                 label: 'Incidenti',
                 data: counts,
                 borderColor: '#3b82f6',
                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
                 tension: 0.4,
-                fill: true
+                fill: true,
+                pointBackgroundColor: pointBackgroundColors,
+                pointBorderColor: pointBorderColors,
+                pointRadius: pointRadius,
+                pointHoverRadius: 7
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
+            ...commonOptions,
             plugins: {
-                legend: { display: false }
+                ...commonOptions.plugins,
+                datalabels: {
+                    display: true,
+                    align: (context) => {
+                        // Alterna le etichette sopra e sotto per evitare sovrapposizioni
+                        return context.dataIndex % 2 === 0 ? 'top' : 'bottom';
+                    },
+                    offset: 6,
+                    color: (context) => {
+                        const year = allYears[context.dataIndex];
+                        return year === selectedYear ? '#ef4444' : '#3b82f6';
+                    },
+                    font: { 
+                        weight: 'bold', 
+                        size: 9
+                    },
+                    backgroundColor: 'rgba(15, 23, 42, 0.8)',
+                    borderRadius: 3,
+                    padding: 3
+                },
+                tooltip: {
+                    callbacks: {
+                        afterLabel: function(context) {
+                            const year = allYears[context.dataIndex];
+                            if (year === selectedYear) {
+                                return '(Anno selezionato)';
+                            }
+                            return '';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { 
+                    ticks: { 
+                        color: '#94a3b8',
+                        font: { size: 10 }
+                    }
+                },
+                y: { 
+                    ticks: { 
+                        color: '#94a3b8',
+                        font: { size: 10 }
+                    }
+                }
             },
             onClick: (e, items) => {
                 if (items.length > 0) {
-                    const year = years[items[0].index];
+                    const year = allYears[items[0].index];
                     currentFilters['filter-anno'] = String(year);
                     document.getElementById('filter-anno').value = String(year);
                     handleFilterChange('filter-anno', String(year));
@@ -1180,8 +1392,21 @@ function updatePanoramicaCharts(data) {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
+            ...commonOptions,
+            plugins: {
+                ...commonOptions.plugins,
+                datalabels: {
+                    display: true,
+                    color: '#fff',
+                    font: { weight: 'bold', size: 11 },
+                    formatter: (value, ctx) => {
+                        const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                        const percentage = ((value / total) * 100).toFixed(1);
+                        return value > 0 ? `${value}\n(${percentage}%)` : '';
+                    },
+                    textShadow: '0 2px 4px rgba(0,0,0,0.8)'
+                }
+            },
             onClick: (e, items) => {
                 if (items.length > 0) {
                     const tipos = ['M', 'R', 'F', 'C'];
@@ -1216,10 +1441,35 @@ function updatePanoramicaCharts(data) {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
+            ...commonOptions,
             plugins: {
-                legend: { display: false }
+                ...commonOptions.plugins,
+                legend: { display: false },
+                datalabels: {
+                    display: true,
+                    anchor: 'end',
+                    align: 'top',
+                    offset: 2,
+                    color: '#1e293b',
+                    font: { weight: 'bold', size: 10 },
+                    backgroundColor: 'rgba(241, 245, 249, 0.9)',
+                    borderRadius: 3,
+                    padding: 3
+                }
+            },
+            scales: {
+                x: { 
+                    ticks: { 
+                        color: '#94a3b8',
+                        font: { size: 10 }
+                    }
+                },
+                y: { 
+                    ticks: { 
+                        color: '#94a3b8',
+                        font: { size: 10 }
+                    }
+                }
             },
             onClick: (e, items) => {
                 if (items.length > 0) {
@@ -1253,10 +1503,35 @@ function updatePanoramicaCharts(data) {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
+            ...commonOptions,
             plugins: {
-                legend: { display: false }
+                ...commonOptions.plugins,
+                legend: { display: false },
+                datalabels: {
+                    display: true,
+                    anchor: 'end',
+                    align: 'top',
+                    offset: 2,
+                    color: '#1e293b',
+                    font: { weight: 'bold', size: 10 },
+                    backgroundColor: 'rgba(241, 245, 249, 0.9)',
+                    borderRadius: 3,
+                    padding: 3
+                }
+            },
+            scales: {
+                x: { 
+                    ticks: { 
+                        color: '#94a3b8',
+                        font: { size: 10 }
+                    }
+                },
+                y: { 
+                    ticks: { 
+                        color: '#94a3b8',
+                        font: { size: 10 }
+                    }
+                }
             },
             onClick: (e, items) => {
                 if (items.length > 0) {
@@ -1272,6 +1547,29 @@ function updatePanoramicaCharts(data) {
 
 // Temporale Charts
 function updateTemporaleCharts(data) {
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { 
+                display: true,
+                labels: {
+                    color: '#f1f5f9',
+                    font: { size: 10 }
+                }
+            },
+            datalabels: {
+                display: true,
+                color: '#1e293b',
+                font: {
+                    weight: 'bold',
+                    size: 9
+                },
+                formatter: (value) => value > 0 ? value : ''
+            }
+        }
+    };
+    
     // Giorno Settimana
     const giornoData = {};
     data.forEach(row => {
@@ -1296,10 +1594,35 @@ function updateTemporaleCharts(data) {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
+            ...commonOptions,
             plugins: {
-                legend: { display: false }
+                ...commonOptions.plugins,
+                legend: { display: false },
+                datalabels: {
+                    display: true,
+                    anchor: 'end',
+                    align: 'top',
+                    offset: 2,
+                    color: '#1e293b',
+                    font: { weight: 'bold', size: 9 },
+                    backgroundColor: 'rgba(241, 245, 249, 0.9)',
+                    borderRadius: 3,
+                    padding: 3
+                }
+            },
+            scales: {
+                x: { 
+                    ticks: { 
+                        color: '#94a3b8',
+                        font: { size: 10 }
+                    }
+                },
+                y: { 
+                    ticks: { 
+                        color: '#94a3b8',
+                        font: { size: 10 }
+                    }
+                }
             },
             onClick: (e, items) => {
                 if (items.length > 0) {
@@ -1349,11 +1672,35 @@ function updateTemporaleCharts(data) {
             ]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
+            ...commonOptions,
             scales: {
-                x: { stacked: true },
-                y: { stacked: true }
+                x: { 
+                    stacked: true,
+                    ticks: { 
+                        color: '#94a3b8',
+                        font: { size: 10 }
+                    }
+                },
+                y: { 
+                    stacked: true,
+                    ticks: { 
+                        color: '#94a3b8',
+                        font: { size: 10 }
+                    }
+                }
+            },
+            plugins: {
+                ...commonOptions.plugins,
+                legend: {
+                    display: true,
+                    labels: {
+                        color: '#f1f5f9',
+                        font: { size: 10 }
+                    }
+                },
+                datalabels: {
+                    display: false // Too crowded in stacked bars
+                }
             },
             onClick: (e, items) => {
                 if (items.length > 0) {
@@ -1369,6 +1716,29 @@ function updateTemporaleCharts(data) {
 
 // Oraria Charts
 function updateOrariaCharts(data) {
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { 
+                display: true,
+                labels: {
+                    color: '#f1f5f9',
+                    font: { size: 10 }
+                }
+            },
+            datalabels: {
+                display: true,
+                color: '#1e293b',
+                font: {
+                    weight: 'bold',
+                    size: 9
+                },
+                formatter: (value) => value > 0 ? value : ''
+            }
+        }
+    };
+    
     const fasciaData = {};
     data.forEach(row => {
         const fascia = row['Fascia oraria dettagliata (6 fasce)'];
@@ -1392,8 +1762,33 @@ function updateOrariaCharts(data) {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
+            ...commonOptions,
+            plugins: {
+                ...commonOptions.plugins,
+                datalabels: {
+                    display: true,
+                    color: '#1e293b',
+                    font: { weight: 'bold', size: 10 },
+                    formatter: (value, ctx) => {
+                        const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                        const percentage = ((value / total) * 100).toFixed(1);
+                        return `${value}\n${percentage}%`;
+                    },
+                    backgroundColor: 'rgba(241, 245, 249, 0.95)',
+                    borderRadius: 3,
+                    padding: 3
+                }
+            },
+            scales: {
+                r: {
+                    ticks: { 
+                        color: '#94a3b8', 
+                        backdropColor: 'transparent',
+                        font: { size: 9 }
+                    },
+                    grid: { color: 'rgba(148, 163, 184, 0.2)' }
+                }
+            },
             onClick: (e, items) => {
                 if (items.length > 0) {
                     const fascia = fascePresenti[items[0].index];
@@ -1420,11 +1815,36 @@ function updateOrariaCharts(data) {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
+            ...commonOptions,
             indexAxis: 'y',
             plugins: {
-                legend: { display: false }
+                ...commonOptions.plugins,
+                legend: { display: false },
+                datalabels: {
+                    display: true,
+                    anchor: 'end',
+                    align: 'right',
+                    offset: 4,
+                    color: '#1e293b',
+                    font: { weight: 'bold', size: 10 },
+                    backgroundColor: 'rgba(241, 245, 249, 0.9)',
+                    borderRadius: 3,
+                    padding: 3
+                }
+            },
+            scales: {
+                x: { 
+                    ticks: { 
+                        color: '#94a3b8',
+                        font: { size: 10 }
+                    }
+                },
+                y: { 
+                    ticks: { 
+                        color: '#94a3b8',
+                        font: { size: 10 }
+                    }
+                }
             }
         }
     });
@@ -1453,11 +1873,36 @@ function updateOrariaCharts(data) {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
+            ...commonOptions,
             indexAxis: 'y',
             plugins: {
-                legend: { display: false }
+                ...commonOptions.plugins,
+                legend: { display: false },
+                datalabels: {
+                    display: true,
+                    anchor: 'end',
+                    align: 'right',
+                    offset: 4,
+                    color: '#1e293b',
+                    font: { weight: 'bold', size: 10 },
+                    backgroundColor: 'rgba(241, 245, 249, 0.9)',
+                    borderRadius: 3,
+                    padding: 3
+                }
+            },
+            scales: {
+                x: { 
+                    ticks: { 
+                        color: '#94a3b8',
+                        font: { size: 10 }
+                    }
+                },
+                y: { 
+                    ticks: { 
+                        color: '#94a3b8',
+                        font: { size: 10 }
+                    }
+                }
             }
         }
     });
@@ -1465,6 +1910,29 @@ function updateOrariaCharts(data) {
 
 // Condizioni Charts
 function updateCondizioniCharts(data) {
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { 
+                display: true,
+                labels: {
+                    color: '#f1f5f9',
+                    font: { size: 10 }
+                }
+            },
+            datalabels: {
+                display: true,
+                color: '#1e293b',
+                font: {
+                    weight: 'bold',
+                    size: 9
+                },
+                formatter: (value) => value > 0 ? value : ''
+            }
+        }
+    };
+    
     const luceData = {};
     data.forEach(row => {
         const luce = row['Giorno/Notte'];
@@ -1484,8 +1952,21 @@ function updateCondizioniCharts(data) {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
+            ...commonOptions,
+            plugins: {
+                ...commonOptions.plugins,
+                datalabels: {
+                    display: true,
+                    color: '#fff',
+                    font: { weight: 'bold', size: 11 },
+                    formatter: (value, ctx) => {
+                        const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                        const percentage = ((value / total) * 100).toFixed(1);
+                        return `${value}\n(${percentage}%)`;
+                    },
+                    textShadow: '0 2px 4px rgba(0,0,0,0.8)'
+                }
+            },
             onClick: (e, items) => {
                 if (items.length > 0) {
                     const luce = Object.keys(luceData)[items[0].index];
@@ -1517,10 +1998,35 @@ function updateCondizioniCharts(data) {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
+            ...commonOptions,
             plugins: {
-                legend: { display: false }
+                ...commonOptions.plugins,
+                legend: { display: false },
+                datalabels: {
+                    display: true,
+                    anchor: 'end',
+                    align: 'top',
+                    offset: 2,
+                    color: '#1e293b',
+                    font: { weight: 'bold', size: 9 },
+                    backgroundColor: 'rgba(241, 245, 249, 0.9)',
+                    borderRadius: 3,
+                    padding: 3
+                }
+            },
+            scales: {
+                x: { 
+                    ticks: { 
+                        color: '#94a3b8',
+                        font: { size: 10 }
+                    }
+                },
+                y: { 
+                    ticks: { 
+                        color: '#94a3b8',
+                        font: { size: 10 }
+                    }
+                }
             },
             onClick: (e, items) => {
                 if (items.length > 0) {
@@ -1569,8 +2075,34 @@ function updateCondizioniCharts(data) {
             ]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false
+            ...commonOptions,
+            plugins: {
+                ...commonOptions.plugins,
+                legend: {
+                    display: true,
+                    labels: {
+                        color: '#f1f5f9',
+                        font: { size: 10 }
+                    }
+                },
+                datalabels: {
+                    display: false // Too crowded in grouped bars
+                }
+            },
+            scales: {
+                x: { 
+                    ticks: { 
+                        color: '#94a3b8',
+                        font: { size: 10 }
+                    }
+                },
+                y: { 
+                    ticks: { 
+                        color: '#94a3b8',
+                        font: { size: 10 }
+                    }
+                }
+            }
         }
     });
 }
