@@ -6,260 +6,538 @@
     <title>Incidenti Stradali Palermo 2015-2023</title>
     <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
     <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/pmtiles@3.0.7/dist/pmtiles.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             height: 100vh;
             display: flex;
             overflow: hidden;
+            background: #0f172a;
         }
+        
         #sidebar {
-            width: 340px;
-            background: #fff;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            width: 380px;
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            box-shadow: 4px 0 20px rgba(0,0,0,0.5);
             overflow-y: auto;
             z-index: 1000;
+            border-right: 1px solid rgba(148, 163, 184, 0.1);
         }
+        
+        #sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        #sidebar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+        }
+        
+        #sidebar::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.3);
+            border-radius: 4px;
+        }
+        
+        #sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(148, 163, 184, 0.5);
+        }
+        
         #map {
             flex: 1;
             height: 100vh;
         }
+        
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
             color: white;
-            padding: 20px;
+            padding: 32px 24px;
+            position: relative;
+            overflow: hidden;
         }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+        
         .header h1 {
-            font-size: 20px;
-            margin-bottom: 5px;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
+        
         .header p {
-            font-size: 12px;
-            opacity: 0.9;
+            font-size: 14px;
+            opacity: 0.95;
+            font-weight: 500;
         }
+        
         .stats {
-            padding: 15px 20px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
+            padding: 24px;
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
         }
+        
+        .stat-label-main {
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+        
         .stat-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 10px;
+            gap: 12px;
+            margin-bottom: 16px;
         }
+        
         .stat-item {
-            padding: 10px;
-            background: white;
-            border-radius: 8px;
-            border-left: 4px solid;
+            padding: 16px;
+            background: linear-gradient(135deg, rgba(51, 65, 85, 0.8) 0%, rgba(30, 41, 59, 0.8) 100%);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border-left: 3px solid;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
         }
-        .stat-item.mortale { border-color: #dc3545; }
-        .stat-item.riserva { border-color: #fd7e14; }
-        .stat-item.feriti { border-color: #ffc107; }
-        .stat-item.cose { border-color: #28a745; }
+        
+        .stat-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .stat-item.mortale { 
+            border-color: #ef4444;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(30, 41, 59, 0.8) 100%);
+        }
+        .stat-item.riserva { 
+            border-color: #f97316;
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(30, 41, 59, 0.8) 100%);
+        }
+        .stat-item.feriti { 
+            border-color: #f59e0b;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(30, 41, 59, 0.8) 100%);
+        }
+        .stat-item.cose { 
+            border-color: #10b981;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(30, 41, 59, 0.8) 100%);
+        }
+        
         .stat-label {
             font-size: 11px;
-            color: #6c757d;
+            color: #94a3b8;
             text-transform: uppercase;
-            font-weight: 600;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
+        
         .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: #212529;
+            font-size: 28px;
+            font-weight: 800;
+            color: #f1f5f9;
+            margin-top: 4px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
+        
         .stat-total {
             text-align: center;
-            padding: 15px;
-            background: white;
-            margin-top: 10px;
-            border-radius: 8px;
-        }
-        .stat-info {
-            font-size: 10px;
-            color: #6c757d;
-            margin-top: 5px;
-            text-align: center;
-        }
-        .filters {
             padding: 20px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
+        
+        .stat-info {
+            font-size: 11px;
+            color: #10b981;
+            margin-top: 8px;
+            font-weight: 700;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        
+        .year-stats {
+            margin-top: 16px;
+            padding: 16px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(30, 41, 59, 0.8) 100%);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+        
+        .year-stats-title {
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        
+        .year-stats-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .year-stat-item {
+            flex: 1;
+            min-width: 80px;
+            padding: 8px 12px;
+            background: rgba(51, 65, 85, 0.6);
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+        
+        .year-stat-year {
+            font-size: 12px;
+            color: #8b5cf6;
+            font-weight: 700;
+        }
+        
+        .year-stat-count {
+            font-size: 18px;
+            color: #f1f5f9;
+            font-weight: 800;
+            margin-top: 2px;
+        }
+        
+        .filters {
+            padding: 24px;
+        }
+        
         .filter-group {
             margin-bottom: 20px;
         }
+        
         .filter-label {
             font-size: 13px;
-            font-weight: 600;
-            color: #495057;
+            font-weight: 700;
+            color: #cbd5e1;
             margin-bottom: 8px;
             display: block;
+            letter-spacing: 0.3px;
         }
+        
         select, input {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ced4da;
-            border-radius: 6px;
+            padding: 12px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 8px;
             font-size: 14px;
-            background: white;
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            color: #f1f5f9;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
+        
         select:focus, input:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #3b82f6;
+            background: rgba(30, 41, 59, 0.8);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
+        
         select:disabled {
-            background: #e9ecef;
+            background: rgba(30, 41, 59, 0.3);
             cursor: not-allowed;
-            opacity: 0.6;
+            opacity: 0.5;
         }
+        
+        select option {
+            background: #1e293b;
+            color: #f1f5f9;
+        }
+        
         .btn-reset {
             width: 100%;
-            padding: 12px;
-            background: #667eea;
+            padding: 14px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 10px;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.3s ease;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
         }
+        
         .btn-reset:hover {
-            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
         }
-        .filter-section {
-            margin-bottom: 25px;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .filter-section-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        
+        .btn-heatmap {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
-            padding: 12px 15px;
+            border: none;
+            border-radius: 10px;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        .btn-heatmap:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+        
+        .btn-heatmap.active {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+        
+        .filter-section {
+            margin-bottom: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(10px);
+        }
+        
+        .filter-section-header {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+            color: #f1f5f9;
+            padding: 16px 20px;
+            font-size: 14px;
+            font-weight: 700;
             cursor: pointer;
             user-select: none;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
         }
+        
         .filter-section-header:hover {
-            opacity: 0.9;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%);
         }
+        
         .filter-section-content {
-            padding: 15px;
-            background: white;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.5);
         }
+        
         .filter-section-content.collapsed {
             display: none;
         }
+        
         .toggle-icon {
-            transition: transform 0.3s;
+            transition: transform 0.3s ease;
+            font-size: 12px;
         }
+        
         .toggle-icon.collapsed {
             transform: rotate(-90deg);
         }
+        
         .legend {
-            background: white;
-            padding: 15px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
             margin: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
             position: absolute;
             bottom: 20px;
             right: 20px;
             z-index: 1000;
+            border: 1px solid rgba(148, 163, 184, 0.2);
         }
+        
+        .legend.hidden {
+            display: none;
+        }
+        
         .legend h3 {
             font-size: 14px;
-            margin-bottom: 10px;
-            color: #212529;
+            margin-bottom: 16px;
+            color: #f1f5f9;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
+        
         .legend-item {
             display: flex;
             align-items: center;
-            margin-bottom: 8px;
-            font-size: 12px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #cbd5e1;
         }
+        
         .legend-color {
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
-            margin-right: 10px;
-            border: 2px solid white;
-            box-shadow: 0 0 4px rgba(0,0,0,0.3);
+            margin-right: 12px;
+            border: 2px solid rgba(241, 245, 249, 0.3);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
+        
         .loading {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 32px 48px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
             z-index: 2000;
-            font-size: 16px;
+            font-size: 18px;
             text-align: center;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            color: #f1f5f9;
         }
+        
         .loading small {
             display: block;
-            margin-top: 8px;
-            font-size: 12px;
-            color: #6c757d;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #94a3b8;
         }
+        
         .loading.hidden {
             display: none;
         }
+        
         .basemap-selector {
             position: absolute;
             top: 20px;
             right: 20px;
             z-index: 1000;
-            background: white;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            border: 1px solid rgba(148, 163, 184, 0.2);
         }
+        
         .basemap-selector select {
-            padding: 8px 12px;
-            border: 1px solid #ced4da;
-            border-radius: 6px;
+            padding: 10px 14px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 8px;
             font-size: 13px;
             cursor: pointer;
             width: 180px;
+            background: rgba(30, 41, 59, 0.8);
+            color: #f1f5f9;
         }
+        
         .basemap-selector select:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #3b82f6;
         }
+        
         .filter-cascade-info {
             font-size: 11px;
-            color: #6c757d;
-            margin-top: 4px;
+            color: #64748b;
+            margin-top: 6px;
             font-style: italic;
+        }
+        
+        .heatmap-legend {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            margin: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+        
+        .heatmap-legend.hidden {
+            display: none;
+        }
+        
+        .heatmap-legend h3 {
+            font-size: 14px;
+            margin-bottom: 16px;
+            color: #f1f5f9;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .heatmap-gradient {
+            height: 24px;
+            background: linear-gradient(to right, 
+                rgba(0,0,255,0) 0%,
+                rgb(0,0,255) 20%,
+                rgb(0,255,255) 40%,
+                rgb(0,255,0) 60%,
+                rgb(255,255,0) 80%,
+                rgb(255,0,0) 100%);
+            border-radius: 6px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .heatmap-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
     <div id="sidebar">
         <div class="header">
-            <h1>Incidenti Stradali</h1>
-            <p>Palermo 2015-2023 • Filtri Interconnessi</p>
+            <div class="header-content">
+                <h1>🚗 Incidenti Stradali</h1>
+                <p>Palermo 2015-2023 • Dashboard Interattiva</p>
+            </div>
         </div>
         
         <div class="stats">
-            <div class="stat-label">Statistiche Filtrate</div>
+            <div class="stat-label-main">Statistiche Filtrate</div>
             <div class="stat-grid">
                 <div class="stat-item mortale">
                     <div class="stat-label">Mortali</div>
@@ -281,40 +559,49 @@
             <div class="stat-total">
                 <div class="stat-label">Totale Incidenti</div>
                 <div class="stat-value" id="stat-total">0</div>
-                <div class="stat-info">Su tutti i dati filtrati</div>
+                <div class="stat-info" id="total-info">Caricamento...</div>
+            </div>
+            
+            <div class="year-stats">
+                <div class="year-stats-title">📊 Distribuzione per Anno</div>
+                <div class="year-stats-grid" id="year-stats-grid"></div>
             </div>
         </div>
 
         <div class="filters">
+            <button class="btn-heatmap" id="btn-toggle-heatmap" onclick="toggleHeatmap()">
+                🔥 Mostra Mappa di Calore
+            </button>
+
             <div class="filter-group">
                 <label class="filter-label">Tipologia Incidente</label>
                 <select id="filter-tipologia">
                     <option value="">Tutte le tipologie</option>
-                    <option value="M">Mortale (M)</option>
-                    <option value="R">Riserva (R)</option>
-                    <option value="F">Feriti (F)</option>
-                    <option value="C">Cose (C)</option>
+                    <option value="M">M - Mortale</option>
+                    <option value="R">R - Riserva</option>
+                    <option value="F">F - Feriti</option>
+                    <option value="C">C - Cose</option>
                 </select>
             </div>
 
             <div class="filter-section">
                 <div class="filter-section-header" onclick="toggleSection('localizzazione')">
                     <span>📍 Localizzazione</span>
-                    <span class="toggle-icon" id="toggle-localizzazione">▼</span>
+                    <span class="toggle-icon collapsed" id="toggle-localizzazione">▼</span>
                 </div>
-                <div class="filter-section-content" id="content-localizzazione">
+                <div class="filter-section-content collapsed" id="content-localizzazione">
                     <div class="filter-group">
-                        <label class="filter-label">Circoscrizione</label>
+                        <label class="filter-label">Circoscrizioni</label>
                         <select id="filter-circoscrizione"></select>
                         <div class="filter-cascade-info">Filtra Quartiere e UPL ↓</div>
                     </div>
                     <div class="filter-group">
-                        <label class="filter-label">Quartiere</label>
+                        <label class="filter-label">Quartieri</label>
                         <select id="filter-quartiere"></select>
                         <div class="filter-cascade-info">Filtra UPL ↓</div>
                     </div>
                     <div class="filter-group">
-                        <label class="filter-label">UPL</label>
+                        <label class="filter-label">Unità di primo livllo</label>
                         <select id="filter-upl"></select>
                     </div>
                 </div>
@@ -323,9 +610,9 @@
             <div class="filter-section">
                 <div class="filter-section-header" onclick="toggleSection('temporale')">
                     <span>📅 Analisi Temporale</span>
-                    <span class="toggle-icon" id="toggle-temporale">▼</span>
+                    <span class="toggle-icon collapsed" id="toggle-temporale">▼</span>
                 </div>
-                <div class="filter-section-content" id="content-temporale">
+                <div class="filter-section-content collapsed" id="content-temporale">
                     <div class="filter-group">
                         <label class="filter-label">Anno</label>
                         <select id="filter-anno"></select>
@@ -352,9 +639,9 @@
             <div class="filter-section">
                 <div class="filter-section-header" onclick="toggleSection('condizioni')">
                     <span>🌤️ Condizioni e Orari</span>
-                    <span class="toggle-icon" id="toggle-condizioni">▼</span>
+                    <span class="toggle-icon collapsed" id="toggle-condizioni">▼</span>
                 </div>
-                <div class="filter-section-content" id="content-condizioni">
+                <div class="filter-section-content collapsed" id="content-condizioni">
                     <div class="filter-group">
                         <label class="filter-label">Giorno/Notte</label>
                         <select id="filter-giorno-notte"></select>
@@ -386,51 +673,77 @@
     
     <div class="basemap-selector">
         <select id="basemap-select" onchange="changeBasemap()">
+            <option value="carto-dark" selected>Carto Dark</option>
             <option value="osm">OpenStreetMap</option>
             <option value="satellite">Satellite</option>
             <option value="carto-light">Carto Light</option>
-            <option value="carto-dark">Carto Dark</option>
         </select>
     </div>
     
-    <div class="legend">
+    <div class="legend" id="points-legend">
         <h3>Legenda Tipologia</h3>
         <div class="legend-item">
-            <div class="legend-color" style="background-color: #dc3545;"></div>
+            <div class="legend-color" style="background-color: #ef4444;"></div>
             <span><strong>M</strong> - Mortale</span>
         </div>
         <div class="legend-item">
-            <div class="legend-color" style="background-color: #fd7e14;"></div>
+            <div class="legend-color" style="background-color: #f97316;"></div>
             <span><strong>R</strong> - Riserva</span>
         </div>
         <div class="legend-item">
-            <div class="legend-color" style="background-color: #ffc107;"></div>
+            <div class="legend-color" style="background-color: #f59e0b;"></div>
             <span><strong>F</strong> - Feriti</span>
         </div>
         <div class="legend-item">
-            <div class="legend-color" style="background-color: #28a745;"></div>
+            <div class="legend-color" style="background-color: #10b981;"></div>
             <span><strong>C</strong> - Cose</span>
         </div>
     </div>
 
-    <div class="loading" id="loading">Caricamento dati...</div>
+    <div class="heatmap-legend hidden" id="heatmap-legend">
+        <h3>Densità Incidenti</h3>
+        <div class="heatmap-gradient"></div>
+        <div class="heatmap-labels">
+            <span>Bassa</span>
+            <span>Alta</span>
+        </div>
+    </div>
+
+    <div class="loading" id="loading">
+        <div>Caricamento dati CSV...</div>
+        <small>Attendere prego</small>
+    </div>
 
     <script>
         let map;
-        let protocol;
-        let allFeatures = [];
+        let allIncidenti = [];
         let currentFilters = {};
-        let loadAttempts = 0;
-        const MAX_LOAD_ATTEMPTS = 5;
+        let showHeatmap = false;
         
         const colorMap = {
-            'M': '#dc3545',
-            'R': '#fd7e14',
-            'F': '#ffc107',
-            'C': '#28a745'
+            'M': '#ef4444',
+            'R': '#f97316',
+            'F': '#f59e0b',
+            'C': '#10b981'
         };
 
         const basemapStyles = {
+            'carto-dark': {
+                version: 8,
+                sources: {
+                    'carto': {
+                        type: 'raster',
+                        tiles: ['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'],
+                        tileSize: 256,
+                        attribution: '© CARTO'
+                    }
+                },
+                layers: [{
+                    id: 'carto',
+                    type: 'raster',
+                    source: 'carto'
+                }]
+            },
             'osm': {
                 version: 8,
                 sources: {
@@ -478,26 +791,9 @@
                     type: 'raster',
                     source: 'carto'
                 }]
-            },
-            'carto-dark': {
-                version: 8,
-                sources: {
-                    'carto': {
-                        type: 'raster',
-                        tiles: ['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'],
-                        tileSize: 256,
-                        attribution: '© CARTO'
-                    }
-                },
-                layers: [{
-                    id: 'carto',
-                    type: 'raster',
-                    source: 'carto'
-                }]
             }
         };
 
-        // Mappa dei filtri e delle loro proprietà
         const filterConfig = {
             'filter-tipologia': 'Tipologia',
             'filter-circoscrizione': 'Circoscrizione',
@@ -515,7 +811,6 @@
             'filter-ora-punta': 'Ora di punta (Picchi di traffico)'
         };
 
-        // Definisce le dipendenze dei filtri (quali filtri dipendono da quali)
         const filterDependencies = {
             'filter-circoscrizione': ['filter-quartiere', 'filter-upl'],
             'filter-quartiere': ['filter-upl']
@@ -531,89 +826,173 @@
 
         async function init() {
             try {
-                console.log('Inizializzazione mappa...');
+                console.log('Inizio caricamento CSV...');
+                document.getElementById('loading').innerHTML = '<div>Caricamento CSV...</div><small>Download in corso</small>';
                 
-                protocol = new pmtiles.Protocol();
-                maplibregl.addProtocol('pmtiles', protocol.tile);
-
-                map = new maplibregl.Map({
-                    container: 'map',
-                    style: basemapStyles['osm'],
-                    center: [13.3614, 38.1157],
-                    zoom: 9,
-                    minZoom: 9,
-                    maxZoom: 17,
-                    hash: true
-                });
-
-                map.addControl(new maplibregl.NavigationControl(), 'top-left');
-                map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
-
-                map.on('load', async () => {
-                    console.log('Mappa caricata, caricamento PMTiles...');
-                    await loadPMTiles();
-                });
+                await loadCSV();
+                
+                console.log('CSV caricato, inizializzazione mappa...');
+                document.getElementById('loading').innerHTML = '<div>Creazione mappa...</div><small>Attendere</small>';
+                
+                initMap();
 
             } catch (error) {
                 console.error('Errore inizializzazione:', error);
-                document.getElementById('loading').innerHTML = 'Errore caricamento mappa';
+                document.getElementById('loading').innerHTML = '<div>Errore caricamento</div><small>' + error.message + '</small>';
             }
         }
 
-        async function loadPMTiles() {
-            try {
-                const pmtilesUrl = 'https://palermohub.github.io/palermo-incidenti/data/incidenti_2015_2023.pmtiles';
-                const sourceLayer = 'incidenti_2015_2023_puliti';
+        async function loadCSV() {
+            return new Promise((resolve, reject) => {
+                Papa.parse('https://palermohub.github.io/palermo-incidenti/data/incidenti_2015_2023.csv', {
+                    download: true,
+                    header: true,
+                    dynamicTyping: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        console.log('CSV scaricato, parsing righe...');
+                        
+                        allIncidenti = results.data.filter(row => {
+                            return row.Tipologia && 
+                                   row.longitude && 
+                                   row.latitude &&
+                                   !isNaN(parseFloat(row.longitude)) &&
+                                   !isNaN(parseFloat(row.latitude));
+                        });
+                        
+                        console.log(`CSV processato: ${allIncidenti.length} incidenti validi su ${results.data.length} righe totali`);
+                        document.getElementById('total-info').textContent = `✓ Tutti i ${allIncidenti.length.toLocaleString('it-IT')} incidenti caricati`;
+                        resolve();
+                    },
+                    error: function(error) {
+                        console.error('Errore download CSV:', error);
+                        reject(error);
+                    }
+                });
+            });
+        }
+
+        function initMap() {
+            map = new maplibregl.Map({
+                container: 'map',
+                style: basemapStyles['carto-dark'],
+                center: [13.3614, 38.1157],
+                zoom: 11,
+                hash: true
+            });
+
+            map.addControl(new maplibregl.NavigationControl(), 'top-left');
+            map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
+
+            map.on('load', () => {
+                console.log('Mappa caricata, creazione layers...');
+                createMapLayers();
+                populateFilters();
+                updateStats();
+                updateYearStats();
+                document.getElementById('loading').classList.add('hidden');
+                console.log('Inizializzazione completata!');
+            });
+        }
+
+        function createGeoJSON() {
+            const filteredData = getFilteredData();
+            
+            return {
+                type: 'FeatureCollection',
+                features: filteredData.map(row => ({
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: [parseFloat(row.longitude), parseFloat(row.latitude)]
+                    },
+                    properties: row
+                }))
+            };
+        }
+
+        function createMapLayers() {
+            const geojson = createGeoJSON();
+            
+            console.log(`Creazione source con ${geojson.features.length} features`);
+            
+            map.addSource('incidenti', {
+                type: 'geojson',
+                data: geojson
+            });
+
+            map.addLayer({
+                id: 'incidenti-heatmap',
+                type: 'heatmap',
+                source: 'incidenti',
+                maxzoom: 15,
+                paint: {
+                    'heatmap-weight': [
+                        'match',
+                        ['get', 'Tipologia'],
+                        'C', 0.5,
+                        'F', 1,
+                        'R', 1.5,
+                        'M', 2,
+                        1
+                    ],
+                    'heatmap-intensity': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        0, 1,
+                        15, 3
+                    ],
+                    'heatmap-color': [
+                        'interpolate',
+                        ['linear'],
+                        ['heatmap-density'],
+                        0, 'rgba(0,0,255,0)',
+                        0.2, 'rgb(0,0,255)',
+                        0.4, 'rgb(0,255,255)',
+                        0.6, 'rgb(0,255,0)',
+                        0.8, 'rgb(255,255,0)',
+                        1, 'rgb(255,0,0)'
+                    ],
+                    'heatmap-radius': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        0, 2,
+                        15, 20
+                    ],
+                    'heatmap-opacity': 0.8
+                },
+                layout: {
+                    visibility: 'none'
+                }
+            });
+
+            ['C', 'F', 'R', 'M'].forEach(tipo => {
+                const layerId = `incidenti-${tipo}`;
                 
-                console.log('Caricamento PMTiles da:', pmtilesUrl);
-                
-                const p = new pmtiles.PMTiles(pmtilesUrl);
-                protocol.add(p);
-                
-                map.addSource('incidenti', {
-                    type: 'vector',
-                    url: `pmtiles://${pmtilesUrl}`,
-                    minzoom: 0,
-                    maxzoom: 14
+                map.addLayer({
+                    id: layerId,
+                    type: 'circle',
+                    source: 'incidenti',
+                    filter: ['==', ['get', 'Tipologia'], tipo],
+                    paint: {
+                        'circle-radius': [
+                            'interpolate', ['linear'], ['zoom'],
+                            10, tipo === 'M' ? 4 : tipo === 'R' ? 3 : 2,
+                            16, tipo === 'M' ? 10 : tipo === 'R' ? 8 : 6
+                        ],
+                        'circle-color': colorMap[tipo],
+                        'circle-opacity': 0.8,
+                        'circle-stroke-width': tipo === 'M' ? 2 : 1,
+                        'circle-stroke-color': '#fff'
+                    }
                 });
 
-                ['C', 'F', 'R', 'M'].forEach(tipo => {
-                    const layerId = `incidenti-${tipo}`;
-                    
-                    map.addLayer({
-                        id: layerId,
-                        type: 'circle',
-                        source: 'incidenti',
-                        'source-layer': sourceLayer,
-                        filter: ['==', ['get', 'Tipologia'], tipo],
-                        paint: {
-                            'circle-radius': [
-                                'interpolate', ['linear'], ['zoom'],
-                                10, tipo === 'M' ? 4 : tipo === 'R' ? 3 : 2,
-                                14, tipo === 'M' ? 8 : tipo === 'R' ? 6 : 5
-                            ],
-                            'circle-color': colorMap[tipo],
-                            'circle-opacity': 0.8,
-                            'circle-stroke-width': tipo === 'M' ? 2 : 1,
-                            'circle-stroke-color': '#fff'
-                        }
-                    });
+                setupLayerInteractions(layerId);
+            });
 
-                    setupLayerInteractions(layerId);
-                });
-
-                console.log('Layers aggiunti con successo');
-
-                map.once('idle', () => {
-                    console.log('Mappa idle, caricamento filtri...');
-                    loadAttempts = 0; // Reset counter
-                    loadAllFeatures();
-                });
-
-            } catch (error) {
-                console.error('Errore caricamento PMTiles:', error);
-                document.getElementById('loading').innerHTML = `Errore: ${error.message}`;
-            }
+            console.log('Layers creati con successo');
         }
 
         function setupLayerInteractions(layerId) {
@@ -634,7 +1013,7 @@
                 `;
                 
                 Object.keys(props).forEach(key => {
-                    if (props[key] && props[key] !== 'null') {
+                    if (props[key] && props[key] !== 'null' && key !== 'longitude' && key !== 'latitude') {
                         html += `<strong>${key}:</strong> ${props[key]}<br>`;
                     }
                 });
@@ -656,61 +1035,18 @@
             });
         }
 
-        function loadAllFeatures() {
-            try {
-                loadAttempts++;
-                
-                const currentZoom = map.getZoom();
-                if (currentZoom < 9) {
-                    map.setZoom(9);
-                }
-
-                // Attendi che i tile si carichino
-                setTimeout(() => {
-                    allFeatures = map.querySourceFeatures('incidenti', {
-                        sourceLayer: 'incidenti_2015_2023_puliti'
-                    });
-
-                    console.log(`Tentativo ${loadAttempts}: Features caricate:`, allFeatures.length);
-                    document.getElementById('loading').innerHTML = `Caricamento dati...<br><small>${allFeatures.length} incidenti caricati (tentativo ${loadAttempts}/${MAX_LOAD_ATTEMPTS})</small>`;
-
-                    if (allFeatures.length > 1000 || loadAttempts >= MAX_LOAD_ATTEMPTS) {
-                        // Abbiamo abbastanza dati O abbiamo raggiunto il limite di tentativi
-                        populateFilters();
-                        updateStatsFromAllFeatures();
-                        document.getElementById('loading').classList.add('hidden');
-                        console.log(`Caricamento completato con ${allFeatures.length} features`);
-                    } else if (allFeatures.length > 0) {
-                        // Abbiamo alcuni dati ma forse non tutti, riprovo
-                        console.warn(`Solo ${allFeatures.length} features caricate, attendo altri tile...`);
-                        setTimeout(loadAllFeatures, 1500);
-                    } else {
-                        // Nessun dato, riprovo
-                        console.warn('Nessuna feature trovata, riprovo...');
-                        setTimeout(loadAllFeatures, 1500);
-                    }
-                }, 2000); // Aumentato il timeout iniziale
-
-            } catch (error) {
-                console.error('Errore caricamento features:', error);
-                document.getElementById('loading').innerHTML = 'Errore caricamento dati';
-            }
-        }
-
-        function getFilteredFeatures() {
-            return allFeatures.filter(feature => {
-                if (!feature.properties) return false;
-
+        function getFilteredData() {
+            return allIncidenti.filter(row => {
                 for (const [filterId, property] of Object.entries(filterConfig)) {
                     const value = currentFilters[filterId];
                     if (!value) continue;
 
-                    const featureValue = feature.properties[property];
-                    const numValue = parseFloat(value);
-                    const filterValue = !isNaN(numValue) && property === 'Anno' ? numValue : value;
+                    const rowValue = row[property];
                     
-                    if (featureValue != filterValue) {
-                        return false;
+                    if (property === 'Anno') {
+                        if (Number(rowValue) !== Number(value)) return false;
+                    } else {
+                        if (String(rowValue) !== String(value)) return false;
                     }
                 }
                 return true;
@@ -718,7 +1054,7 @@
         }
 
         function populateFilters() {
-            console.log('Popolamento filtri iniziale...');
+            console.log('Popolamento filtri...');
 
             Object.entries(filterConfig).forEach(([selectId, property]) => {
                 const select = document.getElementById(selectId);
@@ -735,7 +1071,6 @@
         function handleFilterChange(filterId, value) {
             currentFilters[filterId] = value;
 
-            // Reset dei filtri dipendenti
             if (filterDependencies[filterId]) {
                 filterDependencies[filterId].forEach(dependentId => {
                     currentFilters[dependentId] = '';
@@ -743,23 +1078,19 @@
                 });
             }
 
-            // Aggiorna tutti i filtri con i nuovi valori disponibili
             updateAllFilters();
-
-            // Applica i filtri alla mappa
-            applyFiltersToMap();
-
-            // Zoom automatico per filtri geografici
+            updateMapData();
+            
             if (filterId === 'filter-circoscrizione' || filterId === 'filter-quartiere') {
-                zoomToFilteredFeatures();
+                zoomToFilteredArea();
             }
 
-            // Aggiorna le statistiche
-            updateStatsFromAllFeatures();
+            updateStats();
+            updateYearStats();
         }
 
         function updateAllFilters() {
-            const filteredFeatures = getFilteredFeatures();
+            const filteredData = getFilteredData();
 
             Object.entries(filterConfig).forEach(([selectId, property]) => {
                 const select = document.getElementById(selectId);
@@ -768,16 +1099,14 @@
                 const currentValue = currentFilters[selectId] || '';
                 const values = new Set();
                 
-                filteredFeatures.forEach(feature => {
-                    if (feature.properties && feature.properties[property]) {
-                        const value = feature.properties[property];
-                        if (value !== null && value !== 'null' && value !== '' && value !== undefined) {
-                            values.add(String(value));
-                        }
+                filteredData.forEach(row => {
+                    const value = row[property];
+                    if (value !== null && value !== 'null' && value !== '' && value !== undefined) {
+                        values.add(String(value));
                     }
                 });
 
-                const sortedValues = Array.from(values).sort((a, b) => {
+                let sortedValues = Array.from(values).sort((a, b) => {
                     const numA = parseFloat(a);
                     const numB = parseFloat(b);
                     if (!isNaN(numA) && !isNaN(numB)) {
@@ -785,6 +1114,11 @@
                     }
                     return String(a).localeCompare(String(b), 'it');
                 });
+
+                // Ordine decrescente per gli anni
+                if (property === 'Anno') {
+                    sortedValues.reverse();
+                }
 
                 select.innerHTML = '<option value="">Tutti</option>';
                 sortedValues.forEach(value => {
@@ -797,49 +1131,22 @@
                     select.appendChild(option);
                 });
 
-                // Disabilita i filtri che non hanno opzioni
                 select.disabled = sortedValues.length === 0 && currentValue === '';
             });
         }
 
-        function applyFiltersToMap() {
-            ['C', 'F', 'R', 'M'].forEach(tipo => {
-                const layerId = `incidenti-${tipo}`;
-                
-                if (!map.getLayer(layerId)) return;
-                
-                let mapFilter = ['all'];
-                
-                // Filtro tipologia
-                if (currentFilters['filter-tipologia'] && currentFilters['filter-tipologia'] !== tipo) {
-                    map.setLayoutProperty(layerId, 'visibility', 'none');
-                    return;
-                } else {
-                    map.setLayoutProperty(layerId, 'visibility', 'visible');
-                }
-                
-                mapFilter.push(['==', ['get', 'Tipologia'], tipo]);
-                
-                // Altri filtri
-                Object.entries(currentFilters).forEach(([filterId, value]) => {
-                    if (value && filterId !== 'filter-tipologia') {
-                        const property = filterConfig[filterId];
-                        const numValue = parseFloat(value);
-                        const filterValue = !isNaN(numValue) && property === 'Anno' ? numValue : value;
-                        mapFilter.push(['==', ['get', property], filterValue]);
-                    }
-                });
-                
-                map.setFilter(layerId, mapFilter);
-            });
+        function updateMapData() {
+            const geojson = createGeoJSON();
+            console.log(`Aggiornamento mappa con ${geojson.features.length} features`);
+            map.getSource('incidenti').setData(geojson);
         }
 
-        function updateStatsFromAllFeatures() {
-            const filteredFeatures = getFilteredFeatures();
+        function updateStats() {
+            const filteredData = getFilteredData();
             const stats = { M: 0, R: 0, F: 0, C: 0 };
             
-            filteredFeatures.forEach(feature => {
-                const tipo = feature.properties?.Tipologia;
+            filteredData.forEach(row => {
+                const tipo = row.Tipologia;
                 if (tipo && stats.hasOwnProperty(tipo)) {
                     stats[tipo]++;
                 }
@@ -851,21 +1158,60 @@
             document.getElementById('stat-cose').textContent = stats.C.toLocaleString('it-IT');
             document.getElementById('stat-total').textContent = (stats.M + stats.R + stats.F + stats.C).toLocaleString('it-IT');
 
-            console.log('Statistiche aggiornate:', stats);
+            console.log('Statistiche:', stats, `su ${filteredData.length} incidenti filtrati`);
         }
 
-        function zoomToFilteredFeatures() {
-            const filteredFeatures = getFilteredFeatures();
+        function updateYearStats() {
+            const filteredData = getFilteredData();
+            const selectedYear = currentFilters['filter-anno'];
+            const yearStats = {};
             
-            if (filteredFeatures.length === 0) return;
-
-            const bounds = new maplibregl.LngLatBounds();
-            
-            filteredFeatures.forEach(feature => {
-                if (feature.geometry && feature.geometry.coordinates) {
-                    bounds.extend(feature.geometry.coordinates);
+            // Conta gli incidenti per anno
+            filteredData.forEach(row => {
+                const year = row.Anno;
+                if (year) {
+                    yearStats[year] = (yearStats[year] || 0) + 1;
                 }
             });
+            
+            let gridHtml = '';
+            
+            if (selectedYear) {
+                // Mostra solo l'anno selezionato
+                const count = yearStats[selectedYear] || 0;
+                gridHtml = `
+                    <div class="year-stat-item" style="flex: none; width: 100%;">
+                        <div class="year-stat-year">${selectedYear}</div>
+                        <div class="year-stat-count">${count.toLocaleString('it-IT')}</div>
+                    </div>
+                `;
+            } else {
+                // Mostra tutti gli anni (dal 2023 al 2015)
+                const sortedYears = Object.keys(yearStats).sort((a, b) => b - a);
+                gridHtml = sortedYears.map(year => `
+                    <div class="year-stat-item">
+                        <div class="year-stat-year">${year}</div>
+                        <div class="year-stat-count">${yearStats[year].toLocaleString('it-IT')}</div>
+                    </div>
+                `).join('');
+            }
+            
+            document.getElementById('year-stats-grid').innerHTML = gridHtml;
+        }
+
+        function zoomToFilteredArea() {
+            const filteredData = getFilteredData();
+            
+            if (filteredData.length === 0) return;
+
+            const coords = filteredData
+                .filter(row => row.longitude && row.latitude)
+                .map(row => [parseFloat(row.longitude), parseFloat(row.latitude)]);
+
+            if (coords.length === 0) return;
+
+            const bounds = new maplibregl.LngLatBounds();
+            coords.forEach(coord => bounds.extend(coord));
 
             if (!bounds.isEmpty()) {
                 map.fitBounds(bounds, {
@@ -876,46 +1222,115 @@
             }
         }
 
+        function toggleHeatmap() {
+            showHeatmap = !showHeatmap;
+            const btn = document.getElementById('btn-toggle-heatmap');
+            
+            if (showHeatmap) {
+                map.setLayoutProperty('incidenti-heatmap', 'visibility', 'visible');
+                ['C', 'F', 'R', 'M'].forEach(tipo => {
+                    map.setLayoutProperty(`incidenti-${tipo}`, 'visibility', 'none');
+                });
+                btn.textContent = '🔵 Mostra Mappa a Punti';
+                btn.classList.add('active');
+                document.getElementById('points-legend').classList.add('hidden');
+                document.getElementById('heatmap-legend').classList.remove('hidden');
+            } else {
+                map.setLayoutProperty('incidenti-heatmap', 'visibility', 'none');
+                ['C', 'F', 'R', 'M'].forEach(tipo => {
+                    map.setLayoutProperty(`incidenti-${tipo}`, 'visibility', 'visible');
+                });
+                btn.textContent = '🔥 Mostra Mappa di Calore';
+                btn.classList.remove('active');
+                document.getElementById('points-legend').classList.remove('hidden');
+                document.getElementById('heatmap-legend').classList.add('hidden');
+            }
+        }
+
         function changeBasemap() {
             const selectedBasemap = document.getElementById('basemap-select').value;
             const currentStyle = basemapStyles[selectedBasemap];
             
-            const incidentiLayers = ['C', 'F', 'R', 'M'].map(tipo => {
-                const layerId = `incidenti-${tipo}`;
-                if (map.getLayer(layerId)) {
-                    return {
-                        id: layerId,
-                        filter: map.getFilter(layerId),
-                        visibility: map.getLayoutProperty(layerId, 'visibility')
-                    };
-                }
-                return null;
-            }).filter(l => l !== null);
+            const sourceData = map.getSource('incidenti')._data;
+            const heatmapVisibility = map.getLayoutProperty('incidenti-heatmap', 'visibility');
+            const circleVisibility = {};
+            ['C', 'F', 'R', 'M'].forEach(tipo => {
+                circleVisibility[tipo] = map.getLayoutProperty(`incidenti-${tipo}`, 'visibility');
+            });
 
             const newStyle = JSON.parse(JSON.stringify(currentStyle));
-            newStyle.sources['incidenti'] = map.getSource('incidenti').serialize();
             
-            incidentiLayers.forEach(layerInfo => {
-                const tipo = layerInfo.id.split('-')[1];
+            newStyle.sources['incidenti'] = {
+                type: 'geojson',
+                data: sourceData
+            };
+            
+            newStyle.layers.push({
+                id: 'incidenti-heatmap',
+                type: 'heatmap',
+                source: 'incidenti',
+                maxzoom: 15,
+                paint: {
+                    'heatmap-weight': [
+                        'match',
+                        ['get', 'Tipologia'],
+                        'C', 0.5,
+                        'F', 1,
+                        'R', 1.5,
+                        'M', 2,
+                        1
+                    ],
+                    'heatmap-intensity': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        0, 1,
+                        15, 3
+                    ],
+                    'heatmap-color': [
+                        'interpolate',
+                        ['linear'],
+                        ['heatmap-density'],
+                        0, 'rgba(0,0,255,0)',
+                        0.2, 'rgb(0,0,255)',
+                        0.4, 'rgb(0,255,255)',
+                        0.6, 'rgb(0,255,0)',
+                        0.8, 'rgb(255,255,0)',
+                        1, 'rgb(255,0,0)'
+                    ],
+                    'heatmap-radius': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        0, 2,
+                        15, 20
+                    ],
+                    'heatmap-opacity': 0.8
+                },
+                layout: {
+                    visibility: heatmapVisibility
+                }
+            });
+
+            ['C', 'F', 'R', 'M'].forEach(tipo => {
                 newStyle.layers.push({
-                    id: layerInfo.id,
+                    id: `incidenti-${tipo}`,
                     type: 'circle',
                     source: 'incidenti',
-                    'source-layer': 'incidenti_2015_2023_puliti',
-                    filter: layerInfo.filter,
-                    layout: {
-                        visibility: layerInfo.visibility || 'visible'
-                    },
+                    filter: ['==', ['get', 'Tipologia'], tipo],
                     paint: {
                         'circle-radius': [
                             'interpolate', ['linear'], ['zoom'],
                             10, tipo === 'M' ? 4 : tipo === 'R' ? 3 : 2,
-                            14, tipo === 'M' ? 8 : tipo === 'R' ? 6 : 5
+                            16, tipo === 'M' ? 10 : tipo === 'R' ? 8 : 6
                         ],
                         'circle-color': colorMap[tipo],
                         'circle-opacity': 0.8,
                         'circle-stroke-width': tipo === 'M' ? 2 : 1,
                         'circle-stroke-color': '#fff'
+                    },
+                    layout: {
+                        visibility: circleVisibility[tipo]
                     }
                 });
             });
@@ -926,7 +1341,6 @@
                 ['C', 'F', 'R', 'M'].forEach(tipo => {
                     setupLayerInteractions(`incidenti-${tipo}`);
                 });
-                updateStatsFromAllFeatures();
             });
         }
 
@@ -938,13 +1352,13 @@
             });
             
             updateAllFilters();
-            applyFiltersToMap();
-            updateStatsFromAllFeatures();
+            updateMapData();
+            updateStats();
+            updateYearStats();
 
-            // Torna alla vista iniziale
             map.flyTo({
                 center: [13.3614, 38.1157],
-                zoom: 9,
+                zoom: 11,
                 duration: 1000
             });
         }
