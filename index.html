@@ -3,1344 +3,37 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-	 <title>Palermo incidenti stradali dal 2015 al 2023 - Dashboard by @opendatasicilia</title>
+    <title>Palermo incidenti stradali dal 2015 al 2023 - Dashboard by @opendatasicilia</title>
     <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <META HTTP-EQUIV="refresh" CONTENT="3600">  
-    <meta name="description" content="PalermoHub di opendatasicilia.it è un contenitore di mappe realizzate/rielaborate da liberi cittadini o da civic hackers prevalentemente sul territorio comunale di Palermo, non ha alcun intento commerciale, l'unica finalità è mostrare le possibilità di rielaborazione e comunicazione offerte dagli open data o dati pubblici comunali, regionali e nazionali.">
-    <meta name="keywords" content="Open Data, Sicilia, PAI, Geologia, CTR, PRG, Variente Generale, Palermo">
+    <meta name="description" content="Dashboard interattiva degli incidenti stradali a Palermo">
+    <meta name="keywords" content="Open Data, Sicilia, Palermo, Incidenti Stradali">
     <meta name="author" content="Giovan Battista Vitrano per OpenDataSicilia.it">
-    <meta http-equiv="content-language" content="IT">
-    <meta name="robots" content="index,follow">
-    <meta name="creation_Date" content="06/09/2025>
+    
     <link rel="shortcut icon" href="favicon.ico"/> 
-	<link rel="icon" href="favicon.png" type="image/png"/> 
-	
+    <link rel="icon" href="favicon.png" type="image/png"/> 
+    
     <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+       <link rel="stylesheet" href="css/incidenti.css">
+    
     <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-	
-	
-	
-		    <!-- Meta tags per social sharing pen Graph Protocol -->
-    <meta property="og:url" content="https://palermohub.github.io/palermo-incidenti/">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Palermo incidenti stradali dal 2015 al 20 - Dashboard by @opendatasicilia">
-    <meta property="og:description" content="Palermo Hub - Contenitore di mappe su Palermo realizzato da OpenDataSicilia.it">
-    <meta property="og:image" content="https://palermohub.github.io/palermo-incidenti/img/social_card.jpg">
-	<!-- twitter -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta property="twitter:domain" content="palermohub.opendatasicilia.it">
-    <meta property="twitter:url" content="https://palermohub.github.io/palermo-incidenti/">
-    <meta name="twitter:title" content="Palermo incidenti stradali dal 2015 al 20 - Dashboard by @opendatasicilia">
-    <meta name="twitter:description" content="Palermo Hub - Contenitore di mappe su Palermo realizzato da OpenDataSicilia.it">
-    <meta name="twitter:image" content="https://palermohub.github.io/palermo-incidenti/img/social_card.jpg">
-	
-	<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-87653723-4"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'UA-87653723-4');
-</script>
-	
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            height: 100vh;
-            display: flex;
-            overflow: hidden;
-            background: #0f172a;
-        }
-        
-        #sidebar {
-            width: 380px;
-            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-            box-shadow: 4px 0 20px rgba(0,0,0,0.5);
-            overflow-y: auto;
-            z-index: 1000;
-            border-right: 1px solid rgba(148, 163, 184, 0.1);
-        }
-        
-        #sidebar::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        #sidebar::-webkit-scrollbar-track {
-            background: rgba(15, 23, 42, 0.5);
-        }
-        
-        #sidebar::-webkit-scrollbar-thumb {
-            background: rgba(148, 163, 184, 0.3);
-            border-radius: 4px;
-        }
-        
-        #sidebar::-webkit-scrollbar-thumb:hover {
-            background: rgba(148, 163, 184, 0.5);
-        }
-        
-        #map {
-            flex: 1;
-            height: 100vh;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #4c1d95 100%);
-            color: white;
-            padding: 32px 24px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
-            animation: pulse 8s ease-in-out infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.1); opacity: 0.8; }
-        }
-        
-        .header-content {
-            position: relative;
-            z-index: 1;
-        }
-        
-        .header h1 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-        
-        .header p {
-            font-size: 14px;
-            opacity: 0.95;
-            font-weight: 500;
-        }
-        
-        .stats {
-            padding: 24px;
-            background: rgba(30, 41, 59, 0.6);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-        }
-        
-        .stat-label-main {
-            font-size: 11px;
-            color: #94a3b8;
-            text-transform: uppercase;
-            font-weight: 700;
-            letter-spacing: 1px;
-            margin-bottom: 16px;
-        }
-        
-        .stat-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-        
-        .stat-item {
-            padding: 16px;
-            background: linear-gradient(135deg, rgba(51, 65, 85, 0.8) 0%, rgba(30, 41, 59, 0.8) 100%);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            border-left: 3px solid;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-        }
-        
-        .stat-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        }
-        
-        .stat-item.mortale { 
-            border-color: #ef4444;
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(30, 41, 59, 0.8) 100%);
-        }
-        .stat-item.riserva { 
-            border-color: #f97316;
-            background: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(30, 41, 59, 0.8) 100%);
-        }
-        .stat-item.feriti { 
-            border-color: #f59e0b;
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(30, 41, 59, 0.8) 100%);
-        }
-        .stat-item.cose { 
-            border-color: #10b981;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(30, 41, 59, 0.8) 100%);
-        }
-        
-        .stat-label {
-            font-size: 11px;
-            color: #94a3b8;
-            text-transform: uppercase;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-        
-        .stat-value {
-            font-size: 28px;
-            font-weight: 800;
-            color: #f1f5f9;
-            margin-top: 4px;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-        
-        .stat-total {
-            text-align: center;
-            padding: 20px;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            position: relative;
-        }
-        
-        .stat-info {
-            font-size: 11px;
-            color: #10b981;
-            margin-top: 8px;
-            font-weight: 700;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .info-icon {
-            width: 20px;
-            height: 20px;
-            background: rgba(16, 185, 129, 0.2);
-            border: 2px solid #10b981;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .info-icon:hover {
-            background: rgba(16, 185, 129, 0.3);
-            transform: scale(1.1);
-        }
-        
-        .year-stats {
-            margin-top: 16px;
-            padding: 16px;
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(30, 41, 59, 0.8) 100%);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            border: 1px solid rgba(139, 92, 246, 0.3);
-        }
-        
-        .year-stats-title {
-            font-size: 11px;
-            color: #94a3b8;
-            text-transform: uppercase;
-            font-weight: 700;
-            letter-spacing: 1px;
-            margin-bottom: 12px;
-        }
-        
-        .year-stats-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        
-        .year-stat-item-all {
-            width: 100%;
-            padding: 10px 12px;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.4) 0%, rgba(139, 92, 246, 0.4) 100%);
-            border-radius: 8px;
-            text-align: center;
-            border: 2px solid rgba(59, 130, 246, 0.5);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 8px;
-        }
-        
-        .year-stat-item-all:hover {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.5) 0%, rgba(139, 92, 246, 0.5) 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-        }
-        
-        .year-stat-item-all.active {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.6) 0%, rgba(139, 92, 246, 0.6) 100%);
-            border-color: #3b82f6;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
-        }
-        
-        .year-stat-item-all .year-stat-year {
-            font-size: 13px;
-            color: #60a5fa;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .year-stat-item-all .year-stat-count {
-            font-size: 20px;
-            color: #f1f5f9;
-            font-weight: 800;
-            margin-top: 2px;
-        }
-        
-        .year-stat-item {
-            flex: 1;
-            min-width: 80px;
-            padding: 8px 12px;
-            background: rgba(51, 65, 85, 0.6);
-            border-radius: 8px;
-            text-align: center;
-            border: 1px solid rgba(148, 163, 184, 0.1);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .year-stat-item:hover {
-            background: rgba(59, 130, 246, 0.3);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-        }
-        
-        .year-stat-item.active {
-            background: rgba(59, 130, 246, 0.4);
-            border-color: #3b82f6;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-        }
-        
-        .year-stat-year {
-            font-size: 12px;
-            color: #8b5cf6;
-            font-weight: 700;
-        }
-        
-        .year-stat-count {
-            font-size: 18px;
-            color: #f1f5f9;
-            font-weight: 800;
-            margin-top: 2px;
-        }
-        
-        .filters {
-            padding: 24px;
-        }
-        
-        .filter-group {
-            margin-bottom: 20px;
-        }
-        
-        .filter-group.hidden {
-            display: none;
-        }
-        
-        .filter-label {
-            font-size: 13px;
-            font-weight: 700;
-            color: #cbd5e1;
-            margin-bottom: 8px;
-            display: block;
-            letter-spacing: 0.3px;
-        }
-        
-        select, input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            border-radius: 8px;
-            font-size: 14px;
-            background: rgba(30, 41, 59, 0.6);
-            backdrop-filter: blur(10px);
-            color: #f1f5f9;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        select:focus, input:focus {
-            outline: none;
-            border-color: #3b82f6;
-            background: rgba(30, 41, 59, 0.8);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
-        
-        select:disabled {
-            background: rgba(30, 41, 59, 0.3);
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-        
-        select option {
-            background: #1e293b;
-            color: #f1f5f9;
-        }
-        
-        .btn-reset {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 12px;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-        }
-        
-        .btn-reset:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
-        }
-        
-        .btn-data-table {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 12px;
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
-        }
-        
-        .btn-data-table:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
-        }
-        
-        .btn-fonte {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: block;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(100, 116, 139, 0.3);
-        }
-        
-        .btn-fonte:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(100, 116, 139, 0.4);
-        }
-        
-        .btn-heatmap {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-        }
-        
-        .btn-heatmap:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
-        }
-        
-        .btn-heatmap.active {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
-        }
-        
-        .filter-section {
-            margin-bottom: 16px;
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            border-radius: 12px;
-            overflow: hidden;
-            background: rgba(30, 41, 59, 0.4);
-            backdrop-filter: blur(10px);
-        }
-        
-        .filter-section-header {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
-            color: #f1f5f9;
-            padding: 16px 20px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            user-select: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s ease;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-        }
-        
-        .filter-section-header:hover {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%);
-        }
-        
-        .filter-section-content {
-            padding: 20px;
-            background: rgba(15, 23, 42, 0.5);
-        }
-        
-        .filter-section-content.collapsed {
-            display: none;
-        }
-        
-        .toggle-icon {
-            transition: transform 0.3s ease;
-            font-size: 12px;
-        }
-        
-        .toggle-icon.collapsed {
-            transform: rotate(-90deg);
-        }
-        
-        .legend {
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            margin: 20px;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-            border: 1px solid rgba(148, 163, 184, 0.2);
-        }
-        
-        .legend.hidden {
-            display: none;
-        }
-        
-        .legend h3 {
-            font-size: 14px;
-            margin-bottom: 16px;
-            color: #f1f5f9;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .legend-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 12px;
-            font-size: 13px;
-            color: #cbd5e1;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            padding: 8px;
-            border-radius: 8px;
-        }
-        
-        .legend-item:hover {
-            background: rgba(59, 130, 246, 0.2);
-            transform: translateX(5px);
-        }
-        
-        .legend-item.active {
-            background: rgba(59, 130, 246, 0.3);
-            border-left: 3px solid #3b82f6;
-            padding-left: 13px;
-        }
-        
-        .legend-color {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            margin-right: 12px;
-            border: 2px solid rgba(241, 245, 249, 0.3);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-        
-        .loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 32px 48px;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-            z-index: 2000;
-            font-size: 18px;
-            text-align: center;
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            color: #f1f5f9;
-        }
-        
-        .loading small {
-            display: block;
-            margin-top: 12px;
-            font-size: 13px;
-            color: #94a3b8;
-        }
-        
-        .loading.hidden {
-            display: none;
-        }
-        
-        .basemap-selector {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 12px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            border: 1px solid rgba(148, 163, 184, 0.2);
-        }
-        
-        .basemap-selector select {
-            padding: 10px 14px;
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            border-radius: 8px;
-            font-size: 13px;
-            cursor: pointer;
-            width: 180px;
-            background: rgba(30, 41, 59, 0.8);
-            color: #f1f5f9;
-        }
-        
-        .basemap-selector select:focus {
-            outline: none;
-            border-color: #3b82f6;
-        }
-        
-        .filter-cascade-info {
-            font-size: 11px;
-            color: #64748b;
-            margin-top: 6px;
-            font-style: italic;
-        }
-        
-        .heatmap-legend {
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            margin: 20px;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-            border: 1px solid rgba(148, 163, 184, 0.2);
-        }
-        
-        .heatmap-legend.hidden {
-            display: none;
-        }
-        
-        .heatmap-legend h3 {
-            font-size: 14px;
-            margin-bottom: 16px;
-            color: #f1f5f9;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .heatmap-gradient {
-            height: 24px;
-            background: linear-gradient(to right, 
-                rgba(0,0,255,0) 0%,
-                rgb(0,0,255) 20%,
-                rgb(0,255,255) 40%,
-                rgb(0,255,0) 60%,
-                rgb(255,255,0) 80%,
-                rgb(255,0,0) 100%);
-            border-radius: 6px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-        
-        .heatmap-labels {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: #94a3b8;
-            font-weight: 600;
-        }
-
-        .maplibregl-ctrl-home {
-            background-color: #fff;
-            background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="29" height="29" viewBox="0 0 29 29" fill="%23333"><path d="M14.5 3l-11 9h3v11h5v-7h6v7h5V12h3z"/></svg>');
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: 70%;
-        }
-
-        .maplibregl-ctrl-home:hover {
-            background-color: #f0f0f0;
-        }
-
-        #total-info {
-            white-space: pre-line;
-        }
-        
-        .maplibregl-ctrl-ods {
-            background: transparent;
-            border: none;
-        }
-        
-        .maplibregl-ctrl-ods a {
-            display: block;
-            transition: all 0.3s ease;
-        }
-        
-        .maplibregl-ctrl-ods a:hover {
-            transform: scale(1.05);
-        }
-        
-        .maplibregl-ctrl-ods img {
-            height: 45px;
-            width: auto;
-            display: block;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-        }
-        
-        .maplibregl-ctrl-ods a:hover img {
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.7));
-        }
-        
-        .detail-panel {
-            position: fixed;
-            top: 0;
-            right: -450px;
-            width: 450px;
-            height: 100vh;
-            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-            box-shadow: -4px 0 20px rgba(0,0,0,0.5);
-            z-index: 2000;
-            overflow-y: auto;
-            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border-left: 1px solid rgba(148, 163, 184, 0.2);
-        }
-        
-        .detail-panel.open {
-            right: 0;
-        }
-        
-        .detail-panel::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        .detail-panel::-webkit-scrollbar-track {
-            background: rgba(15, 23, 42, 0.5);
-        }
-        
-        .detail-panel::-webkit-scrollbar-thumb {
-            background: rgba(148, 163, 184, 0.3);
-            border-radius: 4px;
-        }
-        
-        .detail-panel::-webkit-scrollbar-thumb:hover {
-            background: rgba(148, 163, 184, 0.5);
-        }
-        
-        .detail-header {
-            position: sticky;
-            top: 0;
-            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #4c1d95 100%);
-            color: white;
-            padding: 24px;
-            z-index: 10;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-        
-        .detail-header h2 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .detail-header p {
-            font-size: 13px;
-            opacity: 0.9;
-        }
-        
-        .detail-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-        
-        .detail-close:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: rotate(90deg);
-        }
-        
-        .detail-content {
-            padding: 24px;
-        }
-        
-        .detail-section {
-            margin-bottom: 24px;
-            background: rgba(30, 41, 59, 0.6);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid rgba(148, 163, 184, 0.1);
-        }
-        
-        .detail-section h3 {
-            font-size: 14px;
-            color: #60a5fa;
-            text-transform: uppercase;
-            font-weight: 700;
-            letter-spacing: 1px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-        }
-        
-        .detail-row:last-child {
-            border-bottom: none;
-        }
-        
-        .detail-label {
-            font-size: 12px;
-            color: #94a3b8;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            flex-shrink: 0;
-            margin-right: 16px;
-        }
-        
-        .detail-value {
-            font-size: 14px;
-            color: #f1f5f9;
-            font-weight: 600;
-            text-align: right;
-        }
-        
-        .tipo-badge {
-            display: inline-block;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .tipo-badge.M {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.1) 100%);
-            color: #ef4444;
-            border: 2px solid #ef4444;
-        }
-        
-        .tipo-badge.R {
-            background: linear-gradient(135deg, rgba(249, 115, 22, 0.2) 0%, rgba(249, 115, 22, 0.1) 100%);
-            color: #f97316;
-            border: 2px solid #f97316;
-        }
-        
-        .tipo-badge.F {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.1) 100%);
-            color: #f59e0b;
-            border: 2px solid #f59e0b;
-        }
-        
-        .tipo-badge.C {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.1) 100%);
-            color: #10b981;
-            border: 2px solid #10b981;
-        }
-        
-        .coordinates-box {
-            background: rgba(15, 23, 42, 0.8);
-            padding: 12px;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            color: #10b981;
-            margin-top: 8px;
-        }
-        
-        /* Mobile Toggle Button */
-        .mobile-toggle {
-            display: none;
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 2001;
-            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
-            color: white;
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        }
-        
-        .mobile-toggle:active {
-            transform: scale(0.95);
-        }
-        
-        .mobile-toggle span {
-            display: block;
-            width: 25px;
-            height: 3px;
-            background: white;
-            border-radius: 2px;
-            transition: all 0.3s ease;
-        }
-        
-        .mobile-toggle.active span:nth-child(1) {
-            transform: rotate(45deg) translate(7px, 7px);
-        }
-        
-        .mobile-toggle.active span:nth-child(2) {
-            opacity: 0;
-        }
-        
-        .mobile-toggle.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -7px);
-        }
-        
-        /* Responsive Design */
-        @media (max-width: 1024px) {
-            #sidebar {
-                width: 340px;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .mobile-toggle {
-                display: flex;
-            }
-            
-            #sidebar {
-                position: fixed;
-                left: -380px;
-                top: 0;
-                width: 360px;
-                height: 100vh;
-                z-index: 2000;
-                transition: left 0.3s ease;
-            }
-            
-            #sidebar.open {
-                left: 0;
-            }
-            
-            .header h1 {
-                font-size: 20px;
-            }
-            
-            .header p {
-                font-size: 13px;
-            }
-            
-            .stat-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            
-            .stat-value {
-                font-size: 24px;
-            }
-            
-            .basemap-selector {
-                top: 20px;
-                right: 10px;
-            }
-            
-            .basemap-selector select {
-                width: 140px;
-                font-size: 12px;
-                padding: 8px 10px;
-            }
-            
-            .legend {
-                bottom: 10px;
-                right: 10px;
-                padding: 16px;
-                margin: 10px;
-            }
-            
-            .legend h3 {
-                font-size: 12px;
-            }
-            
-            .legend-item {
-                font-size: 11px;
-                margin-bottom: 8px;
-            }
-            
-            .legend-color {
-                width: 20px;
-                height: 20px;
-                margin-right: 8px;
-            }
-            
-            .detail-panel {
-                width: 100%;
-                right: -100%;
-            }
-            
-            .detail-panel.open {
-                right: 0;
-            }
-            
-            .maplibregl-ctrl-ods img {
-                height: 35px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            #sidebar {
-                width: 100%;
-                left: -100%;
-            }
-            
-            .header {
-                padding: 20px 16px;
-            }
-            
-            .header h1 {
-                font-size: 18px;
-            }
-            
-            .stats {
-                padding: 16px;
-            }
-            
-            .stat-value {
-                font-size: 20px;
-            }
-            
-            .stat-label {
-                font-size: 10px;
-            }
-            
-            .filters {
-                padding: 16px;
-            }
-            
-            .btn-heatmap, .btn-reset {
-                padding: 12px;
-                font-size: 13px;
-            }
-            
-            .year-stat-item {
-                min-width: 70px;
-                padding: 6px 10px;
-            }
-            
-            .year-stat-year {
-                font-size: 11px;
-            }
-            
-            .year-stat-count {
-                font-size: 16px;
-            }
-            
-            .legend {
-                max-width: calc(100vw - 40px);
-            }
-            
-            .basemap-selector {
-                top: 80px;
-                right: 10px;
-            }
-            
-            .basemap-selector select {
-                width: 120px;
-                font-size: 11px;
-            }
-            
-            .detail-header h2 {
-                font-size: 18px;
-            }
-            
-            .detail-section {
-                padding: 16px;
-            }
-            
-            .detail-label {
-                font-size: 11px;
-            }
-            
-            .detail-value {
-                font-size: 13px;
-            }
-            
-            .maplibregl-ctrl-ods img {
-                height: 30px;
-            }
-        }
-        
-        /* Overlay per mobile quando sidebar aperta */
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1999;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .sidebar-overlay.show {
-            opacity: 1;
-        }
-        
-        @media (max-width: 768px) {
-            .sidebar-overlay {
-                display: block;
-            }
-        }
-        
-        /* Info Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 3000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .modal.show {
-            display: flex;
-        }
-        
-        .modal-content {
-            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-            border-radius: 16px;
-            padding: 32px;
-            max-width: 600px;
-            width: 100%;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            position: relative;
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .modal-header h3 {
-            color: #f1f5f9;
-            font-size: 18px;
-            font-weight: 700;
-        }
-        
-        .modal-close {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid #ef4444;
-            color: #ef4444;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            transition: all 0.3s ease;
-        }
-        
-        .modal-close:hover {
-            background: rgba(239, 68, 68, 0.3);
-            transform: rotate(90deg);
-        }
-        
-        .modal-body {
-            color: #cbd5e1;
-            font-size: 14px;
-            line-height: 1.8;
-        }
-        
-        .modal-body p {
-            margin-bottom: 16px;
-        }
-        
-        /* Data Table Modal */
-        .table-container {
-            overflow-x: auto;
-            margin-top: 20px;
-        }
-        
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-        }
-        
-        .data-table th {
-            background: rgba(59, 130, 246, 0.2);
-            color: #60a5fa;
-            padding: 12px 8px;
-            text-align: left;
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 11px;
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid rgba(59, 130, 246, 0.3);
-            position: sticky;
-            top: 0;
-        }
-        
-        .data-table td {
-            padding: 10px 8px;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-            color: #cbd5e1;
-        }
-        
-        .data-table tr:hover {
-            background: rgba(59, 130, 246, 0.1);
-        }
-        
-        .table-actions {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-        
-        .btn-download {
-            flex: 1;
-            min-width: 120px;
-            padding: 10px 16px;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
-        }
-        
-        .btn-download:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
-        }
-        
-        @media (max-width: 480px) {
-            .modal-content {
-                padding: 20px;
-                max-height: 90vh;
-            }
-            
-            .modal-header h3 {
-                font-size: 16px;
-            }
-            
-            .modal-body {
-                font-size: 13px;
-            }
-            
-            .data-table {
-                font-size: 11px;
-            }
-            
-            .data-table th,
-            .data-table td {
-                padding: 8px 6px;
-            }
-        }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
-    <button class="mobile-toggle" id="mobile-toggle" onclick="toggleSidebar()">
+    <!-- Mobile Toggle -->
+    <button class="mobile-toggle" id="mobile-toggle">
         <span></span>
         <span></span>
         <span></span>
     </button>
     
-    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
     
+    <!-- Sidebar -->
     <div id="sidebar">
         <div class="header">
             <div class="header-content">
@@ -1374,7 +67,7 @@
                 <div class="stat-value" id="stat-total">0</div>
                 <div class="stat-info" id="total-info">
                     <span>✓ Dati caricati</span>
-                    <span class="info-icon" onclick="openInfoModal()" title="Informazioni sui dati">i</span>
+                    <span class="info-icon" id="info-icon-btn" title="Informazioni sui dati">i</span>
                 </div>
             </div>
             
@@ -1385,10 +78,10 @@
         </div>
 
         <div class="filters">
-            <button class="btn-heatmap" id="btn-toggle-heatmap" onclick="toggleHeatmap()">
+            <button class="btn-heatmap" id="btn-toggle-heatmap">
                 🔥 Mappa di Calore
             </button>
-<br>
+            <br>
             <div class="filter-group hidden">
                 <label class="filter-label">Tipologia Incidente</label>
                 <select id="filter-tipologia">
@@ -1399,11 +92,11 @@
                     <option value="C">C - Cose</option>
                 </select>
             </div>
-<br>
+            <br>
             <div class="filter-section">
-                <div class="filter-section-header" onclick="toggleSection('localizzazione')">
+                <div class="filter-section-header" data-section="localizzazione">
                     <span>📍 Localizzazione</span>
-                    <span class="toggle-icon collapsed" id="toggle-localizzazione">▼</span>
+                    <span class="toggle-icon collapsed">▼</span>
                 </div>
                 <div class="filter-section-content collapsed" id="content-localizzazione">
                     <div class="filter-group">
@@ -1417,16 +110,16 @@
                         <div class="filter-cascade-info">Filtra UPL ↓</div>
                     </div>
                     <div class="filter-group">
-                        <label class="filter-label">Unità di primo livllo</label>
+                        <label class="filter-label">Unità di primo livello</label>
                         <select id="filter-upl"></select>
                     </div>
                 </div>
             </div>
 
             <div class="filter-section">
-                <div class="filter-section-header" onclick="toggleSection('temporale')">
+                <div class="filter-section-header" data-section="temporale">
                     <span>📅 Analisi Temporale</span>
-                    <span class="toggle-icon collapsed" id="toggle-temporale">▼</span>
+                    <span class="toggle-icon collapsed">▼</span>
                 </div>
                 <div class="filter-section-content collapsed" id="content-temporale">
                     <div class="filter-group hidden">
@@ -1453,9 +146,9 @@
             </div>
 
             <div class="filter-section">
-                <div class="filter-section-header" onclick="toggleSection('condizioni')">
+                <div class="filter-section-header" data-section="condizioni">
                     <span>🌤️ Condizioni e Orari</span>
-                    <span class="toggle-icon collapsed" id="toggle-condizioni">▼</span>
+                    <span class="toggle-icon collapsed">▼</span>
                 </div>
                 <div class="filter-section-content collapsed" id="content-condizioni">
                     <div class="filter-group">
@@ -1481,54 +174,69 @@
                 </div>
             </div>
 
-            <button class="btn-reset" onclick="resetFilters()" Title="Reset Filtri" >🔄 Reset Filtri</button>
-            
-            <button class="btn-data-table" onclick="openDataTable()" Title="Visualizza e scarica i dati selezionati">📊 Tabella Dati</button>
-            
-            <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" Title="Agenzia per l'Italia Digitale" target="_blank" rel="noopener noreferrer" class="btn-fonte">
-                📁 Fonte Dati: dati.gov.it
+            <button class="btn-reset" id="btn-reset" title="Reset Filtri">🔄 Reset Filtri</button>
+            <button class="btn-data-table" id="btn-data-table" title="Visualizza e scarica i dati selezionati">📊 Tabella Dati</button>
+            <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" title="Agenzia per l'Italia Digitale" target="_blank" rel="noopener noreferrer" class="btn-fonte">
+                📄 Fonte Dati: dati.gov.it
             </a>
         </div>
     </div>
 
+    <!-- Map -->
     <div id="map"></div>
     
-    <div class="basemap-selector">
-        <select id="basemap-select" onchange="changeBasemap()">
-            <option value="carto-dark" selected>Carto Dark</option>
-            <option value="osm">OpenStreetMap</option>
-            <option value="satellite">Satellite</option>
-            <option value="carto-light">Carto Light</option>
-        </select>
+    <!-- Map Controls Container -->
+    <div class="map-controls-container">
+        <div class="map-control-panel">
+            <select id="basemap-select" title="Seleziona Mappa di Base">
+                <option value="carto-dark" selected>Carto Dark</option>
+                <option value="osm">OpenStreetMap</option>
+                <option value="satellite">Satellite</option>
+                <option value="carto-light">Carto Light</option>
+            </select>
+            <button class="btn-map-control btn-heatmap-map" id="btn-heatmap-map" title="Attiva/Disattiva Mappa di Calore">
+                🔥 Calore
+            </button>
+            <button class="btn-map-control btn-data-table-map" id="btn-data-table-map" title="Visualizza Tabella Dati">
+                📊 Tabella
+            </button>
+            <button class="btn-map-control btn-analytics-map" id="btn-analytics-map" title="Analisi Avanzata">
+                📈 Analisi
+            </button>
+            <button class="btn-map-control btn-reset-map" id="btn-reset-map" title="Reset Filtri">
+                🔄 Reset
+            </button>
+        </div>
     </div>
     
+    <!-- Legend -->
     <div class="legend" id="points-legend">
         <h3>Legenda (clicca per filtrare)</h3>
-        <div class="legend-item" data-tipo="" onclick="filterByTipologia('')" title="Clicca per mostrare tutte le tipologie">
+        <div class="legend-item" data-tipo="">
             <div style="display: flex; align-items: center;">
                 <div style="width: 24px; height: 24px; margin-right: 12px; border-radius: 50%; background: linear-gradient(135deg, #ef4444, #f97316, #f59e0b, #10b981); border: 2px solid rgba(241, 245, 249, 0.3);"></div>
                 <span><strong>Tutte</strong> - Tutte le tipologie</span>
             </div>
         </div>
-        <div class="legend-item" data-tipo="M" onclick="filterByTipologia('M')" title="Clicca per filtrare solo incidenti mortali">
+        <div class="legend-item" data-tipo="M">
             <div style="display: flex; align-items: center;">
                 <div class="legend-color" style="background-color: #ef4444;"></div>
                 <span><strong>M</strong> - Mortale</span>
             </div>
         </div>
-        <div class="legend-item" data-tipo="R" onclick="filterByTipologia('R')" title="Clicca per filtrare solo incidenti con riserva">
+        <div class="legend-item" data-tipo="R">
             <div style="display: flex; align-items: center;">
-                <div class="legend-color" style="background-color: #f97316;"></div>
+                <div class="legend-color" style="background-color: #a855f7;"></div>
                 <span><strong>R</strong> - Riserva</span>
             </div>
         </div>
-        <div class="legend-item" data-tipo="F" onclick="filterByTipologia('F')" title="Clicca per filtrare solo incidenti con feriti">
+        <div class="legend-item" data-tipo="F">
             <div style="display: flex; align-items: center;">
                 <div class="legend-color" style="background-color: #f59e0b;"></div>
                 <span><strong>F</strong> - Feriti</span>
             </div>
         </div>
-        <div class="legend-item" data-tipo="C" onclick="filterByTipologia('C')" title="Clicca per filtrare solo incidenti con danni alle cose">
+        <div class="legend-item" data-tipo="C">
             <div style="display: flex; align-items: center;">
                 <div class="legend-color" style="background-color: #10b981;"></div>
                 <span><strong>C</strong> - Cose</span>
@@ -1536,6 +244,7 @@
         </div>
     </div>
 
+    <!-- Heatmap Legend -->
     <div class="heatmap-legend hidden" id="heatmap-legend">
         <h3>Densità Incidenti</h3>
         <div class="heatmap-gradient"></div>
@@ -1545,23 +254,23 @@
         </div>
     </div>
 
+    <!-- Loading -->
     <div class="loading" id="loading">
         <div>Caricamento dati CSV...</div>
         <small>Attendere prego</small>
     </div>
 
+    <!-- Detail Panel -->
     <div class="detail-panel" id="detail-panel">
         <div class="detail-header">
-            <button class="detail-close" onclick="closeDetailPanel()">×</button>
+            <button class="detail-close" id="detail-close">×</button>
             <h2 id="detail-tipo-header">
                 <span id="detail-tipo-icon">🚗</span>
                 Dettagli Incidente
             </h2>
             <p id="detail-subtitle">Informazioni complete</p>
         </div>
-        <div class="detail-content" id="detail-content">
-            <!-- Contenuto dinamico -->
-        </div>
+        <div class="detail-content" id="detail-content"></div>
     </div>
 
     <!-- Info Modal -->
@@ -1569,20 +278,16 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3>ℹ️ Informazioni sui Dati</h3>
-                <button class="modal-close" onclick="closeInfoModal()">×</button>
+                <button class="modal-close" id="info-modal-close">×</button>
             </div>
             <div class="modal-body">
                 <p><strong>Dataset completo:</strong> 28.239 incidenti registrati a Palermo dal 2015 al 2023.</p>
-                
-                <p><strong>Incidenti mappati:</strong> 23.487 incidenti (83,2% del totale) con coordinate geografiche valide all'interno dei confini comunali.</p>
-                
-                <p><strong>Esclusioni dall'analisi spaziale:</strong></p>
+                <p><strong>Incidenti mappati:</strong> 23.487 incidenti (83,2% del totale) con coordinate geografiche valide.</p>
+                <p><strong>Esclusioni:</strong></p>
                 <ul style="margin-left: 20px; margin-bottom: 16px;">
-                    <li style="margin-bottom: 8px;"><strong>1.560 incidenti (5,5%)</strong> - Le coordinate geografiche risultano esterne ai confini del Comune di Palermo</li>
-                    <li><strong>3.192 incidenti del 2019 (11,3%)</strong> - Completamente privi di coordinate geografiche e pertanto non utilizzabili per l'analisi spaziale</li>
+                    <li style="margin-bottom: 8px;"><strong>1.560 incidenti (5,5%)</strong> - Coordinate esterne ai confini comunali</li>
+                    <li><strong>3.192 incidenti del 2019 (11,3%)</strong> - Privi di coordinate geografiche</li>
                 </ul>
-                
-                <p style="color: #60a5fa;"><strong>Nota:</strong> L'analisi e la visualizzazione sulla mappa si basano sui 23.487 incidenti georeferenziati e validi.</p>
             </div>
         </div>
     </div>
@@ -1592,12 +297,12 @@
         <div class="modal-content" style="max-width: 90vw;">
             <div class="modal-header">
                 <h3>📊 Tabella Dati Incidenti Filtrati</h3>
-                <button class="modal-close" onclick="closeDataTable()">×</button>
+                <button class="modal-close" id="data-table-close">×</button>
             </div>
             <div class="modal-body">
                 <div class="table-actions">
-                    <button class="btn-download" onclick="downloadCSV()">⬇️ Scarica CSV</button>
-                    <button class="btn-download" onclick="downloadJSON()">⬇️ Scarica JSON</button>
+                    <button class="btn-download" id="btn-download-csv">⬇️ Scarica CSV</button>
+                    <button class="btn-download" id="btn-download-json">⬇️ Scarica JSON</button>
                 </div>
                 <div style="color: #94a3b8; font-size: 12px; margin-bottom: 12px;">
                     <strong id="table-count">0</strong> incidenti visualizzati
@@ -1612,1142 +317,185 @@
         </div>
     </div>
 
-    <script>
-        let map;
-        let allIncidenti = [];
-        let currentFilters = {};
-        let showHeatmap = false;
+    <!-- Analytics Panel -->
+    <div class="analytics-panel" id="analytics-panel">
+        <div class="analytics-header">
+            <div class="analytics-header-top">
+                <h2>📈 Analisi Avanzata Incidenti</h2>
+                <button class="analytics-close" id="analytics-close">×</button>
+            </div>
+            <div class="analytics-filters-info" id="analytics-filters-info">
+                <strong>Dati Visualizzati:</strong>
+                <span id="active-filters-text">Tutti gli incidenti (2015-2023)</span>
+            </div>
+        </div>
         
-        const colorMap = {
-            'M': '#ef4444',
-            'R': '#f97316',
-            'F': '#f59e0b',
-            'C': '#10b981'
-        };
+        <div class="analytics-tabs">
+            <button class="analytics-tab active" data-tab="panoramica">📊 Panoramica</button>
+            <button class="analytics-tab" data-tab="temporale">📅 Temporale</button>
+            <button class="analytics-tab" data-tab="oraria">⏰ Oraria</button>
+            <button class="analytics-tab" data-tab="condizioni">🌤️ Condizioni</button>
+            <button class="analytics-tab" data-tab="insights">💡 Insights</button>
+        </div>
 
-        const basemapStyles = {
-            'carto-dark': {
-                version: 8,
-                sources: {
-                    'carto': {
-                        type: 'raster',
-                        tiles: ['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'],
-                        tileSize: 256,
-                        attribution: '© CARTO'
-                    }
-                },
-                layers: [{
-                    id: 'carto',
-                    type: 'raster',
-                    source: 'carto'
-                }]
-            },
-            'osm': {
-                version: 8,
-                sources: {
-                    'osm': {
-                        type: 'raster',
-                        tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
-                        tileSize: 256,
-                        attribution: '© OpenStreetMap contributors'
-                    }
-                },
-                layers: [{
-                    id: 'osm',
-                    type: 'raster',
-                    source: 'osm'
-                }]
-            },
-            'satellite': {
-                version: 8,
-                sources: {
-                    'satellite': {
-                        type: 'raster',
-                        tiles: ['https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'],
-                        tileSize: 256,
-                        attribution: '© Google'
-                    }
-                },
-                layers: [{
-                    id: 'satellite',
-                    type: 'raster',
-                    source: 'satellite'
-                }]
-            },
-            'carto-light': {
-                version: 8,
-                sources: {
-                    'carto': {
-                        type: 'raster',
-                        tiles: ['https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'],
-                        tileSize: 256,
-                        attribution: '© CARTO'
-                    }
-                },
-                layers: [{
-                    id: 'carto',
-                    type: 'raster',
-                    source: 'carto'
-                }]
-            }
-        };
-
-        const filterConfig = {
-            'filter-tipologia': 'Tipologia',
-            'filter-circoscrizione': 'Circoscrizione',
-            'filter-quartiere': 'Quartiere',
-            'filter-upl': 'UPL',
-            'filter-anno': 'Anno',
-            'filter-stagione': 'Stagione',
-            'filter-mese': 'Mese',
-            'filter-giorno-settimana': 'Giorno settimana',
-            'filter-feriale-weekend': 'Feriale/Weekend',
-            'filter-giorno-notte': 'Giorno/Notte',
-            'filter-condizioni-luce': 'Condizioni luce (Visibilità)',
-            'filter-fascia-4': 'Fascia oraria (4 fasce)',
-            'filter-fascia-6': 'Fascia oraria dettagliata (6 fasce)',
-            'filter-ora-punta': 'Ora di punta (Picchi di traffico)'
-        };
-
-        const filterDependencies = {
-            'filter-circoscrizione': ['filter-quartiere', 'filter-upl'],
-            'filter-quartiere': ['filter-upl']
-        };
-
-        function toggleSection(sectionId) {
-            const content = document.getElementById(`content-${sectionId}`);
-            const toggle = document.getElementById(`toggle-${sectionId}`);
-            
-            content.classList.toggle('collapsed');
-            toggle.classList.toggle('collapsed');
-        }
-
-        function filterByYear(year) {
-            const currentYear = currentFilters['filter-anno'];
-            
-            if (currentYear === String(year)) {
-                currentFilters['filter-anno'] = '';
-            } else {
-                currentFilters['filter-anno'] = String(year);
-            }
-            
-            document.getElementById('filter-anno').value = currentFilters['filter-anno'];
-            
-            updateAllFilters();
-            updateMapData();
-            updateStats();
-            updateYearStats();
-            
-            // Chiudi sidebar su mobile
-            if (window.innerWidth <= 768) {
-                closeSidebar();
-            }
-        }
-        
-        function filterAllYears() {
-            currentFilters['filter-anno'] = '';
-            document.getElementById('filter-anno').value = '';
-            
-            updateAllFilters();
-            updateMapData();
-            updateStats();
-            updateYearStats();
-            
-            // Chiudi sidebar su mobile
-            if (window.innerWidth <= 768) {
-                closeSidebar();
-            }
-        }
-
-        function filterByTipologia(tipo) {
-            const currentTipo = currentFilters['filter-tipologia'];
-            
-            if (currentTipo === tipo) {
-                currentFilters['filter-tipologia'] = '';
-            } else {
-                currentFilters['filter-tipologia'] = tipo;
-            }
-            
-            document.getElementById('filter-tipologia').value = currentFilters['filter-tipologia'];
-            
-            updateAllFilters();
-            updateMapData();
-            updateStats();
-            updateYearStats();
-            updateLegendActiveState();
-        }
-
-        function updateLegendActiveState() {
-            const selectedTipo = currentFilters['filter-tipologia'];
-            
-            document.querySelectorAll('.legend-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            if (selectedTipo === '') {
-                document.querySelector('.legend-item[data-tipo=""]').classList.add('active');
-            } else {
-                document.querySelector(`.legend-item[data-tipo="${selectedTipo}"]`).classList.add('active');
-            }
-        }
-
-        function openDetailPanel(properties) {
-            const panel = document.getElementById('detail-panel');
-            const content = document.getElementById('detail-content');
-            
-            const tipologiaNames = {
-                'M': 'Mortale',
-                'R': 'Riserva',
-                'F': 'Feriti',
-                'C': 'Cose'
-            };
-            
-            const tipologiaIcons = {
-                'M': '💀',
-                'R': '🚑',
-                'F': '🤕',
-                'C': '🔧'
-            };
-            
-            // Aggiorna header
-            document.getElementById('detail-tipo-icon').textContent = tipologiaIcons[properties.Tipologia] || '🚗';
-            document.getElementById('detail-subtitle').textContent = `Incidente del ${properties.Data || 'Data non disponibile'}`;
-            
-            // Costruisci contenuto strutturato
-            let html = '';
-            
-            // Sezione 1: Tipologia e Gravità
-            html += `
-                <div class="detail-section">
-                    <h3>⚠️ Tipologia e Gravità</h3>
-                    <div class="detail-row">
-                        <span class="detail-label">Tipo Incidente</span>
-                        <span class="tipo-badge ${properties.Tipologia}">${properties.Tipologia} - ${tipologiaNames[properties.Tipologia]}</span>
+        <div class="analytics-content">
+            <!-- Panoramica Tab -->
+            <div class="analytics-tab-content active" id="tab-panoramica">
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <h3>Trend Annuale Incidenti</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-trend-annuale"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Distribuzione per Tipologia</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-tipologia"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Analisi Stagionale</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-stagionale"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Feriale vs Weekend</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-feriale-weekend"></canvas>
+                        </div>
                     </div>
                 </div>
-            `;
-            
-            // Sezione 2: Informazioni Temporali
-            html += '<div class="detail-section"><h3>📅 Quando è Avvenuto</h3>';
-            const temporalFields = [
-                { key: 'Data', label: 'Data' },
-                { key: 'Anno', label: 'Anno' },
-                { key: 'Stagione', label: 'Stagione' },
-                { key: 'Mese', label: 'Mese' },
-                { key: 'Giorno settimana', label: 'Giorno Settimana' },
-                { key: 'Feriale/Weekend', label: 'Tipo Giorno' },
-                { key: 'Giorno/Notte', label: 'Momento' },
-                { key: 'Fascia oraria (4 fasce)', label: 'Fascia Oraria' },
-                { key: 'Fascia oraria dettagliata (6 fasce)', label: 'Fascia Dettagliata' },
-                { key: 'Ora di punta (Picchi di traffico)', label: 'Ora di Punta' }
-            ];
-            
-            temporalFields.forEach(field => {
-                if (properties[field.key] && properties[field.key] !== 'null') {
-                    html += `
-                        <div class="detail-row">
-                            <span class="detail-label">${field.label}</span>
-                            <span class="detail-value">${properties[field.key]}</span>
+            </div>
+
+            <!-- Temporale Tab -->
+            <div class="analytics-tab-content" id="tab-temporale">
+                <div class="charts-grid">
+                    <div class="chart-container chart-full">
+                        <h3>Distribuzione per Giorno della Settimana</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-giorno-settimana"></canvas>
                         </div>
-                    `;
-                }
-            });
-            html += '</div>';
-            
-            // Sezione 3: Localizzazione
-            html += '<div class="detail-section"><h3>📍 Dove è Avvenuto</h3>';
-            const locationFields = [
-                { key: 'Circoscrizione', label: 'Circoscrizione' },
-                { key: 'Quartiere', label: 'Quartiere' },
-                { key: 'UPL', label: 'Unità Primo Livello' }
-            ];
-            
-            locationFields.forEach(field => {
-                if (properties[field.key] && properties[field.key] !== 'null') {
-                    html += `
-                        <div class="detail-row">
-                            <span class="detail-label">${field.label}</span>
-                            <span class="detail-value">${properties[field.key]}</span>
+                    </div>
+                    <div class="chart-container chart-full">
+                        <h3>Evoluzione Annuale (Feriti vs Non Feriti)</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-evoluzione-anni"></canvas>
                         </div>
-                    `;
-                }
-            });
-            
-            if (properties.latitude && properties.longitude) {
-                html += `
-                    <div class="detail-row">
-                        <span class="detail-label">Coordinate GPS</span>
-                        <div style="flex: 1; text-align: right;">
-                            <div class="coordinates-box">
-                                Lat: ${parseFloat(properties.latitude).toFixed(6)}<br>
-                                Lng: ${parseFloat(properties.longitude).toFixed(6)}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Oraria Tab -->
+            <div class="analytics-tab-content" id="tab-oraria">
+                <div class="charts-grid">
+                    <div class="chart-container chart-full">
+                        <h3>Distribuzione per Fascia Oraria</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-fascia-oraria"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Top 3 Fasce per Incidenti</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-top-incidenti"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Top 3 Fasce per Feriti</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-top-feriti"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Condizioni Tab -->
+            <div class="analytics-tab-content" id="tab-condizioni">
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <h3>Luce vs Buio</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-luce-buio"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Dettaglio Condizioni Luce</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-condizioni-dettaglio"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-container chart-full">
+                        <h3>Confronto Stagionale delle Condizioni</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-stagioni-condizioni"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Insights Tab -->
+            <div class="analytics-tab-content" id="tab-insights">
+                <div class="insights-container">
+                    <div class="stats-realtime">
+                        <h3>📊 Statistiche in Tempo Reale</h3>
+                        <div class="stats-realtime-grid">
+                            <div class="stat-realtime-item">
+                                <div class="stat-realtime-label">Totale Incidenti</div>
+                                <div class="stat-realtime-value" id="realtime-total">0</div>
+                            </div>
+                            <div class="stat-realtime-item">
+                                <div class="stat-realtime-label">Totale Feriti</div>
+                                <div class="stat-realtime-value" id="realtime-feriti">0</div>
+                            </div>
+                            <div class="stat-realtime-item">
+                                <div class="stat-realtime-label">% con Feriti</div>
+                                <div class="stat-realtime-value" id="realtime-percentuale">0%</div>
+                            </div>
+                            <div class="stat-realtime-item">
+                                <div class="stat-realtime-label">Media Feriti</div>
+                                <div class="stat-realtime-value" id="realtime-media">0</div>
                             </div>
                         </div>
                     </div>
-                `;
-            }
-            html += '</div>';
-            
-            // Sezione 4: Condizioni Ambientali
-            html += '<div class="detail-section"><h3>🌤️ Condizioni Ambientali</h3>';
-            const conditionsFields = [
-                { key: 'Condizioni luce (Visibilità)', label: 'Condizioni Luce' }
-            ];
-            
-            conditionsFields.forEach(field => {
-                if (properties[field.key] && properties[field.key] !== 'null') {
-                    html += `
-                        <div class="detail-row">
-                            <span class="detail-label">${field.label}</span>
-                            <span class="detail-value">${properties[field.key]}</span>
+
+                    <div class="insights-auto">
+                        <h3>💡 Insights Automatici</h3>
+                        <div class="insight-item">
+                            <div class="insight-icon">📅</div>
+                            <div class="insight-content">
+                                <div class="insight-label">Giorno più pericoloso</div>
+                                <div class="insight-value" id="insight-giorno">-</div>
+                            </div>
                         </div>
-                    `;
-                }
-            });
-            html += '</div>';
-            
-            // Sezione 5: Altri Dati
-            html += '<div class="detail-section"><h3>📊 Informazioni Aggiuntive</h3>';
-            const otherFields = Object.keys(properties).filter(key => {
-                return !['Tipologia', 'Data', 'Anno', 'Stagione', 'Mese', 'Giorno settimana', 
-                         'Feriale/Weekend', 'Giorno/Notte', 'Fascia oraria (4 fasce)', 
-                         'Fascia oraria dettagliata (6 fasce)', 'Ora di punta (Picchi di traffico)',
-                         'Circoscrizione', 'Quartiere', 'UPL', 'latitude', 'longitude',
-                         'Condizioni luce (Visibilità)'].includes(key) &&
-                       properties[key] && properties[key] !== 'null';
-            });
-            
-            if (otherFields.length > 0) {
-                otherFields.forEach(key => {
-                    html += `
-                        <div class="detail-row">
-                            <span class="detail-label">${key}</span>
-                            <span class="detail-value">${properties[key]}</span>
+                        <div class="insight-item">
+                            <div class="insight-icon">⏰</div>
+                            <div class="insight-content">
+                                <div class="insight-label">Fascia oraria critica</div>
+                                <div class="insight-value" id="insight-fascia">-</div>
+                            </div>
                         </div>
-                    `;
-                });
-            } else {
-                html += '<p style="color: #64748b; font-size: 13px; text-align: center; padding: 10px;">Nessun dato aggiuntivo disponibile</p>';
-            }
-            html += '</div>';
-            
-            content.innerHTML = html;
-            panel.classList.add('open');
-        }
-
-        function closeDetailPanel() {
-            const panel = document.getElementById('detail-panel');
-            panel.classList.remove('open');
-        }
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const toggle = document.getElementById('mobile-toggle');
-            const overlay = document.getElementById('sidebar-overlay');
-            
-            sidebar.classList.toggle('open');
-            toggle.classList.toggle('active');
-            
-            if (sidebar.classList.contains('open')) {
-                overlay.classList.add('show');
-            } else {
-                overlay.classList.remove('show');
-            }
-        }
-
-        function closeSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const toggle = document.getElementById('mobile-toggle');
-            const overlay = document.getElementById('sidebar-overlay');
-            
-            sidebar.classList.remove('open');
-            toggle.classList.remove('active');
-            overlay.classList.remove('show');
-        }
-
-        async function init() {
-            try {
-                console.log('Inizio caricamento CSV...');
-                document.getElementById('loading').innerHTML = '<div>Caricamento CSV...</div><small>Download in corso</small>';
-                
-                await loadCSV();
-                
-                console.log('CSV caricato, inizializzazione mappa...');
-                document.getElementById('loading').innerHTML = '<div>Creazione mappa...</div><small>Attendere</small>';
-                
-                initMap();
-
-            } catch (error) {
-                console.error('Errore inizializzazione:', error);
-                document.getElementById('loading').innerHTML = '<div>Errore caricamento</div><small>' + error.message + '</small>';
-                // Nascondi il loading anche in caso di errore
-                setTimeout(() => {
-                    document.getElementById('loading').classList.add('hidden');
-                }, 2000);
-            }
-        }
-
-        async function loadCSV() {
-            return new Promise((resolve, reject) => {
-                Papa.parse('data/incidenti_2015_2023.csv', {
-                    download: true,
-                    header: true,
-                    dynamicTyping: true,
-                    skipEmptyLines: true,
-                    complete: function(results) {
-                        console.log('CSV scaricato, parsing righe...');
-                        
-                        allIncidenti = results.data.filter(row => {
-                            return row.Tipologia && 
-                                   row.longitude && 
-                                   row.latitude &&
-                                   !isNaN(parseFloat(row.longitude)) &&
-                                   !isNaN(parseFloat(row.latitude));
-                        });
-                        
-                        console.log(`CSV processato: ${allIncidenti.length} incidenti validi su ${results.data.length} righe totali`);
-                        resolve();
-                    },
-                    error: function(error) {
-                        console.error('Errore download CSV:', error);
-                        reject(error);
-                    }
-                });
-            });
-        }
-
-        function openInfoModal() {
-            document.getElementById('info-modal').classList.add('show');
-        }
-
-        function closeInfoModal() {
-            document.getElementById('info-modal').classList.remove('show');
-        }
-
-        function openDataTable() {
-            const filteredData = getFilteredData();
-            const modal = document.getElementById('data-table-modal');
-            
-            // Aggiorna conteggio
-            document.getElementById('table-count').textContent = filteredData.length.toLocaleString('it-IT');
-            
-            if (filteredData.length === 0) {
-                document.getElementById('table-header').innerHTML = '';
-                document.getElementById('table-body').innerHTML = '<tr><td colspan="100" style="text-align: center; padding: 40px; color: #94a3b8;">Nessun dato da visualizzare con i filtri attuali</td></tr>';
-                modal.classList.add('show');
-                return;
-            }
-            
-            // Genera header della tabella
-            const keys = Object.keys(filteredData[0]);
-            let headerHtml = '<tr>';
-            keys.forEach(key => {
-                headerHtml += `<th>${key}</th>`;
-            });
-            headerHtml += '</tr>';
-            document.getElementById('table-header').innerHTML = headerHtml;
-            
-            // Genera righe della tabella (limita a 500 righe per performance)
-            const displayData = filteredData.slice(0, 500);
-            let bodyHtml = '';
-            displayData.forEach(row => {
-                bodyHtml += '<tr>';
-                keys.forEach(key => {
-                    bodyHtml += `<td>${row[key] !== null && row[key] !== undefined ? row[key] : '-'}</td>`;
-                });
-                bodyHtml += '</tr>';
-            });
-            
-            if (filteredData.length > 500) {
-                bodyHtml += `<tr><td colspan="${keys.length}" style="text-align: center; padding: 20px; color: #f59e0b; background: rgba(245, 158, 11, 0.1);">Visualizzate le prime 500 righe di ${filteredData.length.toLocaleString('it-IT')}. Il download include tutti i dati.</td></tr>`;
-            }
-            
-            document.getElementById('table-body').innerHTML = bodyHtml;
-            modal.classList.add('show');
-        }
-
-        function closeDataTable() {
-            document.getElementById('data-table-modal').classList.remove('show');
-        }
-
-        function downloadCSV() {
-            const filteredData = getFilteredData();
-            
-            if (filteredData.length === 0) {
-                alert('Nessun dato da scaricare con i filtri attuali');
-                return;
-            }
-            
-            const keys = Object.keys(filteredData[0]);
-            let csv = keys.join(',') + '\n';
-            
-            filteredData.forEach(row => {
-                const values = keys.map(key => {
-                    const value = row[key];
-                    if (value === null || value === undefined) return '';
-                    const stringValue = String(value);
-                    if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
-                        return '"' + stringValue.replace(/"/g, '""') + '"';
-                    }
-                    return stringValue;
-                });
-                csv += values.join(',') + '\n';
-            });
-            
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            
-            const annoFiltro = currentFilters['filter-anno'] || 'tutti';
-            link.setAttribute('href', url);
-            link.setAttribute('download', `incidenti_palermo_${annoFiltro}_${new Date().getTime()}.csv`);
-            link.style.visibility = 'hidden';
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        function downloadJSON() {
-            const filteredData = getFilteredData();
-            
-            if (filteredData.length === 0) {
-                alert('Nessun dato da scaricare con i filtri attuali');
-                return;
-            }
-            
-            const json = JSON.stringify(filteredData, null, 2);
-            const blob = new Blob([json], { type: 'application/json' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            
-            const annoFiltro = currentFilters['filter-anno'] || 'tutti';
-            link.setAttribute('href', url);
-            link.setAttribute('download', `incidenti_palermo_${annoFiltro}_${new Date().getTime()}.json`);
-            link.style.visibility = 'hidden';
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        // Chiudi modal cliccando fuori
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal')) {
-                e.target.classList.remove('show');
-            }
-        });
-
-        function initMap() {
-            const palermoBounds = [
-                [13.20, 38.00],
-                [13.50, 38.25]
-            ];
-            
-            map = new maplibregl.Map({
-                container: 'map',
-                style: basemapStyles['carto-dark'],
-                center: [13.3614, 38.1157],
-                zoom: 11,
-                minZoom: 9,
-                maxZoom: 18,
-                maxBounds: palermoBounds,
-                hash: true
-            });
-
-            map.addControl(new maplibregl.NavigationControl(), 'top-left');
-            
-            class HomeControl {
-                onAdd(map) {
-                    this._map = map;
-                    this._container = document.createElement('div');
-                    this._container.className = 'maplibregl-ctrl maplibregl-ctrl-group';
-                    this._container.innerHTML = '<button class="maplibregl-ctrl-home" type="button" title="Torna alla vista iniziale"></button>';
-                    
-                    this._container.onclick = () => {
-                        map.flyTo({
-                            center: [13.3614, 38.1157],
-                            zoom: 10,
-                            duration: 1500,
-                            essential: true
-                        });
-                    };
-                    
-                    return this._container;
-                }
-                
-                onRemove() {
-                    this._container.parentNode.removeChild(this._container);
-                    this._map = undefined;
-                }
-            }
-            
-            map.addControl(new HomeControl(), 'top-left');
-            map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
-            
-            // Controllo personalizzato per logo ODS
-            class ODSControl {
-                onAdd(map) {
-                    this._map = map;
-                    this._container = document.createElement('div');
-                    this._container.className = 'maplibregl-ctrl maplibregl-ctrl-ods';
-                    
-                    const link = document.createElement('a');
-                    link.href = 'https://opendatasicilia.it/';
-                    link.target = '_blank';
-                    link.rel = 'noopener noreferrer';
-                    link.title = 'OpenDataSicilia';
-                    
-                    const img = document.createElement('img');
-                    img.src = 'https://palermohub.opendatasicilia.it/lib/images/opendatasicilia.png';
-                    img.alt = 'OpenDataSicilia';
-                    
-                    link.appendChild(img);
-                    this._container.appendChild(link);
-                    
-                    return this._container;
-                }
-                
-                onRemove() {
-                    this._container.parentNode.removeChild(this._container);
-                    this._map = undefined;
-                }
-            }
-            
-            map.addControl(new ODSControl(), 'bottom-left');
-            
-            map.setPadding({ top: 80, bottom: 80, left: 50, right: 50 });
-
-            map.on('load', () => {
-                console.log('Mappa caricata, creazione layers...');
-                try {
-                    // Imposta il filtro anno a 2023 di default
-                    currentFilters['filter-anno'] = '2023';
-                    
-                    createMapLayers();
-                    populateFilters();
-                    updateStats();
-                    updateYearStats();
-                    updateLegendActiveState();
-                    console.log('Inizializzazione completata!');
-                } catch (error) {
-                    console.error('Errore durante inizializzazione:', error);
-                } finally {
-                    document.getElementById('loading').classList.add('hidden');
-                }
-            });
-            
-            // Timeout di sicurezza per nascondere il loading
-            setTimeout(() => {
-                const loading = document.getElementById('loading');
-                if (loading && !loading.classList.contains('hidden')) {
-                    console.log('Timeout sicurezza: nascondo loading');
-                    loading.classList.add('hidden');
-                }
-            }, 5000);
-        }
-
-        function createGeoJSON() {
-            const filteredData = getFilteredData();
-            
-            return {
-                type: 'FeatureCollection',
-                features: filteredData.map(row => ({
-                    type: 'Feature',
-                    geometry: {
-                        type: 'Point',
-                        coordinates: [parseFloat(row.longitude), parseFloat(row.latitude)]
-                    },
-                    properties: row
-                }))
-            };
-        }
-
-        function createMapLayers() {
-            const geojson = createGeoJSON();
-            
-            console.log(`Creazione source con ${geojson.features.length} features`);
-            
-            map.addSource('incidenti', {
-                type: 'geojson',
-                data: geojson
-            });
-
-            map.addLayer({
-                id: 'incidenti-heatmap',
-                type: 'heatmap',
-                source: 'incidenti',
-                maxzoom: 15,
-                paint: {
-                    'heatmap-weight': [
-                        'match',
-                        ['get', 'Tipologia'],
-                        'C', 0.5,
-                        'F', 1,
-                        'R', 1.5,
-                        'M', 2,
-                        1
-                    ],
-                    'heatmap-intensity': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        0, 0.8,
-                        9, 1,
-                        15, 2.5
-                    ],
-                    'heatmap-color': [
-                        'interpolate',
-                        ['linear'],
-                        ['heatmap-density'],
-                        0, 'rgba(0,0,255,0)',
-                        0.1, 'rgba(0,0,255,0.6)',
-                        0.3, 'rgba(0,255,255,0.7)',
-                        0.5, 'rgba(0,255,0,0.8)',
-                        0.7, 'rgba(255,255,0,0.85)',
-                        0.9, 'rgba(255,128,0,0.9)',
-                        1, 'rgba(255,0,0,1)'
-                    ],
-                    'heatmap-radius': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        0, 1,
-                        9, 3,
-                        11, 6,
-                        13, 10,
-                        15, 14
-                    ],
-                    'heatmap-opacity': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        7, 0.65,
-                        15, 0.75
-                    ]
-                },
-                layout: {
-                    visibility: 'none'
-                }
-            });
-
-            ['C', 'F', 'R', 'M'].forEach(tipo => {
-                const layerId = `incidenti-${tipo}`;
-                
-                map.addLayer({
-                    id: layerId,
-                    type: 'circle',
-                    source: 'incidenti',
-                    filter: ['==', ['get', 'Tipologia'], tipo],
-                    paint: {
-                        'circle-radius': [
-                            'interpolate', ['linear'], ['zoom'],
-                            10, tipo === 'M' ? 4 : tipo === 'R' ? 3 : 2,
-                            16, tipo === 'M' ? 10 : tipo === 'R' ? 8 : 6
-                        ],
-                        'circle-color': colorMap[tipo],
-                        'circle-opacity': 0.8,
-                        'circle-stroke-width': tipo === 'M' ? 2 : 1,
-                        'circle-stroke-color': '#fff'
-                    }
-                });
-
-                setupLayerInteractions(layerId);
-            });
-
-            console.log('Layers creati con successo');
-        }
-
-        function setupLayerInteractions(layerId) {
-            map.on('click', layerId, (e) => {
-                if (!e.features || e.features.length === 0) return;
-                
-                const props = e.features[0].properties;
-                openDetailPanel(props);
-            });
-
-            map.on('mouseenter', layerId, () => {
-                map.getCanvas().style.cursor = 'pointer';
-            });
-
-            map.on('mouseleave', layerId, () => {
-                map.getCanvas().style.cursor = '';
-            });
-        }
-
-        function getFilteredData() {
-            return allIncidenti.filter(row => {
-                for (const [filterId, property] of Object.entries(filterConfig)) {
-                    const value = currentFilters[filterId];
-                    if (!value) continue;
-
-                    const rowValue = row[property];
-                    
-                    if (property === 'Anno') {
-                        if (Number(rowValue) !== Number(value)) return false;
-                    } else {
-                        if (String(rowValue) !== String(value)) return false;
-                    }
-                }
-                return true;
-            });
-        }
-
-        function populateFilters() {
-            console.log('Popolamento filtri...');
-
-            Object.entries(filterConfig).forEach(([selectId, property]) => {
-                const select = document.getElementById(selectId);
-                if (!select) return;
-
-                select.addEventListener('change', (e) => {
-                    handleFilterChange(selectId, e.target.value);
-                });
-            });
-
-            updateAllFilters();
-        }
-
-        function handleFilterChange(filterId, value) {
-            currentFilters[filterId] = value;
-
-            if (filterDependencies[filterId]) {
-                filterDependencies[filterId].forEach(dependentId => {
-                    currentFilters[dependentId] = '';
-                    document.getElementById(dependentId).value = '';
-                });
-            }
-
-            updateAllFilters();
-            updateMapData();
-            
-            if (filterId === 'filter-circoscrizione' || filterId === 'filter-quartiere') {
-                zoomToFilteredArea();
-            }
-
-            updateStats();
-            updateYearStats();
-            updateLegendActiveState();
-        }
-
-        function updateAllFilters() {
-            const filteredData = getFilteredData();
-
-            Object.entries(filterConfig).forEach(([selectId, property]) => {
-                const select = document.getElementById(selectId);
-                if (!select) return;
-
-                const currentValue = currentFilters[selectId] || '';
-                const values = new Set();
-                
-                filteredData.forEach(row => {
-                    const value = row[property];
-                    if (value !== null && value !== 'null' && value !== '' && value !== undefined) {
-                        values.add(String(value));
-                    }
-                });
-
-                let sortedValues = Array.from(values).sort((a, b) => {
-                    const numA = parseFloat(a);
-                    const numB = parseFloat(b);
-                    if (!isNaN(numA) && !isNaN(numB)) {
-                        return numA - numB;
-                    }
-                    return String(a).localeCompare(String(b), 'it');
-                });
-
-                if (property === 'Anno') {
-                    sortedValues.reverse();
-                }
-
-                select.innerHTML = '<option value="">Tutti</option>';
-                sortedValues.forEach(value => {
-                    const option = document.createElement('option');
-                    option.value = value;
-                    option.textContent = value;
-                    if (value === currentValue) {
-                        option.selected = true;
-                    }
-                    select.appendChild(option);
-                });
-
-                select.disabled = sortedValues.length === 0 && currentValue === '';
-            });
-        }
-
-        function updateMapData() {
-            const geojson = createGeoJSON();
-            console.log(`Aggiornamento mappa con ${geojson.features.length} features`);
-            map.getSource('incidenti').setData(geojson);
-        }
-
-        function updateStats() {
-            const filteredData = getFilteredData();
-            const stats = { M: 0, R: 0, F: 0, C: 0 };
-            
-            filteredData.forEach(row => {
-                const tipo = row.Tipologia;
-                if (tipo && stats.hasOwnProperty(tipo)) {
-                    stats[tipo]++;
-                }
-            });
-
-            document.getElementById('stat-mortale').textContent = stats.M.toLocaleString('it-IT');
-            document.getElementById('stat-riserva').textContent = stats.R.toLocaleString('it-IT');
-            document.getElementById('stat-feriti').textContent = stats.F.toLocaleString('it-IT');
-            document.getElementById('stat-cose').textContent = stats.C.toLocaleString('it-IT');
-            document.getElementById('stat-total').textContent = (stats.M + stats.R + stats.F + stats.C).toLocaleString('it-IT');
-            
-            // Aggiorna il label del totale con l'anno se filtrato
-            const annoFiltrato = currentFilters['filter-anno'];
-            const labelTotale = document.querySelector('.stat-total .stat-label');
-            if (annoFiltrato) {
-                labelTotale.textContent = `Totale Incidenti (${annoFiltrato})`;
-            } else {
-                labelTotale.textContent = 'Totale Incidenti';
-            }
-
-            console.log('Statistiche:', stats, `su ${filteredData.length} incidenti filtrati`);
-        }
-
-        function updateYearStats() {
-            const selectedYear = currentFilters['filter-anno'];
-            const yearStats = {};
-            
-            const tempFilters = {...currentFilters};
-            delete tempFilters['filter-anno'];
-            
-            const dataForYearCount = allIncidenti.filter(row => {
-                for (const [filterId, property] of Object.entries(filterConfig)) {
-                    if (filterId === 'filter-anno') continue;
-                    const value = tempFilters[filterId];
-                    if (!value) continue;
-
-                    const rowValue = row[property];
-                    
-                    if (property === 'Anno') {
-                        if (Number(rowValue) !== Number(value)) return false;
-                    } else {
-                        if (String(rowValue) !== String(value)) return false;
-                    }
-                }
-                return true;
-            });
-            
-            dataForYearCount.forEach(row => {
-                const year = row.Anno;
-                if (year) {
-                    yearStats[year] = (yearStats[year] || 0) + 1;
-                }
-            });
-            
-            // Calcola totale di tutti gli anni
-            const totalAllYears = Object.values(yearStats).reduce((sum, count) => sum + count, 0);
-            
-            // Pulsante "Tutti"
-            let gridHtml = `
-                <div class="year-stat-item-all ${selectedYear === '' ? 'active' : ''}" 
-                     onclick="filterAllYears()"
-                     title="Clicca per mostrare tutti gli anni">
-                    <div class="year-stat-year">Tutti gli Anni</div>
-                    <div class="year-stat-count">${totalAllYears.toLocaleString('it-IT')}</div>
+                        <div class="insight-item">
+                            <div class="insight-icon">🍂</div>
+                            <div class="insight-content">
+                                <div class="insight-label">Stagione più rischiosa</div>
+                                <div class="insight-value" id="insight-stagione">-</div>
+                            </div>
+                        </div>
+                        <div class="insight-item">
+                            <div class="insight-icon">🌙</div>
+                            <div class="insight-content">
+                                <div class="insight-label">Condizione più pericolosa</div>
+                                <div class="insight-value" id="insight-condizione">-</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            `;
-            
-            // Mostra tutti gli anni (dal 2023 al 2015)
-            const sortedYears = Object.keys(yearStats).sort((a, b) => b - a);
-            gridHtml += sortedYears.map(year => `
-                <div class="year-stat-item ${selectedYear === String(year) ? 'active' : ''}" 
-                     onclick="filterByYear('${year}')"
-                     title="Clicca per filtrare l'anno ${year}">
-                    <div class="year-stat-year">${year}</div>
-                    <div class="year-stat-count">${yearStats[year].toLocaleString('it-IT')}</div>
-                </div>
-            `).join('');
-            
-            document.getElementById('year-stats-grid').innerHTML = gridHtml;
-        }
+            </div>
+        </div>
+    </div>
 
-        function zoomToFilteredArea() {
-            const filteredData = getFilteredData();
-            
-            if (filteredData.length === 0) return;
-
-            const coords = filteredData
-                .filter(row => row.longitude && row.latitude)
-                .map(row => [parseFloat(row.longitude), parseFloat(row.latitude)]);
-
-            if (coords.length === 0) return;
-
-            const bounds = new maplibregl.LngLatBounds();
-            coords.forEach(coord => bounds.extend(coord));
-
-            if (!bounds.isEmpty()) {
-                map.fitBounds(bounds, {
-                    padding: { top: 100, bottom: 100, left: 80, right: 80 },
-                    maxZoom: 17,
-                    duration: 1000
-                });
-            }
-        }
-
-        function toggleHeatmap() {
-            showHeatmap = !showHeatmap;
-            const btn = document.getElementById('btn-toggle-heatmap');
-            
-            if (showHeatmap) {
-                map.setLayoutProperty('incidenti-heatmap', 'visibility', 'visible');
-                ['C', 'F', 'R', 'M'].forEach(tipo => {
-                    map.setLayoutProperty(`incidenti-${tipo}`, 'visibility', 'none');
-                });
-                btn.textContent = '🔵 Localizzaione incidenti';
-                btn.classList.add('active');
-                document.getElementById('points-legend').classList.add('hidden');
-                document.getElementById('heatmap-legend').classList.remove('hidden');
-            } else {
-                map.setLayoutProperty('incidenti-heatmap', 'visibility', 'none');
-                ['C', 'F', 'R', 'M'].forEach(tipo => {
-                    map.setLayoutProperty(`incidenti-${tipo}`, 'visibility', 'visible');
-                });
-                btn.textContent = '🔥 Mappa di Calore';
-                btn.classList.remove('active');
-                document.getElementById('points-legend').classList.remove('hidden');
-                document.getElementById('heatmap-legend').classList.add('hidden');
-            }
-        }
-
-        function changeBasemap() {
-            const selectedBasemap = document.getElementById('basemap-select').value;
-            const currentStyle = basemapStyles[selectedBasemap];
-            
-            const sourceData = map.getSource('incidenti')._data;
-            const heatmapVisibility = map.getLayoutProperty('incidenti-heatmap', 'visibility');
-            const circleVisibility = {};
-            ['C', 'F', 'R', 'M'].forEach(tipo => {
-                circleVisibility[tipo] = map.getLayoutProperty(`incidenti-${tipo}`, 'visibility');
-            });
-
-            const newStyle = JSON.parse(JSON.stringify(currentStyle));
-            
-            newStyle.sources['incidenti'] = {
-                type: 'geojson',
-                data: sourceData
-            };
-            
-            newStyle.layers.push({
-                id: 'incidenti-heatmap',
-                type: 'heatmap',
-                source: 'incidenti',
-                maxzoom: 15,
-                paint: {
-                    'heatmap-weight': [
-                        'match',
-                        ['get', 'Tipologia'],
-                        'C', 0.5,
-                        'F', 1,
-                        'R', 1.5,
-                        'M', 2,
-                        1
-                    ],
-                    'heatmap-intensity': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        0, 0.8,
-                        9, 1,
-                        15, 2.5
-                    ],
-                    'heatmap-color': [
-                        'interpolate',
-                        ['linear'],
-                        ['heatmap-density'],
-                        0, 'rgba(0,0,255,0)',
-                        0.1, 'rgba(0,0,255,0.6)',
-                        0.3, 'rgba(0,255,255,0.7)',
-                        0.5, 'rgba(0,255,0,0.8)',
-                        0.7, 'rgba(255,255,0,0.85)',
-                        0.9, 'rgba(255,128,0,0.9)',
-                        1, 'rgba(255,0,0,1)'
-                    ],
-                    'heatmap-radius': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        0, 1,
-                        9, 3,
-                        11, 6,
-                        13, 10,
-                        15, 14
-                    ],
-                    'heatmap-opacity': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        7, 0.65,
-                        15, 0.75
-                    ]
-                },
-                layout: {
-                    visibility: heatmapVisibility
-                }
-            });
-
-            ['C', 'F', 'R', 'M'].forEach(tipo => {
-                newStyle.layers.push({
-                    id: `incidenti-${tipo}`,
-                    type: 'circle',
-                    source: 'incidenti',
-                    filter: ['==', ['get', 'Tipologia'], tipo],
-                    paint: {
-                        'circle-radius': [
-                            'interpolate', ['linear'], ['zoom'],
-                            10, tipo === 'M' ? 4 : tipo === 'R' ? 3 : 2,
-                            16, tipo === 'M' ? 10 : tipo === 'R' ? 8 : 6
-                        ],
-                        'circle-color': colorMap[tipo],
-                        'circle-opacity': 0.8,
-                        'circle-stroke-width': tipo === 'M' ? 2 : 1,
-                        'circle-stroke-color': '#fff'
-                    },
-                    layout: {
-                        visibility: circleVisibility[tipo]
-                    }
-                });
-            });
-
-            map.setStyle(newStyle);
-
-            map.once('styledata', () => {
-                ['C', 'F', 'R', 'M'].forEach(tipo => {
-                    setupLayerInteractions(`incidenti-${tipo}`);
-                });
-            });
-        }
-
-        function resetFilters() {
-            currentFilters = {};
-            document.querySelectorAll('select').forEach(select => {
-                select.value = '';
-                select.disabled = false;
-            });
-            
-            currentFilters['filter-anno'] = '2023';
-            
-            updateAllFilters();
-            updateMapData();
-            updateStats();
-            updateYearStats();
-            updateLegendActiveState();
-
-            map.flyTo({
-                center: [13.3614, 38.1157],
-                zoom: 11,
-                duration: 1000,
-                padding: { top: 80, bottom: 80, left: 50, right: 50 }
-            });
-        }
-
-        init();
-    </script>
+<script src="js/incidenti.js"></script>
 </body>
 </html>
