@@ -1447,6 +1447,22 @@ function updatePanoramicaCharts(data) {
                             return '';
                         }
                     }
+                },
+                annotation: {
+                    annotations: {
+                        nota2019: {
+                            type: 'label',
+                            xValue: '2019',
+                            yValue: 'max',
+                            content: ['* 2019: include 3.192 incidenti', 'non mappati (senza coordinate)'],
+                            font: {
+                                size: 8,
+                                style: 'italic'
+                            },
+                            color: '#64748b',
+                            position: 'end'
+                        }
+                    }
                 }
             },
             scales: {
@@ -1473,30 +1489,6 @@ function updatePanoramicaCharts(data) {
             }
         }
     });
-    
-    // AGGIUNGI NOTA SOTTO IL GRAFICO - QUESTA È LA PARTE CRITICA
-    const chartContainer = document.getElementById('chart-trend-annuale').closest('.chart-container');
-    let existingNote = chartContainer.querySelector('.chart-note-2019');
-    if (existingNote) {
-        existingNote.remove();
-    }
-    
-    const note = document.createElement('div');
-    note.className = 'chart-note-2019';
-    note.style.cssText = `
-        margin-top: 8px;
-        padding: 8px 12px;
-        background: rgba(59, 130, 246, 0.1);
-        border-left: 3px solid #3b82f6;
-        border-radius: 4px;
-        font-size: 10px;
-        color: #94a3b8;
-        font-style: italic;
-        line-height: 1.4;
-    `;
-    note.innerHTML = `<strong style="color: #3b82f6;">* Nota 2019:</strong> Include 3.192 incidenti non mappati (assenza coordinate geografiche nel dataset).`;
-    
-    chartContainer.appendChild(note);
     
     // Distribuzione Tipologia - ETICHETTE SCURE
     const tipoData = { M: 0, R: 0, F: 0, C: 0 };
@@ -1732,7 +1724,7 @@ function updateTemporaleCharts(data) {
                     offset: 2,
                     color: '#1e293b',
                     font: { weight: 'bold', size: 9 },
-                    backgroundColor: 'rgba(241, 245, 249, 0.95)',
+                    backgroundColor: 'rgba(241, 245, 249, 0.9)',
                     borderRadius: 3,
                     padding: 3
                 }
@@ -1954,7 +1946,7 @@ function updateOrariaCharts(data) {
                     offset: 4,
                     color: '#1e293b',
                     font: { weight: 'bold', size: 10 },
-                    backgroundColor: 'rgba(241, 245, 249, 0.95)',
+                    backgroundColor: 'rgba(241, 245, 249, 0.9)',
                     borderRadius: 3,
                     padding: 3
                 }
@@ -2012,7 +2004,7 @@ function updateOrariaCharts(data) {
                     offset: 4,
                     color: '#1e293b',
                     font: { weight: 'bold', size: 10 },
-                    backgroundColor: 'rgba(241, 245, 249, 0.95)',
+                    backgroundColor: 'rgba(241, 245, 249, 0.9)',
                     borderRadius: 3,
                     padding: 3
                 }
