@@ -1176,7 +1176,7 @@ function updatePanoramicaCharts(data) {
             labels: ['Mortale', 'Riserva', 'Feriti', 'Cose'],
             datasets: [{
                 data: [tipoData.M, tipoData.R, tipoData.F, tipoData.C],
-                backgroundColor: ['#ef4444', '#f97316', '#f59e0b', '#10b981']
+                backgroundColor: ['#ef4444', '#a855f7', '#f59e0b', '#10b981']
             }]
         },
         options: {
@@ -1212,7 +1212,7 @@ function updatePanoramicaCharts(data) {
             datasets: [{
                 label: 'Incidenti',
                 data: stagioniCounts,
-                backgroundColor: ['#10b981', '#f59e0b', '#f97316', '#3b82f6']
+                backgroundColor: ['#10b981', '#f59e0b', '#a855f7', '#3b82f6']
             }]
         },
         options: {
@@ -1449,7 +1449,7 @@ function updateOrariaCharts(data) {
             datasets: [{
                 label: 'Incidenti con Feriti',
                 data: sortedFeriti.map(f => f[1]),
-                backgroundColor: '#f97316'
+                backgroundColor: '#a855f7'
             }]
         },
         options: {
