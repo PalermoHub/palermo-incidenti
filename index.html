@@ -1,12 +1,52 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Incidenti Stradali Palermo 2015-2023</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	 <title>Palermo incidenti stradali dal 2015 al 2023 - Dashboard by @opendatasicilia</title>
+    <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <META HTTP-EQUIV="refresh" CONTENT="3600">  
+    <meta name="description" content="PalermoHub di opendatasicilia.it è un contenitore di mappe realizzate/rielaborate da liberi cittadini o da civic hackers prevalentemente sul territorio comunale di Palermo, non ha alcun intento commerciale, l'unica finalità è mostrare le possibilità di rielaborazione e comunicazione offerte dagli open data o dati pubblici comunali, regionali e nazionali.">
+    <meta name="keywords" content="Open Data, Sicilia, PAI, Geologia, CTR, PRG, Variente Generale, Palermo">
+    <meta name="author" content="Giovan Battista Vitrano per OpenDataSicilia.it">
+    <meta http-equiv="content-language" content="IT">
+    <meta name="robots" content="index,follow">
+    <meta name="creation_Date" content="06/09/2025>
+    <link rel="shortcut icon" href="favicon.ico"/> 
+	<link rel="icon" href="favicon.png" type="image/png"/> 
+	
     <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
     <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+	
+	
+	
+		    <!-- Meta tags per social sharing pen Graph Protocol -->
+    <meta property="og:url" content="https://palermohub.github.io/palermo-incidenti/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Palermo incidenti stradali dal 2015 al 20 - Dashboard by @opendatasicilia">
+    <meta property="og:description" content="Palermo Hub - Contenitore di mappe su Palermo realizzato da OpenDataSicilia.it">
+    <meta property="og:image" content="img/social_card.jpg">
+	<!-- twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="twitter:domain" content="palermohub.opendatasicilia.it">
+    <meta property="twitter:url" content="https://palermohub.github.io/palermo-incidenti/">
+    <meta name="twitter:title" content="Palermo incidenti stradali dal 2015 al 20 - Dashboard by @opendatasicilia">
+    <meta name="twitter:description" content="Palermo Hub - Contenitore di mappe su Palermo realizzato da OpenDataSicilia.it">
+    <meta name="twitter:image" content="img/social_card.jpg">
+	
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-87653723-4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-87653723-4');
+</script>
+	
     <style>
         * {
             margin: 0;
@@ -1441,12 +1481,12 @@
                 </div>
             </div>
 
-            <button class="btn-reset" onclick="resetFilters()">🔄 Resetta Tutti i Filtri</button>
+            <button class="btn-reset" onclick="resetFilters()" Title="Reset Filtri" >🔄 Reset Filtri</button>
             
-            <button class="btn-data-table" onclick="openDataTable()">📊 Visualizza Tabella Dati</button>
+            <button class="btn-data-table" onclick="openDataTable()" Title="Visualizza e scarica i dati selezionati">📊 Tabella Dati</button>
             
-            <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" target="_blank" rel="noopener noreferrer" class="btn-fonte">
-                📁 Fonte Dati
+            <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" Title="Agenzia per l'Italia Digitale" target="_blank" rel="noopener noreferrer" class="btn-fonte">
+                📁 Fonte Dati: dati.gov.it
             </a>
         </div>
     </div>
@@ -2560,7 +2600,7 @@
                 ['C', 'F', 'R', 'M'].forEach(tipo => {
                     map.setLayoutProperty(`incidenti-${tipo}`, 'visibility', 'none');
                 });
-                btn.textContent = '🔵 Mostra Mappa a Punti';
+                btn.textContent = '🔵 Localizzaione incidenti';
                 btn.classList.add('active');
                 document.getElementById('points-legend').classList.add('hidden');
                 document.getElementById('heatmap-legend').classList.remove('hidden');
@@ -2569,7 +2609,7 @@
                 ['C', 'F', 'R', 'M'].forEach(tipo => {
                     map.setLayoutProperty(`incidenti-${tipo}`, 'visibility', 'visible');
                 });
-                btn.textContent = '🔥 Mostra Mappa di Calore';
+                btn.textContent = '🔥 Mappa di Calore';
                 btn.classList.remove('active');
                 document.getElementById('points-legend').classList.remove('hidden');
                 document.getElementById('heatmap-legend').classList.add('hidden');
