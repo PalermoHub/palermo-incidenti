@@ -2398,15 +2398,42 @@ function downloadJSON() {
 
 // Setup Event Listeners
 function setupEventListeners() {
+    // Helper per gestire sia touch che click
+    function addTouchClickListener(element, handler) {
+        if (!element) return;
+        
+        let touchStartTime = 0;
+        let touchMoved = false;
+        
+        element.addEventListener('touchstart', (e) => {
+            touchStartTime = Date.now();
+            touchMoved = false;
+        }, { passive: true });
+        
+        element.addEventListener('touchmove', () => {
+            touchMoved = true;
+        }, { passive: true });
+        
+        element.addEventListener('touchend', (e) => {
+            const touchDuration = Date.now() - touchStartTime;
+            if (!touchMoved && touchDuration < 500) {
+                e.preventDefault();
+                handler(e);
+            }
+        });
+        
+        element.addEventListener('click', handler);
+    }
+    
     // Mobile Toggle
     const mobileToggle = document.getElementById('mobile-toggle');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
-    if (mobileToggle) mobileToggle.addEventListener('click', toggleSidebar);
-    if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+    if (mobileToggle) addTouchClickListener(mobileToggle, toggleSidebar);
+    if (sidebarOverlay) addTouchClickListener(sidebarOverlay, closeSidebar);
     
     // Filter Sections
     document.querySelectorAll('.filter-section-header').forEach(header => {
-        header.addEventListener('click', () => {
+        addTouchClickListener(header, () => {
             const section = header.dataset.section;
             toggleSection(section);
         });
@@ -2415,53 +2442,59 @@ function setupEventListeners() {
     // Year Stats
     const yearStatsGrid = document.getElementById('year-stats-grid');
     if (yearStatsGrid) {
-        yearStatsGrid.addEventListener('click', (e) => {
+        yearStatsGrid.addEventListener('touchstart', (e) => {
             const item = e.target.closest('.year-stat-item, .year-stat-item-all');
             if (item) {
+                item.style.opacity = '0.7';
+            }
+        }, { passive: true });
+        
+        yearStatsGrid.addEventListener('touchend', (e) => {
+            const item = e.target.closest('.year-stat-item, .year-stat-item-all');
+            if (item) {
+                item.style.opacity = '';
                 const year = item.dataset.year;
                 
-                // Se è il 2019, mostra il popup informativo
                 if (year === '2019') {
                     show2019InfoPopup();
-                    // Poi applica comunque il filtro
-                    setTimeout(() => {
-                        filterByYear(year);
-                    }, 100);
-                } else if (year === '') {
-                    filterByYear('');
+                    setTimeout(() => filterByYear(year), 100);
                 } else {
                     filterByYear(year);
                 }
+            }
+        });
+        
+        yearStatsGrid.addEventListener('click', (e) => {
+            if (e.target.closest('.year-stat-item, .year-stat-item-all')) {
+                e.preventDefault();
             }
         });
     }
     
     // Legend
     document.querySelectorAll('.legend-item').forEach(item => {
-        item.addEventListener('click', () => {
+        addTouchClickListener(item, () => {
             const tipo = item.dataset.tipo;
             filterByTipologia(tipo);
         });
     });
     
     // Buttons - with null checks
-    const btnHeatmap = document.getElementById('btn-toggle-heatmap');
-    const btnHeatmapMap = document.getElementById('btn-heatmap-map');
-    const btnReset = document.getElementById('btn-reset');
-    const btnResetMap = document.getElementById('btn-reset-map');
-    const btnDataTable = document.getElementById('btn-data-table');
-    const btnDataTableMap = document.getElementById('btn-data-table-map');
-    const btnAnalytics = document.getElementById('btn-analytics');
-    const btnAnalyticsMap = document.getElementById('btn-analytics-map');
+    const buttonsConfig = [
+        { id: 'btn-toggle-heatmap', handler: toggleHeatmap },
+        { id: 'btn-heatmap-map', handler: toggleHeatmap },
+        { id: 'btn-reset', handler: resetFilters },
+        { id: 'btn-reset-map', handler: resetFilters },
+        { id: 'btn-data-table', handler: openDataTable },
+        { id: 'btn-data-table-map', handler: openDataTable },
+        { id: 'btn-analytics', handler: openAnalytics },
+        { id: 'btn-analytics-map', handler: openAnalytics }
+    ];
     
-    if (btnHeatmap) btnHeatmap.addEventListener('click', toggleHeatmap);
-    if (btnHeatmapMap) btnHeatmapMap.addEventListener('click', toggleHeatmap);
-    if (btnReset) btnReset.addEventListener('click', resetFilters);
-    if (btnResetMap) btnResetMap.addEventListener('click', resetFilters);
-    if (btnDataTable) btnDataTable.addEventListener('click', openDataTable);
-    if (btnDataTableMap) btnDataTableMap.addEventListener('click', openDataTable);
-    if (btnAnalytics) btnAnalytics.addEventListener('click', openAnalytics);
-    if (btnAnalyticsMap) btnAnalyticsMap.addEventListener('click', openAnalytics);
+    buttonsConfig.forEach(config => {
+        const btn = document.getElementById(config.id);
+        if (btn) addTouchClickListener(btn, config.handler);
+    });
     
     // Basemap
     const basemapSelect = document.getElementById('basemap-select');
@@ -2469,33 +2502,35 @@ function setupEventListeners() {
     
     // Modals Close Buttons
     const infoIconBtn = document.getElementById('info-icon-btn');
-    if (infoIconBtn) {
-        infoIconBtn.addEventListener('click', () => {
-            const modal = document.getElementById('info-modal');
-            if (modal) modal.classList.add('show');
-        });
-    }
+    if (infoIconBtn) addTouchClickListener(infoIconBtn, () => {
+        const modal = document.getElementById('info-modal');
+        if (modal) modal.classList.add('show');
+    });
     
-    const infoModalClose = document.getElementById('info-modal-close');
-    if (infoModalClose) {
-        infoModalClose.addEventListener('click', () => {
-            const modal = document.getElementById('info-modal');
-            if (modal) modal.classList.remove('show');
-        });
-    }
+    const modalsConfig = [
+        { id: 'info-modal-close', modalId: 'info-modal' },
+        { id: 'data-table-close', handler: closeDataTable },
+        { id: 'detail-close', handler: closeDetailPanel },
+        { id: 'analytics-close', handler: closeAnalytics }
+    ];
     
-    const dataTableClose = document.getElementById('data-table-close');
-    if (dataTableClose) dataTableClose.addEventListener('click', closeDataTable);
-    
-    const detailClose = document.getElementById('detail-close');
-    if (detailClose) detailClose.addEventListener('click', closeDetailPanel);
-    
-    const analyticsClose = document.getElementById('analytics-close');
-    if (analyticsClose) analyticsClose.addEventListener('click', closeAnalytics);
+    modalsConfig.forEach(config => {
+        const btn = document.getElementById(config.id);
+        if (btn) {
+            if (config.handler) {
+                addTouchClickListener(btn, config.handler);
+            } else {
+                addTouchClickListener(btn, () => {
+                    const modal = document.getElementById(config.modalId);
+                    if (modal) modal.classList.remove('show');
+                });
+            }
+        }
+    });
     
     // Analytics Tabs
     document.querySelectorAll('.analytics-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
+        addTouchClickListener(tab, () => {
             const tabName = tab.dataset.tab;
             switchAnalyticsTab(tabName);
         });
@@ -2503,10 +2538,10 @@ function setupEventListeners() {
     
     // Download Buttons
     const btnDownloadCSV = document.getElementById('btn-download-csv');
-    if (btnDownloadCSV) btnDownloadCSV.addEventListener('click', downloadCSV);
+    if (btnDownloadCSV) addTouchClickListener(btnDownloadCSV, downloadCSV);
     
     const btnDownloadJSON = document.getElementById('btn-download-json');
-    if (btnDownloadJSON) btnDownloadJSON.addEventListener('click', downloadJSON);
+    if (btnDownloadJSON) addTouchClickListener(btnDownloadJSON, downloadJSON);
     
     // Modal Close on Click Outside
     document.addEventListener('click', (e) => {
@@ -2514,7 +2549,17 @@ function setupEventListeners() {
             e.target.classList.remove('show');
         }
     });
+    
+    // Previeni zoom su double-tap per tutti i pulsanti
+    document.addEventListener('touchend', (e) => {
+        if (e.target.closest('button, .legend-item, .year-stat-item, .year-stat-item-all')) {
+            e.preventDefault();
+        }
+    }, { passive: false });
 }
+
+
+
 
 // Initialize App
 init();

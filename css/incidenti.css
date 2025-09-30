@@ -12,6 +12,88 @@ body {
     background: #0f172a;
 }
 
+/* Touch Optimization */
+* {
+    -webkit-tap-highlight-color: rgba(59, 130, 246, 0.3);
+    -webkit-touch-callout: none;
+}
+
+button, .legend-item, .year-stat-item, .year-stat-item-all {
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* Aumenta area touch per tutti i pulsanti su mobile */
+@media (max-width: 768px) {
+    button, .btn-map-control, .legend-item, .year-stat-item {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    .mobile-toggle {
+        width: 56px;
+        height: 56px;
+        touch-action: manipulation;
+    }
+    
+    /* Migliora pulsanti mappa su mobile */
+    .map-controls-container {
+        touch-action: manipulation;
+        pointer-events: auto;
+    }
+    
+    .btn-map-control {
+        padding: 10px 12px;
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+    
+    /* Assicura che la sidebar overlay non blocchi i click quando chiusa */
+    .sidebar-overlay {
+        pointer-events: none;
+    }
+    
+    .sidebar-overlay.show {
+        pointer-events: auto;
+    }
+    
+    /* Migliora legenda su mobile */
+    .legend {
+        pointer-events: auto;
+        touch-action: manipulation;
+    }
+    
+    .legend-item {
+        padding: 10px 8px;
+        margin-bottom: 10px;
+        min-height: 44px;
+    }
+    
+    /* Year stats più grandi */
+    .year-stat-item, .year-stat-item-all {
+        min-height: 50px;
+        padding: 12px 14px;
+    }
+}
+
+/* Aggiungi al CSS */
+@media (max-width: 768px) {
+    .mobile-toggle {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 9999; /* Aumenta z-index */
+        pointer-events: auto;
+    }
+    
+    /* Quando sidebar è aperta, sposta il toggle */
+    #sidebar.open ~ .mobile-toggle {
+        left: 340px;
+        transition: left 0.3s ease;
+    }
+}
+
 /* Sidebar */
 #sidebar {
     width: 380px;
