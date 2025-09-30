@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incidenti Stradali Palermo 2015-2023</title>
+    <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pmtiles@3.0.7/dist/pmtiles.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+        #sidebar {
+            width: 340px;
+            background: #fff;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        #map {
+            flex: 1;
+            height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+        }
+        .header h1 {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        .header p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        .stats {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .stat-item {
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+        .stat-item.mortale { border-color: #dc3545; }
+        .stat-item.riserva { border-color: #fd7e14; }
+        .stat-item.feriti { border-color: #ffc107; }
+        .stat-item.cose { border-color: #28a745; }
+        .stat-label {
+            font-size: 11px;
+            color: #6c757d;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #212529;
+        }
+        .stat-total {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            margin-top: 10px;
+            border-radius: 8px;
+        }
+        .filters {
+            padding: 20px;
+        }
+        .filter-group {
+            margin-bottom: 20px;
+        }
+        .filter-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+            display: block;
+        }
+        select, input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .btn-reset {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-reset:hover {
+            background: #5568d3;
+        }
+        .filter-section {
+            margin-bottom: 25px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .filter-section-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 15px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .filter-section-header:hover {
+            opacity: 0.9;
+        }
+        .filter-section-content {
+            padding: 15px;
+            background: white;
+        }
+        .filter-section-content.collapsed {
+            display: none;
+        }
+        .toggle-icon {
+            transition: transform 0.3s;
+        }
+        .toggle-icon.collapsed {
+            transform: rotate(-90deg);
+        }
+        .legend {
+            background: white;
+            padding: 15px;
+            margin: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .legend h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #212529;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+            border: 2px solid white;
+            box-shadow: 0 0 4px rgba(0,0,0,0.3);
+        }
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            z-index: 2000;
+            font-size: 16px;
+        }
+        .loading.hidden {
+            display: none;
+        }
+        .basemap-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .basemap-selector select {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            width: 180px;
+        }
+        .basemap-selector select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebar">
+        <div class="header">
+            <h1>Incidenti Stradali</h1>
+            <p>Palermo 2015-2023</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-label">Statistiche Filtrate</div>
+            <div class="stat-grid">
+                <div class="stat-item mortale">
+                    <div class="stat-label">Mortali</div>
+                    <div class="stat-value" id="stat-mortale">0</div>
+                </div>
+                <div class="stat-item riserva">
+                    <div class="stat-label">Riserva</div>
+                    <div class="stat-value" id="stat-riserva">0</div>
+                </div>
+                <div class="stat-item feriti">
+                    <div class="stat-label">Feriti</div>
+                    <div class="stat-value" id="stat-feriti">0</div>
+                </div>
+                <div class="stat-item cose">
+                    <div class="stat-label">Cose</div>
+                    <div class="stat-value" id="stat-cose">0</div>
+                </div>
+            </div>
+            <div class="stat-total">
+                <div class="stat-label">Totale Incidenti</div>
+                <div class="stat-value" id="stat-total">0</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label class="filter-label">Tipologia Incidente</label>
+                <select id="filter-tipologia">
+                    <option value="">Tutte le tipologie</option>
+                    <option value="M">Mortale (M)</option>
+                    <option value="R">Riserva (R)</option>
+                    <option value="F">Feriti (F)</option>
+                    <option value="C">Cose (C)</option>
+                </select>
+            </div>
+
+            <div class="filter-section">
+                <div class="filter-section-header" onclick="toggleSection('localizzazione')">
+                    <span>📍 Localizzazione</span>
+                    <span class="toggle-icon" id="toggle-localizzazione">▼</span>
+                </div>
+                <div class="filter-section-content" id="content-localizzazione">
+                    <div class="filter-group">
+                        <label class="filter-label">UPL</label>
+                        <select id="filter-upl"></select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Circoscrizione</label>
+                        <select id="filter-circoscrizione"></select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Quartiere</label>
+                        <select id="filter-quartiere"></select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <div class="filter-section-header" onclick="toggleSection('temporale')">
+                    <span>📅 Analisi Temporale</span>
+                    <span class="toggle-icon" id="toggle-temporale">▼</span>
+                </div>
+                <div class="filter-section-content" id="content-temporale">
+                    <div class="filter-group">
+                        <label class="filter-label">Anno</label>
+                        <select id="filter-anno"></select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Stagione</label>
+                        <select id="filter-stagione"></select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Mese</label>
+                        <select id="filter-mese"></select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Giorno Settimana</label>
+                        <select id="filter-giorno-settimana"></select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Feriale/Weekend</label>
+                        <select id="filter-feriale-weekend"></select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <div class="filter-section-header" onclick="toggleSection('condizioni')">
+                    <span>🌤️ Condizioni e Orari</span>
+                    <span class="toggle-icon" id="toggle-condizioni">▼</span>
+                </div>
+                <div class="filter-section-content" id="content-condizioni">
+                    <div class="filter-group">
+                        <label class="filter-label">Giorno/Notte</label>
+                        <select id="filter-giorno-notte"></select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Condizioni Luce</label>
+                        <select id="filter-condizioni-luce"></select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Fascia Oraria (4 fasce)</label>
+                        <select id="filter-fascia-4"></select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Fascia Oraria (6 fasce)</label>
+                        <select id="filter-fascia-6"></select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Ora di Punta</label>
+                        <select id="filter-ora-punta"></select>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-reset" onclick="resetFilters()">🔄 Resetta Tutti i Filtri</button>
+        </div>
+    </div>
+
+    <div id="map"></div>
+    
+    <div class="basemap-selector">
+        <select id="basemap-select" onchange="changeBasemap()">
+            <option value="osm">OpenStreetMap</option>
+            <option value="satellite">Satellite</option>
+            <option value="carto-light">Carto Light</option>
+            <option value="carto-dark">Carto Dark</option>
+        </select>
+    </div>
+    
+    <div class="legend">
+        <h3>Legenda Tipologia</h3>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #dc3545;"></div>
+            <span><strong>M</strong> - Mortale</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #fd7e14;"></div>
+            <span><strong>R</strong> - Riserva</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #ffc107;"></div>
+            <span><strong>F</strong> - Feriti</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #28a745;"></div>
+            <span><strong>C</strong> - Cose</span>
+        </div>
+    </div>
+
+    <div class="loading" id="loading">Caricamento dati...</div>
+
+    <script>
+        let map;
+        let protocol;
+        let allFeatures = [];
+        
+        const colorMap = {
+            'M': '#dc3545',
+            'R': '#fd7e14',
+            'F': '#ffc107',
+            'C': '#28a745'
+        };
+
+        const basemapStyles = {
+            'osm': {
+                version: 8,
+                sources: {
+                    'osm': {
+                        type: 'raster',
+                        tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+                        tileSize: 256,
+                        attribution: '© OpenStreetMap contributors'
+                    }
+                },
+                layers: [{
+                    id: 'osm',
+                    type: 'raster',
+                    source: 'osm'
+                }]
+            },
+            'satellite': {
+                version: 8,
+                sources: {
+                    'satellite': {
+                        type: 'raster',
+                        tiles: ['https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'],
+                        tileSize: 256,
+                        attribution: '© Google'
+                    }
+                },
+                layers: [{
+                    id: 'satellite',
+                    type: 'raster',
+                    source: 'satellite'
+                }]
+            },
+            'carto-light': {
+                version: 8,
+                sources: {
+                    'carto': {
+                        type: 'raster',
+                        tiles: ['https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'],
+                        tileSize: 256,
+                        attribution: '© CARTO'
+                    }
+                },
+                layers: [{
+                    id: 'carto',
+                    type: 'raster',
+                    source: 'carto'
+                }]
+            },
+            'carto-dark': {
+                version: 8,
+                sources: {
+                    'carto': {
+                        type: 'raster',
+                        tiles: ['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'],
+                        tileSize: 256,
+                        attribution: '© CARTO'
+                    }
+                },
+                layers: [{
+                    id: 'carto',
+                    type: 'raster',
+                    source: 'carto'
+                }]
+            }
+        };
+
+        function toggleSection(sectionId) {
+            const content = document.getElementById(`content-${sectionId}`);
+            const toggle = document.getElementById(`toggle-${sectionId}`);
+            
+            content.classList.toggle('collapsed');
+            toggle.classList.toggle('collapsed');
+        }
+
+        async function init() {
+            try {
+                console.log('Inizializzazione mappa...');
+                
+                // Inizializza protocollo PMTiles
+                protocol = new pmtiles.Protocol();
+                maplibregl.addProtocol('pmtiles', protocol.tile);
+
+                // Inizializza mappa
+                map = new maplibregl.Map({
+                    container: 'map',
+                    style: basemapStyles['osm'],
+                    center: [13.3614, 38.1157],
+                    zoom: 11,
+                    hash: true // Aggiungi hash per coordinate nell'URL
+                });
+
+                // Aggiungi controlli di navigazione
+                map.addControl(new maplibregl.NavigationControl(), 'top-left');
+
+                // Aggiungi controllo scala
+                map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
+
+                map.on('load', async () => {
+                    console.log('Mappa caricata, caricamento PMTiles...');
+                    await loadPMTiles();
+                });
+
+            } catch (error) {
+                console.error('Errore inizializzazione:', error);
+                document.getElementById('loading').innerHTML = 'Errore caricamento mappa';
+            }
+        }
+
+        async function loadPMTiles() {
+            try {
+                const pmtilesUrl = 'https://palermohub.github.io/palermo-incidenti/data/incidenti_2015_2023.pmtiles';
+                const sourceLayer = 'incidenti_2015_2023';
+                
+                console.log('Caricamento PMTiles da:', pmtilesUrl);
+                
+                // Crea istanza PMTiles
+                const p = new pmtiles.PMTiles(pmtilesUrl);
+                protocol.add(p);
+                
+                // Aggiungi source PMTiles
+                map.addSource('incidenti', {
+                    type: 'vector',
+                    url: `pmtiles://${pmtilesUrl}`,
+                    minzoom: 0,
+                    maxzoom: 14
+                });
+
+                // Aggiungi layer per ogni tipologia
+                ['C', 'F', 'R', 'M'].forEach(tipo => {
+                    const layerId = `incidenti-${tipo}`;
+                    
+                    map.addLayer({
+                        id: layerId,
+                        type: 'circle',
+                        source: 'incidenti',
+                        'source-layer': sourceLayer,
+                        filter: ['==', ['get', 'Tipologia'], tipo],
+                        paint: {
+                            'circle-radius': [
+                                'interpolate', ['linear'], ['zoom'],
+                                10, tipo === 'M' ? 4 : tipo === 'R' ? 3 : 2,
+                                14, tipo === 'M' ? 8 : tipo === 'R' ? 6 : 5
+                            ],
+                            'circle-color': colorMap[tipo],
+                            'circle-opacity': 0.8,
+                            'circle-stroke-width': tipo === 'M' ? 2 : 1,
+                            'circle-stroke-color': '#fff'
+                        }
+                    });
+
+                    // Popup al click
+                    map.on('click', layerId, (e) => {
+                        if (!e.features || e.features.length === 0) return;
+                        
+                        const props = e.features[0].properties;
+                        const tipologiaName = {
+                            'M': 'Mortale',
+                            'R': 'Riserva',
+                            'F': 'Feriti',
+                            'C': 'Cose'
+                        };
+                        
+                        let html = `
+                            <div style="padding: 10px; min-width: 200px;">
+                                <strong style="color: ${colorMap[props.Tipologia]}; font-size: 16px;">${tipologiaName[props.Tipologia]}</strong><br><br>
+                        `;
+                        
+                        // Aggiungi solo le proprietà disponibili
+                        Object.keys(props).forEach(key => {
+                            if (props[key] && props[key] !== 'null') {
+                                html += `<strong>${key}:</strong> ${props[key]}<br>`;
+                            }
+                        });
+                        
+                        html += '</div>';
+                        
+                        new maplibregl.Popup()
+                            .setLngLat(e.lngLat)
+                            .setHTML(html)
+                            .addTo(map);
+                    });
+
+                    map.on('mouseenter', layerId, () => {
+                        map.getCanvas().style.cursor = 'pointer';
+                    });
+
+                    map.on('mouseleave', layerId, () => {
+                        map.getCanvas().style.cursor = '';
+                    });
+                });
+
+                console.log('Layers aggiunti con successo');
+
+                // Attendi che i dati siano caricati
+                map.once('idle', () => {
+                    console.log('Mappa idle, caricamento filtri...');
+                    loadAllFeatures();
+                });
+
+            } catch (error) {
+                console.error('Errore caricamento PMTiles:', error);
+                document.getElementById('loading').innerHTML = `Errore: ${error.message}`;
+            }
+        }
+
+        function loadAllFeatures() {
+            try {
+                // Forza zoom per caricare i dati
+                const currentZoom = map.getZoom();
+                if (currentZoom < 11) {
+                    map.setZoom(11);
+                }
+
+                // Attendi un po' e poi carica le features
+                setTimeout(() => {
+                    allFeatures = map.querySourceFeatures('incidenti', {
+                        sourceLayer: 'incidenti_2015_2023'
+                    });
+
+                    console.log('Features caricate:', allFeatures.length);
+
+                    if (allFeatures.length > 0) {
+                        populateFilters();
+                        updateStats();
+                        document.getElementById('loading').classList.add('hidden');
+                    } else {
+                        console.warn('Nessuna feature trovata, riprovo...');
+                        setTimeout(loadAllFeatures, 1000);
+                    }
+                }, 1000);
+
+            } catch (error) {
+                console.error('Errore caricamento features:', error);
+            }
+        }
+
+        function populateFilters() {
+            const filters = {
+                'filter-upl': 'UPL',
+                'filter-anno': 'Anno',
+                'filter-circoscrizione': 'Circoscrizione',
+                'filter-quartiere': 'Quartiere',
+                'filter-stagione': 'Stagione',
+                'filter-mese': 'Mese',
+                'filter-giorno-settimana': 'Giorno settimana',
+                'filter-feriale-weekend': 'Feriale/Weekend',
+                'filter-giorno-notte': 'Giorno/Notte',
+                'filter-condizioni-luce': 'Condizioni luce (Visibilità)',
+                'filter-fascia-4': 'Fascia oraria (4 fasce)',
+                'filter-fascia-6': 'Fascia oraria dettagliata (6 fasce)',
+                'filter-ora-punta': 'Ora di punta (Picchi di traffico)'
+            };
+
+            console.log('Popolamento filtri...');
+
+            Object.entries(filters).forEach(([selectId, property]) => {
+                const select = document.getElementById(selectId);
+                const values = new Set();
+                
+                allFeatures.forEach(feature => {
+                    if (feature.properties && feature.properties[property]) {
+                        const value = feature.properties[property];
+                        if (value !== null && value !== 'null' && value !== '' && value !== undefined) {
+                            values.add(String(value));
+                        }
+                    }
+                });
+
+                const sortedValues = Array.from(values).sort((a, b) => {
+                    const numA = parseFloat(a);
+                    const numB = parseFloat(b);
+                    if (!isNaN(numA) && !isNaN(numB)) {
+                        return numA - numB;
+                    }
+                    return String(a).localeCompare(String(b), 'it');
+                });
+
+                select.innerHTML = '<option value="">Tutti</option>';
+                sortedValues.forEach(value => {
+                    const option = document.createElement('option');
+                    option.value = value;
+                    option.textContent = value;
+                    select.appendChild(option);
+                });
+
+                console.log(`${property}: ${sortedValues.length} valori`);
+
+                select.addEventListener('change', applyFilters);
+            });
+
+            // Aggiungi listener al filtro tipologia
+            document.getElementById('filter-tipologia').addEventListener('change', applyFilters);
+        }
+
+        function applyFilters() {
+            const filters = {
+                'Tipologia': document.getElementById('filter-tipologia').value,
+                'UPL': document.getElementById('filter-upl').value,
+                'Anno': document.getElementById('filter-anno').value,
+                'Circoscrizione': document.getElementById('filter-circoscrizione').value,
+                'Quartiere': document.getElementById('filter-quartiere').value,
+                'Stagione': document.getElementById('filter-stagione').value,
+                'Mese': document.getElementById('filter-mese').value,
+                'Giorno settimana': document.getElementById('filter-giorno-settimana').value,
+                'Feriale/Weekend': document.getElementById('filter-feriale-weekend').value,
+                'Giorno/Notte': document.getElementById('filter-giorno-notte').value,
+                'Condizioni luce (Visibilità)': document.getElementById('filter-condizioni-luce').value,
+                'Fascia oraria (4 fasce)': document.getElementById('filter-fascia-4').value,
+                'Fascia oraria dettagliata (6 fasce)': document.getElementById('filter-fascia-6').value,
+                'Ora di punta (Picchi di traffico)': document.getElementById('filter-ora-punta').value
+            };
+
+            // Applica filtri ai layer
+            ['C', 'F', 'R', 'M'].forEach(tipo => {
+                const layerId = `incidenti-${tipo}`;
+                
+                if (!map.getLayer(layerId)) return;
+                
+                let mapFilter = ['all'];
+                
+                // Filtro tipologia
+                if (filters.Tipologia && filters.Tipologia !== tipo) {
+                    map.setLayoutProperty(layerId, 'visibility', 'none');
+                    return;
+                } else {
+                    map.setLayoutProperty(layerId, 'visibility', 'visible');
+                }
+                
+                mapFilter.push(['==', ['get', 'Tipologia'], tipo]);
+                
+                // Altri filtri
+                Object.entries(filters).forEach(([key, value]) => {
+                    if (value && key !== 'Tipologia') {
+                        const numValue = parseFloat(value);
+                        const filterValue = !isNaN(numValue) && key === 'Anno' ? numValue : value;
+                        mapFilter.push(['==', ['get', key], filterValue]);
+                    }
+                });
+                
+                map.setFilter(layerId, mapFilter);
+            });
+
+            setTimeout(() => updateStats(), 100);
+        }
+
+        function updateStats() {
+            const stats = { M: 0, R: 0, F: 0, C: 0 };
+            
+            try {
+                const features = map.queryRenderedFeatures({
+                    layers: ['incidenti-M', 'incidenti-R', 'incidenti-F', 'incidenti-C']
+                });
+
+                features.forEach(feature => {
+                    const tipo = feature.properties?.Tipologia;
+                    if (tipo && stats.hasOwnProperty(tipo)) {
+                        stats[tipo]++;
+                    }
+                });
+            } catch (error) {
+                console.error('Errore statistiche:', error);
+            }
+
+            document.getElementById('stat-mortale').textContent = stats.M.toLocaleString('it-IT');
+            document.getElementById('stat-riserva').textContent = stats.R.toLocaleString('it-IT');
+            document.getElementById('stat-feriti').textContent = stats.F.toLocaleString('it-IT');
+            document.getElementById('stat-cose').textContent = stats.C.toLocaleString('it-IT');
+            document.getElementById('stat-total').textContent = (stats.M + stats.R + stats.F + stats.C).toLocaleString('it-IT');
+        }
+
+        function changeBasemap() {
+            const selectedBasemap = document.getElementById('basemap-select').value;
+            const currentStyle = basemapStyles[selectedBasemap];
+            
+            // Salva lo stato dei layer incidenti
+            const incidentiLayers = ['C', 'F', 'R', 'M'].map(tipo => {
+                const layerId = `incidenti-${tipo}`;
+                if (map.getLayer(layerId)) {
+                    return {
+                        id: layerId,
+                        filter: map.getFilter(layerId),
+                        visibility: map.getLayoutProperty(layerId, 'visibility')
+                    };
+                }
+                return null;
+            }).filter(l => l !== null);
+
+            // Ricrea lo stile con il nuovo basemap mantenendo i layer incidenti
+            const newStyle = JSON.parse(JSON.stringify(currentStyle));
+            
+            // Aggiungi source incidenti
+            newStyle.sources['incidenti'] = map.getSource('incidenti').serialize();
+            
+            // Aggiungi i layer incidenti
+            incidentiLayers.forEach(layerInfo => {
+                const tipo = layerInfo.id.split('-')[1];
+                newStyle.layers.push({
+                    id: layerInfo.id,
+                    type: 'circle',
+                    source: 'incidenti',
+                    'source-layer': 'incidenti_2015_2023',
+                    filter: layerInfo.filter,
+                    layout: {
+                        visibility: layerInfo.visibility || 'visible'
+                    },
+                    paint: {
+                        'circle-radius': [
+                            'interpolate', ['linear'], ['zoom'],
+                            10, tipo === 'M' ? 4 : tipo === 'R' ? 3 : 2,
+                            14, tipo === 'M' ? 8 : tipo === 'R' ? 6 : 5
+                        ],
+                        'circle-color': colorMap[tipo],
+                        'circle-opacity': 0.8,
+                        'circle-stroke-width': tipo === 'M' ? 2 : 1,
+                        'circle-stroke-color': '#fff'
+                    }
+                });
+            });
+
+            map.setStyle(newStyle);
+
+            // Riattacca gli event listener dopo il cambio stile
+            map.once('styledata', () => {
+                ['C', 'F', 'R', 'M'].forEach(tipo => {
+                    const layerId = `incidenti-${tipo}`;
+                    
+                    map.on('click', layerId, (e) => {
+                        if (!e.features || e.features.length === 0) return;
+                        
+                        const props = e.features[0].properties;
+                        const tipologiaName = {
+                            'M': 'Mortale',
+                            'R': 'Riserva',
+                            'F': 'Feriti',
+                            'C': 'Cose'
+                        };
+                        
+                        let html = `
+                            <div style="padding: 10px; min-width: 200px;">
+                                <strong style="color: ${colorMap[props.Tipologia]}; font-size: 16px;">${tipologiaName[props.Tipologia]}</strong><br><br>
+                        `;
+                        
+                        Object.keys(props).forEach(key => {
+                            if (props[key] && props[key] !== 'null') {
+                                html += `<strong>${key}:</strong> ${props[key]}<br>`;
+                            }
+                        });
+                        
+                        html += '</div>';
+                        
+                        new maplibregl.Popup()
+                            .setLngLat(e.lngLat)
+                            .setHTML(html)
+                            .addTo(map);
+                    });
+
+                    map.on('mouseenter', layerId, () => {
+                        map.getCanvas().style.cursor = 'pointer';
+                    });
+
+                    map.on('mouseleave', layerId, () => {
+                        map.getCanvas().style.cursor = '';
+                    });
+                });
+
+                updateStats();
+            });
+        }
+
+        function resetFilters() {
+            document.querySelectorAll('select').forEach(select => {
+                select.value = '';
+            });
+            applyFilters();
+        }
+
+        // Aggiorna statistiche al movimento della mappa
+        map?.on('moveend', () => {
+            setTimeout(updateStats, 300);
+        });
+
+        // Avvia l'applicazione
+        init();
+    </script>
+</body>
+</html>
