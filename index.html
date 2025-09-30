@@ -82,6 +82,12 @@
             margin-top: 10px;
             border-radius: 8px;
         }
+        .stat-info {
+            font-size: 10px;
+            color: #6c757d;
+            margin-top: 5px;
+            text-align: center;
+        }
         .filters {
             padding: 20px;
         }
@@ -108,6 +114,11 @@
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        select:disabled {
+            background: #e9ecef;
+            cursor: not-allowed;
+            opacity: 0.6;
         }
         .btn-reset {
             width: 100%;
@@ -199,6 +210,13 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
             z-index: 2000;
             font-size: 16px;
+            text-align: center;
+        }
+        .loading small {
+            display: block;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #6c757d;
         }
         .loading.hidden {
             display: none;
@@ -225,13 +243,19 @@
             outline: none;
             border-color: #667eea;
         }
+        .filter-cascade-info {
+            font-size: 11px;
+            color: #6c757d;
+            margin-top: 4px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
     <div id="sidebar">
         <div class="header">
             <h1>Incidenti Stradali</h1>
-            <p>Palermo 2015-2023</p>
+            <p>Palermo 2015-2023 • Filtri Interconnessi</p>
         </div>
         
         <div class="stats">
@@ -257,6 +281,7 @@
             <div class="stat-total">
                 <div class="stat-label">Totale Incidenti</div>
                 <div class="stat-value" id="stat-total">0</div>
+                <div class="stat-info">Su tutti i dati filtrati</div>
             </div>
         </div>
 
@@ -279,16 +304,18 @@
                 </div>
                 <div class="filter-section-content" id="content-localizzazione">
                     <div class="filter-group">
-                        <label class="filter-label">UPL</label>
-                        <select id="filter-upl"></select>
-                    </div>
-                    <div class="filter-group">
                         <label class="filter-label">Circoscrizione</label>
                         <select id="filter-circoscrizione"></select>
+                        <div class="filter-cascade-info">Filtra Quartiere e UPL ↓</div>
                     </div>
                     <div class="filter-group">
                         <label class="filter-label">Quartiere</label>
                         <select id="filter-quartiere"></select>
+                        <div class="filter-cascade-info">Filtra UPL ↓</div>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">UPL</label>
+                        <select id="filter-upl"></select>
                     </div>
                 </div>
             </div>
@@ -392,6 +419,9 @@
         let map;
         let protocol;
         let allFeatures = [];
+        let currentFilters = {};
+        let loadAttempts = 0;
+        const MAX_LOAD_ATTEMPTS = 5;
         
         const colorMap = {
             'M': '#dc3545',
@@ -467,6 +497,30 @@
             }
         };
 
+        // Mappa dei filtri e delle loro proprietà
+        const filterConfig = {
+            'filter-tipologia': 'Tipologia',
+            'filter-circoscrizione': 'Circoscrizione',
+            'filter-quartiere': 'Quartiere',
+            'filter-upl': 'UPL',
+            'filter-anno': 'Anno',
+            'filter-stagione': 'Stagione',
+            'filter-mese': 'Mese',
+            'filter-giorno-settimana': 'Giorno settimana',
+            'filter-feriale-weekend': 'Feriale/Weekend',
+            'filter-giorno-notte': 'Giorno/Notte',
+            'filter-condizioni-luce': 'Condizioni luce (Visibilità)',
+            'filter-fascia-4': 'Fascia oraria (4 fasce)',
+            'filter-fascia-6': 'Fascia oraria dettagliata (6 fasce)',
+            'filter-ora-punta': 'Ora di punta (Picchi di traffico)'
+        };
+
+        // Definisce le dipendenze dei filtri (quali filtri dipendono da quali)
+        const filterDependencies = {
+            'filter-circoscrizione': ['filter-quartiere', 'filter-upl'],
+            'filter-quartiere': ['filter-upl']
+        };
+
         function toggleSection(sectionId) {
             const content = document.getElementById(`content-${sectionId}`);
             const toggle = document.getElementById(`toggle-${sectionId}`);
@@ -479,23 +533,20 @@
             try {
                 console.log('Inizializzazione mappa...');
                 
-                // Inizializza protocollo PMTiles
                 protocol = new pmtiles.Protocol();
                 maplibregl.addProtocol('pmtiles', protocol.tile);
 
-                // Inizializza mappa
                 map = new maplibregl.Map({
                     container: 'map',
                     style: basemapStyles['osm'],
                     center: [13.3614, 38.1157],
-                    zoom: 11,
-                    hash: true // Aggiungi hash per coordinate nell'URL
+                    zoom: 9,
+                    minZoom: 9,
+                    maxZoom: 17,
+                    hash: true
                 });
 
-                // Aggiungi controlli di navigazione
                 map.addControl(new maplibregl.NavigationControl(), 'top-left');
-
-                // Aggiungi controllo scala
                 map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
 
                 map.on('load', async () => {
@@ -512,15 +563,13 @@
         async function loadPMTiles() {
             try {
                 const pmtilesUrl = 'https://palermohub.github.io/palermo-incidenti/data/incidenti_2015_2023.pmtiles';
-                const sourceLayer = 'incidenti_2015_2023';
+                const sourceLayer = 'incidenti_2015_2023_puliti';
                 
                 console.log('Caricamento PMTiles da:', pmtilesUrl);
                 
-                // Crea istanza PMTiles
                 const p = new pmtiles.PMTiles(pmtilesUrl);
                 protocol.add(p);
                 
-                // Aggiungi source PMTiles
                 map.addSource('incidenti', {
                     type: 'vector',
                     url: `pmtiles://${pmtilesUrl}`,
@@ -528,7 +577,6 @@
                     maxzoom: 14
                 });
 
-                // Aggiungi layer per ogni tipologia
                 ['C', 'F', 'R', 'M'].forEach(tipo => {
                     const layerId = `incidenti-${tipo}`;
                     
@@ -551,52 +599,14 @@
                         }
                     });
 
-                    // Popup al click
-                    map.on('click', layerId, (e) => {
-                        if (!e.features || e.features.length === 0) return;
-                        
-                        const props = e.features[0].properties;
-                        const tipologiaName = {
-                            'M': 'Mortale',
-                            'R': 'Riserva',
-                            'F': 'Feriti',
-                            'C': 'Cose'
-                        };
-                        
-                        let html = `
-                            <div style="padding: 10px; min-width: 200px;">
-                                <strong style="color: ${colorMap[props.Tipologia]}; font-size: 16px;">${tipologiaName[props.Tipologia]}</strong><br><br>
-                        `;
-                        
-                        // Aggiungi solo le proprietà disponibili
-                        Object.keys(props).forEach(key => {
-                            if (props[key] && props[key] !== 'null') {
-                                html += `<strong>${key}:</strong> ${props[key]}<br>`;
-                            }
-                        });
-                        
-                        html += '</div>';
-                        
-                        new maplibregl.Popup()
-                            .setLngLat(e.lngLat)
-                            .setHTML(html)
-                            .addTo(map);
-                    });
-
-                    map.on('mouseenter', layerId, () => {
-                        map.getCanvas().style.cursor = 'pointer';
-                    });
-
-                    map.on('mouseleave', layerId, () => {
-                        map.getCanvas().style.cursor = '';
-                    });
+                    setupLayerInteractions(layerId);
                 });
 
                 console.log('Layers aggiunti con successo');
 
-                // Attendi che i dati siano caricati
                 map.once('idle', () => {
                     console.log('Mappa idle, caricamento filtri...');
+                    loadAttempts = 0; // Reset counter
                     loadAllFeatures();
                 });
 
@@ -606,61 +616,159 @@
             }
         }
 
+        function setupLayerInteractions(layerId) {
+            map.on('click', layerId, (e) => {
+                if (!e.features || e.features.length === 0) return;
+                
+                const props = e.features[0].properties;
+                const tipologiaName = {
+                    'M': 'Mortale',
+                    'R': 'Riserva',
+                    'F': 'Feriti',
+                    'C': 'Cose'
+                };
+                
+                let html = `
+                    <div style="padding: 10px; min-width: 200px;">
+                        <strong style="color: ${colorMap[props.Tipologia]}; font-size: 16px;">${tipologiaName[props.Tipologia]}</strong><br><br>
+                `;
+                
+                Object.keys(props).forEach(key => {
+                    if (props[key] && props[key] !== 'null') {
+                        html += `<strong>${key}:</strong> ${props[key]}<br>`;
+                    }
+                });
+                
+                html += '</div>';
+                
+                new maplibregl.Popup()
+                    .setLngLat(e.lngLat)
+                    .setHTML(html)
+                    .addTo(map);
+            });
+
+            map.on('mouseenter', layerId, () => {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+
+            map.on('mouseleave', layerId, () => {
+                map.getCanvas().style.cursor = '';
+            });
+        }
+
         function loadAllFeatures() {
             try {
-                // Forza zoom per caricare i dati
+                loadAttempts++;
+                
                 const currentZoom = map.getZoom();
-                if (currentZoom < 11) {
-                    map.setZoom(11);
+                if (currentZoom < 9) {
+                    map.setZoom(9);
                 }
 
-                // Attendi un po' e poi carica le features
+                // Attendi che i tile si carichino
                 setTimeout(() => {
                     allFeatures = map.querySourceFeatures('incidenti', {
-                        sourceLayer: 'incidenti_2015_2023'
+                        sourceLayer: 'incidenti_2015_2023_puliti'
                     });
 
-                    console.log('Features caricate:', allFeatures.length);
+                    console.log(`Tentativo ${loadAttempts}: Features caricate:`, allFeatures.length);
+                    document.getElementById('loading').innerHTML = `Caricamento dati...<br><small>${allFeatures.length} incidenti caricati (tentativo ${loadAttempts}/${MAX_LOAD_ATTEMPTS})</small>`;
 
-                    if (allFeatures.length > 0) {
+                    if (allFeatures.length > 1000 || loadAttempts >= MAX_LOAD_ATTEMPTS) {
+                        // Abbiamo abbastanza dati O abbiamo raggiunto il limite di tentativi
                         populateFilters();
-                        updateStats();
+                        updateStatsFromAllFeatures();
                         document.getElementById('loading').classList.add('hidden');
+                        console.log(`Caricamento completato con ${allFeatures.length} features`);
+                    } else if (allFeatures.length > 0) {
+                        // Abbiamo alcuni dati ma forse non tutti, riprovo
+                        console.warn(`Solo ${allFeatures.length} features caricate, attendo altri tile...`);
+                        setTimeout(loadAllFeatures, 1500);
                     } else {
+                        // Nessun dato, riprovo
                         console.warn('Nessuna feature trovata, riprovo...');
-                        setTimeout(loadAllFeatures, 1000);
+                        setTimeout(loadAllFeatures, 1500);
                     }
-                }, 1000);
+                }, 2000); // Aumentato il timeout iniziale
 
             } catch (error) {
                 console.error('Errore caricamento features:', error);
+                document.getElementById('loading').innerHTML = 'Errore caricamento dati';
             }
         }
 
+        function getFilteredFeatures() {
+            return allFeatures.filter(feature => {
+                if (!feature.properties) return false;
+
+                for (const [filterId, property] of Object.entries(filterConfig)) {
+                    const value = currentFilters[filterId];
+                    if (!value) continue;
+
+                    const featureValue = feature.properties[property];
+                    const numValue = parseFloat(value);
+                    const filterValue = !isNaN(numValue) && property === 'Anno' ? numValue : value;
+                    
+                    if (featureValue != filterValue) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+        }
+
         function populateFilters() {
-            const filters = {
-                'filter-upl': 'UPL',
-                'filter-anno': 'Anno',
-                'filter-circoscrizione': 'Circoscrizione',
-                'filter-quartiere': 'Quartiere',
-                'filter-stagione': 'Stagione',
-                'filter-mese': 'Mese',
-                'filter-giorno-settimana': 'Giorno settimana',
-                'filter-feriale-weekend': 'Feriale/Weekend',
-                'filter-giorno-notte': 'Giorno/Notte',
-                'filter-condizioni-luce': 'Condizioni luce (Visibilità)',
-                'filter-fascia-4': 'Fascia oraria (4 fasce)',
-                'filter-fascia-6': 'Fascia oraria dettagliata (6 fasce)',
-                'filter-ora-punta': 'Ora di punta (Picchi di traffico)'
-            };
+            console.log('Popolamento filtri iniziale...');
 
-            console.log('Popolamento filtri...');
-
-            Object.entries(filters).forEach(([selectId, property]) => {
+            Object.entries(filterConfig).forEach(([selectId, property]) => {
                 const select = document.getElementById(selectId);
+                if (!select) return;
+
+                select.addEventListener('change', (e) => {
+                    handleFilterChange(selectId, e.target.value);
+                });
+            });
+
+            updateAllFilters();
+        }
+
+        function handleFilterChange(filterId, value) {
+            currentFilters[filterId] = value;
+
+            // Reset dei filtri dipendenti
+            if (filterDependencies[filterId]) {
+                filterDependencies[filterId].forEach(dependentId => {
+                    currentFilters[dependentId] = '';
+                    document.getElementById(dependentId).value = '';
+                });
+            }
+
+            // Aggiorna tutti i filtri con i nuovi valori disponibili
+            updateAllFilters();
+
+            // Applica i filtri alla mappa
+            applyFiltersToMap();
+
+            // Zoom automatico per filtri geografici
+            if (filterId === 'filter-circoscrizione' || filterId === 'filter-quartiere') {
+                zoomToFilteredFeatures();
+            }
+
+            // Aggiorna le statistiche
+            updateStatsFromAllFeatures();
+        }
+
+        function updateAllFilters() {
+            const filteredFeatures = getFilteredFeatures();
+
+            Object.entries(filterConfig).forEach(([selectId, property]) => {
+                const select = document.getElementById(selectId);
+                if (!select) return;
+
+                const currentValue = currentFilters[selectId] || '';
                 const values = new Set();
                 
-                allFeatures.forEach(feature => {
+                filteredFeatures.forEach(feature => {
                     if (feature.properties && feature.properties[property]) {
                         const value = feature.properties[property];
                         if (value !== null && value !== 'null' && value !== '' && value !== undefined) {
@@ -683,37 +791,18 @@
                     const option = document.createElement('option');
                     option.value = value;
                     option.textContent = value;
+                    if (value === currentValue) {
+                        option.selected = true;
+                    }
                     select.appendChild(option);
                 });
 
-                console.log(`${property}: ${sortedValues.length} valori`);
-
-                select.addEventListener('change', applyFilters);
+                // Disabilita i filtri che non hanno opzioni
+                select.disabled = sortedValues.length === 0 && currentValue === '';
             });
-
-            // Aggiungi listener al filtro tipologia
-            document.getElementById('filter-tipologia').addEventListener('change', applyFilters);
         }
 
-        function applyFilters() {
-            const filters = {
-                'Tipologia': document.getElementById('filter-tipologia').value,
-                'UPL': document.getElementById('filter-upl').value,
-                'Anno': document.getElementById('filter-anno').value,
-                'Circoscrizione': document.getElementById('filter-circoscrizione').value,
-                'Quartiere': document.getElementById('filter-quartiere').value,
-                'Stagione': document.getElementById('filter-stagione').value,
-                'Mese': document.getElementById('filter-mese').value,
-                'Giorno settimana': document.getElementById('filter-giorno-settimana').value,
-                'Feriale/Weekend': document.getElementById('filter-feriale-weekend').value,
-                'Giorno/Notte': document.getElementById('filter-giorno-notte').value,
-                'Condizioni luce (Visibilità)': document.getElementById('filter-condizioni-luce').value,
-                'Fascia oraria (4 fasce)': document.getElementById('filter-fascia-4').value,
-                'Fascia oraria dettagliata (6 fasce)': document.getElementById('filter-fascia-6').value,
-                'Ora di punta (Picchi di traffico)': document.getElementById('filter-ora-punta').value
-            };
-
-            // Applica filtri ai layer
+        function applyFiltersToMap() {
             ['C', 'F', 'R', 'M'].forEach(tipo => {
                 const layerId = `incidenti-${tipo}`;
                 
@@ -722,7 +811,7 @@
                 let mapFilter = ['all'];
                 
                 // Filtro tipologia
-                if (filters.Tipologia && filters.Tipologia !== tipo) {
+                if (currentFilters['filter-tipologia'] && currentFilters['filter-tipologia'] !== tipo) {
                     map.setLayoutProperty(layerId, 'visibility', 'none');
                     return;
                 } else {
@@ -732,50 +821,65 @@
                 mapFilter.push(['==', ['get', 'Tipologia'], tipo]);
                 
                 // Altri filtri
-                Object.entries(filters).forEach(([key, value]) => {
-                    if (value && key !== 'Tipologia') {
+                Object.entries(currentFilters).forEach(([filterId, value]) => {
+                    if (value && filterId !== 'filter-tipologia') {
+                        const property = filterConfig[filterId];
                         const numValue = parseFloat(value);
-                        const filterValue = !isNaN(numValue) && key === 'Anno' ? numValue : value;
-                        mapFilter.push(['==', ['get', key], filterValue]);
+                        const filterValue = !isNaN(numValue) && property === 'Anno' ? numValue : value;
+                        mapFilter.push(['==', ['get', property], filterValue]);
                     }
                 });
                 
                 map.setFilter(layerId, mapFilter);
             });
-
-            setTimeout(() => updateStats(), 100);
         }
 
-        function updateStats() {
+        function updateStatsFromAllFeatures() {
+            const filteredFeatures = getFilteredFeatures();
             const stats = { M: 0, R: 0, F: 0, C: 0 };
             
-            try {
-                const features = map.queryRenderedFeatures({
-                    layers: ['incidenti-M', 'incidenti-R', 'incidenti-F', 'incidenti-C']
-                });
-
-                features.forEach(feature => {
-                    const tipo = feature.properties?.Tipologia;
-                    if (tipo && stats.hasOwnProperty(tipo)) {
-                        stats[tipo]++;
-                    }
-                });
-            } catch (error) {
-                console.error('Errore statistiche:', error);
-            }
+            filteredFeatures.forEach(feature => {
+                const tipo = feature.properties?.Tipologia;
+                if (tipo && stats.hasOwnProperty(tipo)) {
+                    stats[tipo]++;
+                }
+            });
 
             document.getElementById('stat-mortale').textContent = stats.M.toLocaleString('it-IT');
             document.getElementById('stat-riserva').textContent = stats.R.toLocaleString('it-IT');
             document.getElementById('stat-feriti').textContent = stats.F.toLocaleString('it-IT');
             document.getElementById('stat-cose').textContent = stats.C.toLocaleString('it-IT');
             document.getElementById('stat-total').textContent = (stats.M + stats.R + stats.F + stats.C).toLocaleString('it-IT');
+
+            console.log('Statistiche aggiornate:', stats);
+        }
+
+        function zoomToFilteredFeatures() {
+            const filteredFeatures = getFilteredFeatures();
+            
+            if (filteredFeatures.length === 0) return;
+
+            const bounds = new maplibregl.LngLatBounds();
+            
+            filteredFeatures.forEach(feature => {
+                if (feature.geometry && feature.geometry.coordinates) {
+                    bounds.extend(feature.geometry.coordinates);
+                }
+            });
+
+            if (!bounds.isEmpty()) {
+                map.fitBounds(bounds, {
+                    padding: 50,
+                    maxZoom: 14,
+                    duration: 1000
+                });
+            }
         }
 
         function changeBasemap() {
             const selectedBasemap = document.getElementById('basemap-select').value;
             const currentStyle = basemapStyles[selectedBasemap];
             
-            // Salva lo stato dei layer incidenti
             const incidentiLayers = ['C', 'F', 'R', 'M'].map(tipo => {
                 const layerId = `incidenti-${tipo}`;
                 if (map.getLayer(layerId)) {
@@ -788,20 +892,16 @@
                 return null;
             }).filter(l => l !== null);
 
-            // Ricrea lo stile con il nuovo basemap mantenendo i layer incidenti
             const newStyle = JSON.parse(JSON.stringify(currentStyle));
-            
-            // Aggiungi source incidenti
             newStyle.sources['incidenti'] = map.getSource('incidenti').serialize();
             
-            // Aggiungi i layer incidenti
             incidentiLayers.forEach(layerInfo => {
                 const tipo = layerInfo.id.split('-')[1];
                 newStyle.layers.push({
                     id: layerInfo.id,
                     type: 'circle',
                     source: 'incidenti',
-                    'source-layer': 'incidenti_2015_2023',
+                    'source-layer': 'incidenti_2015_2023_puliti',
                     filter: layerInfo.filter,
                     layout: {
                         visibility: layerInfo.visibility || 'visible'
@@ -822,67 +922,33 @@
 
             map.setStyle(newStyle);
 
-            // Riattacca gli event listener dopo il cambio stile
             map.once('styledata', () => {
                 ['C', 'F', 'R', 'M'].forEach(tipo => {
-                    const layerId = `incidenti-${tipo}`;
-                    
-                    map.on('click', layerId, (e) => {
-                        if (!e.features || e.features.length === 0) return;
-                        
-                        const props = e.features[0].properties;
-                        const tipologiaName = {
-                            'M': 'Mortale',
-                            'R': 'Riserva',
-                            'F': 'Feriti',
-                            'C': 'Cose'
-                        };
-                        
-                        let html = `
-                            <div style="padding: 10px; min-width: 200px;">
-                                <strong style="color: ${colorMap[props.Tipologia]}; font-size: 16px;">${tipologiaName[props.Tipologia]}</strong><br><br>
-                        `;
-                        
-                        Object.keys(props).forEach(key => {
-                            if (props[key] && props[key] !== 'null') {
-                                html += `<strong>${key}:</strong> ${props[key]}<br>`;
-                            }
-                        });
-                        
-                        html += '</div>';
-                        
-                        new maplibregl.Popup()
-                            .setLngLat(e.lngLat)
-                            .setHTML(html)
-                            .addTo(map);
-                    });
-
-                    map.on('mouseenter', layerId, () => {
-                        map.getCanvas().style.cursor = 'pointer';
-                    });
-
-                    map.on('mouseleave', layerId, () => {
-                        map.getCanvas().style.cursor = '';
-                    });
+                    setupLayerInteractions(`incidenti-${tipo}`);
                 });
-
-                updateStats();
+                updateStatsFromAllFeatures();
             });
         }
 
         function resetFilters() {
+            currentFilters = {};
             document.querySelectorAll('select').forEach(select => {
                 select.value = '';
+                select.disabled = false;
             });
-            applyFilters();
+            
+            updateAllFilters();
+            applyFiltersToMap();
+            updateStatsFromAllFeatures();
+
+            // Torna alla vista iniziale
+            map.flyTo({
+                center: [13.3614, 38.1157],
+                zoom: 9,
+                duration: 1000
+            });
         }
 
-        // Aggiorna statistiche al movimento della mappa
-        map?.on('moveend', () => {
-            setTimeout(updateStats, 300);
-        });
-
-        // Avvia l'applicazione
         init();
     </script>
 </body>
