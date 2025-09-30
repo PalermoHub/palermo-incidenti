@@ -54,7 +54,7 @@
         }
         
         .header {
-            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #4c1d95 100%);
             color: white;
             padding: 32px 24px;
             position: relative;
@@ -68,7 +68,7 @@
             right: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
             animation: pulse 8s ease-in-out infinite;
         }
         
@@ -174,6 +174,7 @@
             border-radius: 12px;
             border: 1px solid rgba(148, 163, 184, 0.2);
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: relative;
         }
         
         .stat-info {
@@ -182,6 +183,30 @@
             margin-top: 8px;
             font-weight: 700;
             text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .info-icon {
+            width: 20px;
+            height: 20px;
+            background: rgba(16, 185, 129, 0.2);
+            border: 2px solid #10b981;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .info-icon:hover {
+            background: rgba(16, 185, 129, 0.3);
+            transform: scale(1.1);
         }
         
         .year-stats {
@@ -206,6 +231,45 @@
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
+        }
+        
+        .year-stat-item-all {
+            width: 100%;
+            padding: 10px 12px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.4) 0%, rgba(139, 92, 246, 0.4) 100%);
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid rgba(59, 130, 246, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 8px;
+        }
+        
+        .year-stat-item-all:hover {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.5) 0%, rgba(139, 92, 246, 0.5) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+        
+        .year-stat-item-all.active {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.6) 0%, rgba(139, 92, 246, 0.6) 100%);
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
+        }
+        
+        .year-stat-item-all .year-stat-year {
+            font-size: 13px;
+            color: #60a5fa;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .year-stat-item-all .year-stat-count {
+            font-size: 20px;
+            color: #f1f5f9;
+            font-weight: 800;
+            margin-top: 2px;
         }
         
         .year-stat-item {
@@ -315,6 +379,48 @@
         .btn-reset:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+        
+        .btn-data-table {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+        
+        .btn-data-table:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+        }
+        
+        .btn-fonte {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(100, 116, 139, 0.3);
+        }
+        
+        .btn-fonte:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(100, 116, 139, 0.4);
         }
         
         .btn-heatmap {
@@ -574,9 +680,627 @@
         #total-info {
             white-space: pre-line;
         }
+        
+        .maplibregl-ctrl-ods {
+            background: transparent;
+            border: none;
+        }
+        
+        .maplibregl-ctrl-ods a {
+            display: block;
+            transition: all 0.3s ease;
+        }
+        
+        .maplibregl-ctrl-ods a:hover {
+            transform: scale(1.05);
+        }
+        
+        .maplibregl-ctrl-ods img {
+            height: 45px;
+            width: auto;
+            display: block;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+        }
+        
+        .maplibregl-ctrl-ods a:hover img {
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.7));
+        }
+        
+        .detail-panel {
+            position: fixed;
+            top: 0;
+            right: -450px;
+            width: 450px;
+            height: 100vh;
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            box-shadow: -4px 0 20px rgba(0,0,0,0.5);
+            z-index: 2000;
+            overflow-y: auto;
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 1px solid rgba(148, 163, 184, 0.2);
+        }
+        
+        .detail-panel.open {
+            right: 0;
+        }
+        
+        .detail-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .detail-panel::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+        }
+        
+        .detail-panel::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.3);
+            border-radius: 4px;
+        }
+        
+        .detail-panel::-webkit-scrollbar-thumb:hover {
+            background: rgba(148, 163, 184, 0.5);
+        }
+        
+        .detail-header {
+            position: sticky;
+            top: 0;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #4c1d95 100%);
+            color: white;
+            padding: 24px;
+            z-index: 10;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .detail-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .detail-header p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        .detail-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .detail-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+        
+        .detail-content {
+            padding: 24px;
+        }
+        
+        .detail-section {
+            margin-bottom: 24px;
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+        
+        .detail-section h3 {
+            font-size: 14px;
+            color: #60a5fa;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+            margin-right: 16px;
+        }
+        
+        .detail-value {
+            font-size: 14px;
+            color: #f1f5f9;
+            font-weight: 600;
+            text-align: right;
+        }
+        
+        .tipo-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .tipo-badge.M {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.1) 100%);
+            color: #ef4444;
+            border: 2px solid #ef4444;
+        }
+        
+        .tipo-badge.R {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.2) 0%, rgba(249, 115, 22, 0.1) 100%);
+            color: #f97316;
+            border: 2px solid #f97316;
+        }
+        
+        .tipo-badge.F {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.1) 100%);
+            color: #f59e0b;
+            border: 2px solid #f59e0b;
+        }
+        
+        .tipo-badge.C {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.1) 100%);
+            color: #10b981;
+            border: 2px solid #10b981;
+        }
+        
+        .coordinates-box {
+            background: rgba(15, 23, 42, 0.8);
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #10b981;
+            margin-top: 8px;
+        }
+        
+        /* Mobile Toggle Button */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 2001;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .mobile-toggle:active {
+            transform: scale(0.95);
+        }
+        
+        .mobile-toggle span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(7px, 7px);
+        }
+        
+        .mobile-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .mobile-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            #sidebar {
+                width: 340px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                display: flex;
+            }
+            
+            #sidebar {
+                position: fixed;
+                left: -380px;
+                top: 0;
+                width: 360px;
+                height: 100vh;
+                z-index: 2000;
+                transition: left 0.3s ease;
+            }
+            
+            #sidebar.open {
+                left: 0;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .header p {
+                font-size: 13px;
+            }
+            
+            .stat-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .stat-value {
+                font-size: 24px;
+            }
+            
+            .basemap-selector {
+                top: 20px;
+                right: 10px;
+            }
+            
+            .basemap-selector select {
+                width: 140px;
+                font-size: 12px;
+                padding: 8px 10px;
+            }
+            
+            .legend {
+                bottom: 10px;
+                right: 10px;
+                padding: 16px;
+                margin: 10px;
+            }
+            
+            .legend h3 {
+                font-size: 12px;
+            }
+            
+            .legend-item {
+                font-size: 11px;
+                margin-bottom: 8px;
+            }
+            
+            .legend-color {
+                width: 20px;
+                height: 20px;
+                margin-right: 8px;
+            }
+            
+            .detail-panel {
+                width: 100%;
+                right: -100%;
+            }
+            
+            .detail-panel.open {
+                right: 0;
+            }
+            
+            .maplibregl-ctrl-ods img {
+                height: 35px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            #sidebar {
+                width: 100%;
+                left: -100%;
+            }
+            
+            .header {
+                padding: 20px 16px;
+            }
+            
+            .header h1 {
+                font-size: 18px;
+            }
+            
+            .stats {
+                padding: 16px;
+            }
+            
+            .stat-value {
+                font-size: 20px;
+            }
+            
+            .stat-label {
+                font-size: 10px;
+            }
+            
+            .filters {
+                padding: 16px;
+            }
+            
+            .btn-heatmap, .btn-reset {
+                padding: 12px;
+                font-size: 13px;
+            }
+            
+            .year-stat-item {
+                min-width: 70px;
+                padding: 6px 10px;
+            }
+            
+            .year-stat-year {
+                font-size: 11px;
+            }
+            
+            .year-stat-count {
+                font-size: 16px;
+            }
+            
+            .legend {
+                max-width: calc(100vw - 40px);
+            }
+            
+            .basemap-selector {
+                top: 80px;
+                right: 10px;
+            }
+            
+            .basemap-selector select {
+                width: 120px;
+                font-size: 11px;
+            }
+            
+            .detail-header h2 {
+                font-size: 18px;
+            }
+            
+            .detail-section {
+                padding: 16px;
+            }
+            
+            .detail-label {
+                font-size: 11px;
+            }
+            
+            .detail-value {
+                font-size: 13px;
+            }
+            
+            .maplibregl-ctrl-ods img {
+                height: 30px;
+            }
+        }
+        
+        /* Overlay per mobile quando sidebar aperta */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .sidebar-overlay.show {
+            opacity: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar-overlay {
+                display: block;
+            }
+        }
+        
+        /* Info Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            position: relative;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h3 {
+            color: #f1f5f9;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .modal-close {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-close:hover {
+            background: rgba(239, 68, 68, 0.3);
+            transform: rotate(90deg);
+        }
+        
+        .modal-body {
+            color: #cbd5e1;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        
+        .modal-body p {
+            margin-bottom: 16px;
+        }
+        
+        /* Data Table Modal */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        
+        .data-table th {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+            position: sticky;
+            top: 0;
+        }
+        
+        .data-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            color: #cbd5e1;
+        }
+        
+        .data-table tr:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-download {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px 16px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
+        }
+        
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+        
+        @media (max-width: 480px) {
+            .modal-content {
+                padding: 20px;
+                max-height: 90vh;
+            }
+            
+            .modal-header h3 {
+                font-size: 16px;
+            }
+            
+            .modal-body {
+                font-size: 13px;
+            }
+            
+            .data-table {
+                font-size: 11px;
+            }
+            
+            .data-table th,
+            .data-table td {
+                padding: 8px 6px;
+            }
+        }
     </style>
 </head>
 <body>
+    <button class="mobile-toggle" id="mobile-toggle" onclick="toggleSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+    
     <div id="sidebar">
         <div class="header">
             <div class="header-content">
@@ -608,7 +1332,10 @@
             <div class="stat-total">
                 <div class="stat-label">Totale Incidenti</div>
                 <div class="stat-value" id="stat-total">0</div>
-                <div class="stat-info" id="total-info">Caricamento...</div>
+                <div class="stat-info" id="total-info">
+                    <span>✓ Dati caricati</span>
+                    <span class="info-icon" onclick="openInfoModal()" title="Informazioni sui dati">i</span>
+                </div>
             </div>
             
             <div class="year-stats">
@@ -619,9 +1346,9 @@
 
         <div class="filters">
             <button class="btn-heatmap" id="btn-toggle-heatmap" onclick="toggleHeatmap()">
-                🔥 Mostra Mappa di Calore
+                🔥 Mappa di Calore
             </button>
-
+<br>
             <div class="filter-group hidden">
                 <label class="filter-label">Tipologia Incidente</label>
                 <select id="filter-tipologia">
@@ -632,7 +1359,7 @@
                     <option value="C">C - Cose</option>
                 </select>
             </div>
-
+<br>
             <div class="filter-section">
                 <div class="filter-section-header" onclick="toggleSection('localizzazione')">
                     <span>📍 Localizzazione</span>
@@ -715,6 +1442,12 @@
             </div>
 
             <button class="btn-reset" onclick="resetFilters()">🔄 Resetta Tutti i Filtri</button>
+            
+            <button class="btn-data-table" onclick="openDataTable()">📊 Visualizza Tabella Dati</button>
+            
+            <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" target="_blank" rel="noopener noreferrer" class="btn-fonte">
+                📁 Fonte Dati
+            </a>
         </div>
     </div>
 
@@ -775,6 +1508,68 @@
     <div class="loading" id="loading">
         <div>Caricamento dati CSV...</div>
         <small>Attendere prego</small>
+    </div>
+
+    <div class="detail-panel" id="detail-panel">
+        <div class="detail-header">
+            <button class="detail-close" onclick="closeDetailPanel()">×</button>
+            <h2 id="detail-tipo-header">
+                <span id="detail-tipo-icon">🚗</span>
+                Dettagli Incidente
+            </h2>
+            <p id="detail-subtitle">Informazioni complete</p>
+        </div>
+        <div class="detail-content" id="detail-content">
+            <!-- Contenuto dinamico -->
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div class="modal" id="info-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>ℹ️ Informazioni sui Dati</h3>
+                <button class="modal-close" onclick="closeInfoModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Dataset completo:</strong> 28.239 incidenti registrati a Palermo dal 2015 al 2023.</p>
+                
+                <p><strong>Incidenti mappati:</strong> 23.487 incidenti (83,2% del totale) con coordinate geografiche valide all'interno dei confini comunali.</p>
+                
+                <p><strong>Esclusioni dall'analisi spaziale:</strong></p>
+                <ul style="margin-left: 20px; margin-bottom: 16px;">
+                    <li style="margin-bottom: 8px;"><strong>1.560 incidenti (5,5%)</strong> - Le coordinate geografiche risultano esterne ai confini del Comune di Palermo</li>
+                    <li><strong>3.192 incidenti del 2019 (11,3%)</strong> - Completamente privi di coordinate geografiche e pertanto non utilizzabili per l'analisi spaziale</li>
+                </ul>
+                
+                <p style="color: #60a5fa;"><strong>Nota:</strong> L'analisi e la visualizzazione sulla mappa si basano sui 23.487 incidenti georeferenziati e validi.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Table Modal -->
+    <div class="modal" id="data-table-modal">
+        <div class="modal-content" style="max-width: 90vw;">
+            <div class="modal-header">
+                <h3>📊 Tabella Dati Incidenti Filtrati</h3>
+                <button class="modal-close" onclick="closeDataTable()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="table-actions">
+                    <button class="btn-download" onclick="downloadCSV()">⬇️ Scarica CSV</button>
+                    <button class="btn-download" onclick="downloadJSON()">⬇️ Scarica JSON</button>
+                </div>
+                <div style="color: #94a3b8; font-size: 12px; margin-bottom: 12px;">
+                    <strong id="table-count">0</strong> incidenti visualizzati
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="data-table">
+                        <thead id="table-header"></thead>
+                        <tbody id="table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -902,6 +1697,26 @@
             updateMapData();
             updateStats();
             updateYearStats();
+            
+            // Chiudi sidebar su mobile
+            if (window.innerWidth <= 768) {
+                closeSidebar();
+            }
+        }
+        
+        function filterAllYears() {
+            currentFilters['filter-anno'] = '';
+            document.getElementById('filter-anno').value = '';
+            
+            updateAllFilters();
+            updateMapData();
+            updateStats();
+            updateYearStats();
+            
+            // Chiudi sidebar su mobile
+            if (window.innerWidth <= 768) {
+                closeSidebar();
+            }
         }
 
         function filterByTipologia(tipo) {
@@ -934,6 +1749,180 @@
             } else {
                 document.querySelector(`.legend-item[data-tipo="${selectedTipo}"]`).classList.add('active');
             }
+        }
+
+        function openDetailPanel(properties) {
+            const panel = document.getElementById('detail-panel');
+            const content = document.getElementById('detail-content');
+            
+            const tipologiaNames = {
+                'M': 'Mortale',
+                'R': 'Riserva',
+                'F': 'Feriti',
+                'C': 'Cose'
+            };
+            
+            const tipologiaIcons = {
+                'M': '💀',
+                'R': '🚑',
+                'F': '🤕',
+                'C': '🔧'
+            };
+            
+            // Aggiorna header
+            document.getElementById('detail-tipo-icon').textContent = tipologiaIcons[properties.Tipologia] || '🚗';
+            document.getElementById('detail-subtitle').textContent = `Incidente del ${properties.Data || 'Data non disponibile'}`;
+            
+            // Costruisci contenuto strutturato
+            let html = '';
+            
+            // Sezione 1: Tipologia e Gravità
+            html += `
+                <div class="detail-section">
+                    <h3>⚠️ Tipologia e Gravità</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Tipo Incidente</span>
+                        <span class="tipo-badge ${properties.Tipologia}">${properties.Tipologia} - ${tipologiaNames[properties.Tipologia]}</span>
+                    </div>
+                </div>
+            `;
+            
+            // Sezione 2: Informazioni Temporali
+            html += '<div class="detail-section"><h3>📅 Quando è Avvenuto</h3>';
+            const temporalFields = [
+                { key: 'Data', label: 'Data' },
+                { key: 'Anno', label: 'Anno' },
+                { key: 'Stagione', label: 'Stagione' },
+                { key: 'Mese', label: 'Mese' },
+                { key: 'Giorno settimana', label: 'Giorno Settimana' },
+                { key: 'Feriale/Weekend', label: 'Tipo Giorno' },
+                { key: 'Giorno/Notte', label: 'Momento' },
+                { key: 'Fascia oraria (4 fasce)', label: 'Fascia Oraria' },
+                { key: 'Fascia oraria dettagliata (6 fasce)', label: 'Fascia Dettagliata' },
+                { key: 'Ora di punta (Picchi di traffico)', label: 'Ora di Punta' }
+            ];
+            
+            temporalFields.forEach(field => {
+                if (properties[field.key] && properties[field.key] !== 'null') {
+                    html += `
+                        <div class="detail-row">
+                            <span class="detail-label">${field.label}</span>
+                            <span class="detail-value">${properties[field.key]}</span>
+                        </div>
+                    `;
+                }
+            });
+            html += '</div>';
+            
+            // Sezione 3: Localizzazione
+            html += '<div class="detail-section"><h3>📍 Dove è Avvenuto</h3>';
+            const locationFields = [
+                { key: 'Circoscrizione', label: 'Circoscrizione' },
+                { key: 'Quartiere', label: 'Quartiere' },
+                { key: 'UPL', label: 'Unità Primo Livello' }
+            ];
+            
+            locationFields.forEach(field => {
+                if (properties[field.key] && properties[field.key] !== 'null') {
+                    html += `
+                        <div class="detail-row">
+                            <span class="detail-label">${field.label}</span>
+                            <span class="detail-value">${properties[field.key]}</span>
+                        </div>
+                    `;
+                }
+            });
+            
+            if (properties.latitude && properties.longitude) {
+                html += `
+                    <div class="detail-row">
+                        <span class="detail-label">Coordinate GPS</span>
+                        <div style="flex: 1; text-align: right;">
+                            <div class="coordinates-box">
+                                Lat: ${parseFloat(properties.latitude).toFixed(6)}<br>
+                                Lng: ${parseFloat(properties.longitude).toFixed(6)}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            html += '</div>';
+            
+            // Sezione 4: Condizioni Ambientali
+            html += '<div class="detail-section"><h3>🌤️ Condizioni Ambientali</h3>';
+            const conditionsFields = [
+                { key: 'Condizioni luce (Visibilità)', label: 'Condizioni Luce' }
+            ];
+            
+            conditionsFields.forEach(field => {
+                if (properties[field.key] && properties[field.key] !== 'null') {
+                    html += `
+                        <div class="detail-row">
+                            <span class="detail-label">${field.label}</span>
+                            <span class="detail-value">${properties[field.key]}</span>
+                        </div>
+                    `;
+                }
+            });
+            html += '</div>';
+            
+            // Sezione 5: Altri Dati
+            html += '<div class="detail-section"><h3>📊 Informazioni Aggiuntive</h3>';
+            const otherFields = Object.keys(properties).filter(key => {
+                return !['Tipologia', 'Data', 'Anno', 'Stagione', 'Mese', 'Giorno settimana', 
+                         'Feriale/Weekend', 'Giorno/Notte', 'Fascia oraria (4 fasce)', 
+                         'Fascia oraria dettagliata (6 fasce)', 'Ora di punta (Picchi di traffico)',
+                         'Circoscrizione', 'Quartiere', 'UPL', 'latitude', 'longitude',
+                         'Condizioni luce (Visibilità)'].includes(key) &&
+                       properties[key] && properties[key] !== 'null';
+            });
+            
+            if (otherFields.length > 0) {
+                otherFields.forEach(key => {
+                    html += `
+                        <div class="detail-row">
+                            <span class="detail-label">${key}</span>
+                            <span class="detail-value">${properties[key]}</span>
+                        </div>
+                    `;
+                });
+            } else {
+                html += '<p style="color: #64748b; font-size: 13px; text-align: center; padding: 10px;">Nessun dato aggiuntivo disponibile</p>';
+            }
+            html += '</div>';
+            
+            content.innerHTML = html;
+            panel.classList.add('open');
+        }
+
+        function closeDetailPanel() {
+            const panel = document.getElementById('detail-panel');
+            panel.classList.remove('open');
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.getElementById('mobile-toggle');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            sidebar.classList.toggle('open');
+            toggle.classList.toggle('active');
+            
+            if (sidebar.classList.contains('open')) {
+                overlay.classList.add('show');
+            } else {
+                overlay.classList.remove('show');
+            }
+        }
+
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.getElementById('mobile-toggle');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            sidebar.classList.remove('open');
+            toggle.classList.remove('active');
+            overlay.classList.remove('show');
         }
 
         async function init() {
@@ -977,7 +1966,6 @@
                         });
                         
                         console.log(`CSV processato: ${allIncidenti.length} incidenti validi su ${results.data.length} righe totali`);
-                        document.getElementById('total-info').textContent = `✓ Tutti i ${allIncidenti.length.toLocaleString('it-IT')} incidenti mappati. \nDei 28.239 incidenti esaminati, 1.560 (5,5%) sono stati esclusi dall'analisi in quanto le relative coordinate geografiche risultavano esterne ai confini del Comune di Palermo. Inoltre, i 3.192 incidenti registrati nel 2019 (11,3% del totale) sono risultati completamente privi di coordinate geografiche e pertanto non utilizzabili per l'analisi spaziale.`;
                         resolve();
                     },
                     error: function(error) {
@@ -987,6 +1975,128 @@
                 });
             });
         }
+
+        function openInfoModal() {
+            document.getElementById('info-modal').classList.add('show');
+        }
+
+        function closeInfoModal() {
+            document.getElementById('info-modal').classList.remove('show');
+        }
+
+        function openDataTable() {
+            const filteredData = getFilteredData();
+            const modal = document.getElementById('data-table-modal');
+            
+            // Aggiorna conteggio
+            document.getElementById('table-count').textContent = filteredData.length.toLocaleString('it-IT');
+            
+            if (filteredData.length === 0) {
+                document.getElementById('table-header').innerHTML = '';
+                document.getElementById('table-body').innerHTML = '<tr><td colspan="100" style="text-align: center; padding: 40px; color: #94a3b8;">Nessun dato da visualizzare con i filtri attuali</td></tr>';
+                modal.classList.add('show');
+                return;
+            }
+            
+            // Genera header della tabella
+            const keys = Object.keys(filteredData[0]);
+            let headerHtml = '<tr>';
+            keys.forEach(key => {
+                headerHtml += `<th>${key}</th>`;
+            });
+            headerHtml += '</tr>';
+            document.getElementById('table-header').innerHTML = headerHtml;
+            
+            // Genera righe della tabella (limita a 500 righe per performance)
+            const displayData = filteredData.slice(0, 500);
+            let bodyHtml = '';
+            displayData.forEach(row => {
+                bodyHtml += '<tr>';
+                keys.forEach(key => {
+                    bodyHtml += `<td>${row[key] !== null && row[key] !== undefined ? row[key] : '-'}</td>`;
+                });
+                bodyHtml += '</tr>';
+            });
+            
+            if (filteredData.length > 500) {
+                bodyHtml += `<tr><td colspan="${keys.length}" style="text-align: center; padding: 20px; color: #f59e0b; background: rgba(245, 158, 11, 0.1);">Visualizzate le prime 500 righe di ${filteredData.length.toLocaleString('it-IT')}. Il download include tutti i dati.</td></tr>`;
+            }
+            
+            document.getElementById('table-body').innerHTML = bodyHtml;
+            modal.classList.add('show');
+        }
+
+        function closeDataTable() {
+            document.getElementById('data-table-modal').classList.remove('show');
+        }
+
+        function downloadCSV() {
+            const filteredData = getFilteredData();
+            
+            if (filteredData.length === 0) {
+                alert('Nessun dato da scaricare con i filtri attuali');
+                return;
+            }
+            
+            const keys = Object.keys(filteredData[0]);
+            let csv = keys.join(',') + '\n';
+            
+            filteredData.forEach(row => {
+                const values = keys.map(key => {
+                    const value = row[key];
+                    if (value === null || value === undefined) return '';
+                    const stringValue = String(value);
+                    if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+                        return '"' + stringValue.replace(/"/g, '""') + '"';
+                    }
+                    return stringValue;
+                });
+                csv += values.join(',') + '\n';
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            const annoFiltro = currentFilters['filter-anno'] || 'tutti';
+            link.setAttribute('href', url);
+            link.setAttribute('download', `incidenti_palermo_${annoFiltro}_${new Date().getTime()}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function downloadJSON() {
+            const filteredData = getFilteredData();
+            
+            if (filteredData.length === 0) {
+                alert('Nessun dato da scaricare con i filtri attuali');
+                return;
+            }
+            
+            const json = JSON.stringify(filteredData, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            const annoFiltro = currentFilters['filter-anno'] || 'tutti';
+            link.setAttribute('href', url);
+            link.setAttribute('download', `incidenti_palermo_${annoFiltro}_${new Date().getTime()}.json`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Chiudi modal cliccando fuori
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('show');
+            }
+        });
 
         function initMap() {
             const palermoBounds = [
@@ -1034,6 +2144,38 @@
             
             map.addControl(new HomeControl(), 'top-left');
             map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
+            
+            // Controllo personalizzato per logo ODS
+            class ODSControl {
+                onAdd(map) {
+                    this._map = map;
+                    this._container = document.createElement('div');
+                    this._container.className = 'maplibregl-ctrl maplibregl-ctrl-ods';
+                    
+                    const link = document.createElement('a');
+                    link.href = 'https://opendatasicilia.it/';
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                    link.title = 'OpenDataSicilia';
+                    
+                    const img = document.createElement('img');
+                    img.src = 'https://palermohub.opendatasicilia.it/lib/images/opendatasicilia.png';
+                    img.alt = 'OpenDataSicilia';
+                    
+                    link.appendChild(img);
+                    this._container.appendChild(link);
+                    
+                    return this._container;
+                }
+                
+                onRemove() {
+                    this._container.parentNode.removeChild(this._container);
+                    this._map = undefined;
+                }
+            }
+            
+            map.addControl(new ODSControl(), 'bottom-left');
+            
             map.setPadding({ top: 80, bottom: 80, left: 50, right: 50 });
 
             map.on('load', () => {
@@ -1110,28 +2252,39 @@
                         'interpolate',
                         ['linear'],
                         ['zoom'],
-                        0, 1,
-                        15, 3
+                        0, 0.8,
+                        9, 1,
+                        15, 2.5
                     ],
                     'heatmap-color': [
                         'interpolate',
                         ['linear'],
                         ['heatmap-density'],
                         0, 'rgba(0,0,255,0)',
-                        0.2, 'rgb(0,0,255)',
-                        0.4, 'rgb(0,255,255)',
-                        0.6, 'rgb(0,255,0)',
-                        0.8, 'rgb(255,255,0)',
-                        1, 'rgb(255,0,0)'
+                        0.1, 'rgba(0,0,255,0.6)',
+                        0.3, 'rgba(0,255,255,0.7)',
+                        0.5, 'rgba(0,255,0,0.8)',
+                        0.7, 'rgba(255,255,0,0.85)',
+                        0.9, 'rgba(255,128,0,0.9)',
+                        1, 'rgba(255,0,0,1)'
                     ],
                     'heatmap-radius': [
                         'interpolate',
                         ['linear'],
                         ['zoom'],
-                        0, 2,
-                        15, 20
+                        0, 1,
+                        9, 3,
+                        11, 6,
+                        13, 10,
+                        15, 14
                     ],
-                    'heatmap-opacity': 0.8
+                    'heatmap-opacity': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        7, 0.65,
+                        15, 0.75
+                    ]
                 },
                 layout: {
                     visibility: 'none'
@@ -1170,30 +2323,7 @@
                 if (!e.features || e.features.length === 0) return;
                 
                 const props = e.features[0].properties;
-                const tipologiaName = {
-                    'M': 'Mortale',
-                    'R': 'Riserva',
-                    'F': 'Feriti',
-                    'C': 'Cose'
-                };
-                
-                let html = `
-                    <div style="padding: 10px; min-width: 200px;">
-                        <strong style="color: ${colorMap[props.Tipologia]}; font-size: 16px;">${tipologiaName[props.Tipologia]}</strong><br><br>
-                `;
-                
-                Object.keys(props).forEach(key => {
-                    if (props[key] && props[key] !== 'null' && key !== 'longitude' && key !== 'latitude') {
-                        html += `<strong>${key}:</strong> ${props[key]}<br>`;
-                    }
-                });
-                
-                html += '</div>';
-                
-                new maplibregl.Popup()
-                    .setLngLat(e.lngLat)
-                    .setHTML(html)
-                    .addTo(map);
+                openDetailPanel(props);
             });
 
             map.on('mouseenter', layerId, () => {
@@ -1327,6 +2457,15 @@
             document.getElementById('stat-feriti').textContent = stats.F.toLocaleString('it-IT');
             document.getElementById('stat-cose').textContent = stats.C.toLocaleString('it-IT');
             document.getElementById('stat-total').textContent = (stats.M + stats.R + stats.F + stats.C).toLocaleString('it-IT');
+            
+            // Aggiorna il label del totale con l'anno se filtrato
+            const annoFiltrato = currentFilters['filter-anno'];
+            const labelTotale = document.querySelector('.stat-total .stat-label');
+            if (annoFiltrato) {
+                labelTotale.textContent = `Totale Incidenti (${annoFiltrato})`;
+            } else {
+                labelTotale.textContent = 'Totale Incidenti';
+            }
 
             console.log('Statistiche:', stats, `su ${filteredData.length} incidenti filtrati`);
         }
@@ -1362,8 +2501,22 @@
                 }
             });
             
+            // Calcola totale di tutti gli anni
+            const totalAllYears = Object.values(yearStats).reduce((sum, count) => sum + count, 0);
+            
+            // Pulsante "Tutti"
+            let gridHtml = `
+                <div class="year-stat-item-all ${selectedYear === '' ? 'active' : ''}" 
+                     onclick="filterAllYears()"
+                     title="Clicca per mostrare tutti gli anni">
+                    <div class="year-stat-year">Tutti gli Anni</div>
+                    <div class="year-stat-count">${totalAllYears.toLocaleString('it-IT')}</div>
+                </div>
+            `;
+            
+            // Mostra tutti gli anni (dal 2023 al 2015)
             const sortedYears = Object.keys(yearStats).sort((a, b) => b - a);
-            const gridHtml = sortedYears.map(year => `
+            gridHtml += sortedYears.map(year => `
                 <div class="year-stat-item ${selectedYear === String(year) ? 'active' : ''}" 
                      onclick="filterByYear('${year}')"
                      title="Clicca per filtrare l'anno ${year}">
@@ -1460,28 +2613,39 @@
                         'interpolate',
                         ['linear'],
                         ['zoom'],
-                        0, 1,
-                        15, 3
+                        0, 0.8,
+                        9, 1,
+                        15, 2.5
                     ],
                     'heatmap-color': [
                         'interpolate',
                         ['linear'],
                         ['heatmap-density'],
                         0, 'rgba(0,0,255,0)',
-                        0.2, 'rgb(0,0,255)',
-                        0.4, 'rgb(0,255,255)',
-                        0.6, 'rgb(0,255,0)',
-                        0.8, 'rgb(255,255,0)',
-                        1, 'rgb(255,0,0)'
+                        0.1, 'rgba(0,0,255,0.6)',
+                        0.3, 'rgba(0,255,255,0.7)',
+                        0.5, 'rgba(0,255,0,0.8)',
+                        0.7, 'rgba(255,255,0,0.85)',
+                        0.9, 'rgba(255,128,0,0.9)',
+                        1, 'rgba(255,0,0,1)'
                     ],
                     'heatmap-radius': [
                         'interpolate',
                         ['linear'],
                         ['zoom'],
-                        0, 2,
-                        15, 20
+                        0, 1,
+                        9, 3,
+                        11, 6,
+                        13, 10,
+                        15, 14
                     ],
-                    'heatmap-opacity': 0.8
+                    'heatmap-opacity': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        7, 0.65,
+                        15, 0.75
+                    ]
                 },
                 layout: {
                     visibility: heatmapVisibility
