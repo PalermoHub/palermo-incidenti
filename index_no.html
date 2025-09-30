@@ -20,32 +20,7 @@
     <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
     <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-	
-	
-	
-		    <!-- Meta tags per social sharing pen Graph Protocol -->
-    <meta property="og:url" content="https://palermohub.github.io/palermo-incidenti/">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Palermo incidenti stradali dal 2015 al 20 - Dashboard by @opendatasicilia">
-    <meta property="og:description" content="Palermo Hub - Contenitore di mappe su Palermo realizzato da OpenDataSicilia.it">
-    <meta property="og:image" content="https://palermohub.github.io/palermo-incidenti/img/social_card.jpg">
-	<!-- twitter -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta property="twitter:domain" content="palermohub.opendatasicilia.it">
-    <meta property="twitter:url" content="https://palermohub.github.io/palermo-incidenti/">
-    <meta name="twitter:title" content="Palermo incidenti stradali dal 2015 al 20 - Dashboard by @opendatasicilia">
-    <meta name="twitter:description" content="Palermo Hub - Contenitore di mappe su Palermo realizzato da OpenDataSicilia.it">
-    <meta name="twitter:image" content="https://palermohub.github.io/palermo-incidenti/img/social_card.jpg">
-	
-	<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-87653723-4"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'UA-87653723-4');
-</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js"></script>
 	
     <style>
         * {
@@ -419,6 +394,26 @@
         .btn-reset:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-charts {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #ec4899 0%, #d946ef 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
+        }
+        
+        .btn-charts:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(236, 72, 153, 0.4);
         }
         
         .btn-data-table {
@@ -926,7 +921,6 @@
             margin-top: 8px;
         }
         
-        /* Mobile Toggle Button */
         .mobile-toggle {
             display: none;
             position: fixed;
@@ -973,7 +967,6 @@
             transform: rotate(-45deg) translate(7px, -7px);
         }
         
-        /* Responsive Design */
         @media (max-width: 1024px) {
             #sidebar {
                 width: 340px;
@@ -1145,7 +1138,6 @@
             }
         }
         
-        /* Overlay per mobile quando sidebar aperta */
         .sidebar-overlay {
             display: none;
             position: fixed;
@@ -1169,7 +1161,6 @@
             }
         }
         
-        /* Info Modal */
         .modal {
             display: none;
             position: fixed;
@@ -1244,7 +1235,6 @@
             margin-bottom: 16px;
         }
         
-        /* Data Table Modal */
         .table-container {
             overflow-x: auto;
             margin-top: 20px;
@@ -1306,6 +1296,54 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
         }
+
+        .charts-modal .modal-content {
+            max-width: 95vw;
+            max-height: 95vh;
+            width: 1400px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .chart-container {
+            background: rgba(30, 41, 59, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .chart-title {
+            font-size: 14px;
+            color: #60a5fa;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            letter-spacing: 1px;
+        }
+
+        .chart-canvas-wrapper {
+            position: relative;
+            height: 300px;
+        }
+
+        .calendar-chart {
+            grid-column: 1 / -1;
+        }
+
+        .calendar-chart .chart-canvas-wrapper {
+            height: 400px;
+        }
+
+        @media (max-width: 1200px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
         
         @media (max-width: 480px) {
             .modal-content {
@@ -1328,6 +1366,15 @@
             .data-table th,
             .data-table td {
                 padding: 8px 6px;
+            }
+
+            .chart-canvas-wrapper {
+                height: 250px;
+            }
+
+            .charts-modal .modal-content {
+                width: 100%;
+                padding: 16px;
             }
         }
     </style>
@@ -1483,10 +1530,12 @@
 
             <button class="btn-reset" onclick="resetFilters()" Title="Reset Filtri" >🔄 Reset Filtri</button>
             
+            <button class="btn-charts" onclick="openChartsModal()" Title="Visualizza grafici statistici">📊 Analisi Grafici</button>
+            
             <button class="btn-data-table" onclick="openDataTable()" Title="Visualizza e scarica i dati selezionati">📊 Tabella Dati</button>
             
             <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" Title="Agenzia per l'Italia Digitale" target="_blank" rel="noopener noreferrer" class="btn-fonte">
-                📁 Fonte Dati: dati.gov.it
+                📋 Fonte Dati: dati.gov.it
             </a>
         </div>
     </div>
@@ -1559,12 +1608,9 @@
             </h2>
             <p id="detail-subtitle">Informazioni complete</p>
         </div>
-        <div class="detail-content" id="detail-content">
-            <!-- Contenuto dinamico -->
-        </div>
+        <div class="detail-content" id="detail-content"></div>
     </div>
 
-    <!-- Info Modal -->
     <div class="modal" id="info-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1587,7 +1633,6 @@
         </div>
     </div>
 
-    <!-- Data Table Modal -->
     <div class="modal" id="data-table-modal">
         <div class="modal-content" style="max-width: 90vw;">
             <div class="modal-header">
@@ -1612,11 +1657,59 @@
         </div>
     </div>
 
+    <div class="modal charts-modal" id="charts-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📊 Analisi Statistica Incidenti</h3>
+                <button class="modal-close" onclick="closeChartsModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <div class="chart-title">Incidenti per Tipologia</div>
+                        <div class="chart-canvas-wrapper">
+                            <canvas id="chart-tipologia"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <div class="chart-title">Incidenti per Periodo del Giorno</div>
+                        <div class="chart-canvas-wrapper">
+                            <canvas id="chart-periodo"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <div class="chart-title">Incidenti per Giorno della Settimana</div>
+                        <div class="chart-canvas-wrapper">
+                            <canvas id="chart-giorni"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <div class="chart-title">Stagioni: Feriali vs Weekend</div>
+                        <div class="chart-canvas-wrapper">
+                            <canvas id="chart-stagioni"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-container calendar-chart">
+                        <div class="chart-title">Calendario Incidenti</div>
+                        <div class="chart-canvas-wrapper">
+                            <canvas id="chart-calendario"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         let map;
         let allIncidenti = [];
         let currentFilters = {};
         let showHeatmap = false;
+        let chartInstances = {};
         
         const colorMap = {
             'M': '#ef4444',
@@ -1738,7 +1831,11 @@
             updateStats();
             updateYearStats();
             
-            // Chiudi sidebar su mobile
+            if (document.getElementById('charts-modal').classList.contains('show')) {
+                destroyAllCharts();
+                createAllCharts();
+            }
+            
             if (window.innerWidth <= 768) {
                 closeSidebar();
             }
@@ -1753,7 +1850,11 @@
             updateStats();
             updateYearStats();
             
-            // Chiudi sidebar su mobile
+            if (document.getElementById('charts-modal').classList.contains('show')) {
+                destroyAllCharts();
+                createAllCharts();
+            }
+            
             if (window.innerWidth <= 768) {
                 closeSidebar();
             }
@@ -1775,6 +1876,11 @@
             updateStats();
             updateYearStats();
             updateLegendActiveState();
+            
+            if (document.getElementById('charts-modal').classList.contains('show')) {
+                destroyAllCharts();
+                createAllCharts();
+            }
         }
 
         function updateLegendActiveState() {
@@ -1809,14 +1915,11 @@
                 'C': '🔧'
             };
             
-            // Aggiorna header
             document.getElementById('detail-tipo-icon').textContent = tipologiaIcons[properties.Tipologia] || '🚗';
             document.getElementById('detail-subtitle').textContent = `Incidente del ${properties.Data || 'Data non disponibile'}`;
             
-            // Costruisci contenuto strutturato
             let html = '';
             
-            // Sezione 1: Tipologia e Gravità
             html += `
                 <div class="detail-section">
                     <h3>⚠️ Tipologia e Gravità</h3>
@@ -1827,7 +1930,6 @@
                 </div>
             `;
             
-            // Sezione 2: Informazioni Temporali
             html += '<div class="detail-section"><h3>📅 Quando è Avvenuto</h3>';
             const temporalFields = [
                 { key: 'Data', label: 'Data' },
@@ -1854,7 +1956,6 @@
             });
             html += '</div>';
             
-            // Sezione 3: Localizzazione
             html += '<div class="detail-section"><h3>📍 Dove è Avvenuto</h3>';
             const locationFields = [
                 { key: 'Circoscrizione', label: 'Circoscrizione' },
@@ -1888,7 +1989,6 @@
             }
             html += '</div>';
             
-            // Sezione 4: Condizioni Ambientali
             html += '<div class="detail-section"><h3>🌤️ Condizioni Ambientali</h3>';
             const conditionsFields = [
                 { key: 'Condizioni luce (Visibilità)', label: 'Condizioni Luce' }
@@ -1906,7 +2006,6 @@
             });
             html += '</div>';
             
-            // Sezione 5: Altri Dati
             html += '<div class="detail-section"><h3>📊 Informazioni Aggiuntive</h3>';
             const otherFields = Object.keys(properties).filter(key => {
                 return !['Tipologia', 'Data', 'Anno', 'Stagione', 'Mese', 'Giorno settimana', 
@@ -1968,7 +2067,7 @@
         async function init() {
             try {
                 console.log('Inizio caricamento CSV...');
-                document.getElementById('loading').innerHTML = '<div>Caricamento CSV...</div><small>Download in corso</small>';
+                document.getElementById('loading').innerHTML = '<div>Caricamento CSV...</div><small>Download in corso dal server</small>';
                 
                 await loadCSV();
                 
@@ -1979,23 +2078,44 @@
 
             } catch (error) {
                 console.error('Errore inizializzazione:', error);
-                document.getElementById('loading').innerHTML = '<div>Errore caricamento</div><small>' + error.message + '</small>';
-                // Nascondi il loading anche in caso di errore
-                setTimeout(() => {
-                    document.getElementById('loading').classList.add('hidden');
-                }, 2000);
+                const loadingDiv = document.getElementById('loading');
+                loadingDiv.innerHTML = `
+                    <div style="color: #ef4444;">❌ Errore Caricamento</div>
+                    <small style="color: #f87171; margin-top: 12px; display: block; max-width: 400px; line-height: 1.4;">
+                        ${error.message}
+                    </small>
+                    <button onclick="location.reload()" style="margin-top: 16px; padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600;">
+                        🔄 Riprova
+                    </button>
+                `;
             }
         }
 
         async function loadCSV() {
             return new Promise((resolve, reject) => {
-                Papa.parse('data/incidenti_2015_2023.csv', {
+                const csvUrl = 'data/incidenti_2015_2023.csv';
+                
+                console.log('Tentativo caricamento CSV da:', csvUrl);
+                
+                const timeout = setTimeout(() => {
+                    reject(new Error('Timeout: Il caricamento del CSV sta impiegando troppo tempo. Verifica che il file esista in: ' + csvUrl));
+                }, 30000);
+                
+                Papa.parse(csvUrl, {
                     download: true,
                     header: true,
                     dynamicTyping: true,
                     skipEmptyLines: true,
                     complete: function(results) {
+                        clearTimeout(timeout);
                         console.log('CSV scaricato, parsing righe...');
+                        console.log('Righe totali ricevute:', results.data.length);
+                        console.log('Prima riga esempio:', results.data[0]);
+                        
+                        if (results.data.length === 0) {
+                            reject(new Error('Il file CSV è vuoto o non è stato caricato correttamente'));
+                            return;
+                        }
                         
                         allIncidenti = results.data.filter(row => {
                             return row.Tipologia && 
@@ -2006,14 +2126,57 @@
                         });
                         
                         console.log(`CSV processato: ${allIncidenti.length} incidenti validi su ${results.data.length} righe totali`);
+                        
+                        if (allIncidenti.length === 0) {
+                            reject(new Error('Nessun incidente valido trovato nel CSV'));
+                            return;
+                        }
+                        
                         resolve();
                     },
                     error: function(error) {
+                        clearTimeout(timeout);
                         console.error('Errore download CSV:', error);
-                        reject(error);
+                        reject(new Error(`Errore caricamento CSV: ${error.message || 'File non trovato. Verifica che esista in data/incidenti_2015_2023.csv'}`));
                     }
                 });
             });
+        }
+
+        function openChartsModal() {
+            const modal = document.getElementById('charts-modal');
+            modal.classList.add('show');
+            
+            setTimeout(() => {
+                destroyAllCharts();
+                createAllCharts();
+            }, 100);
+        }
+
+        function closeChartsModal() {
+            document.getElementById('charts-modal').classList.remove('show');
+            destroyAllCharts();
+        }
+
+        function destroyAllCharts() {
+            Object.values(chartInstances).forEach(chart => {
+                if (chart) chart.destroy();
+            });
+            chartInstances = {};
+        }
+
+        function createAllCharts() {
+            const filteredData = getFilteredData();
+            
+            if (filteredData.length === 0) {
+                return;
+            }
+
+            createTipologiaChart(filteredData);
+            createPeriodoChart(filteredData);
+            createGiorniChart(filteredData);
+            createStagioniChart(filteredData);
+            createCalendarioChart(filteredData);
         }
 
         function openInfoModal() {
@@ -2028,7 +2191,6 @@
             const filteredData = getFilteredData();
             const modal = document.getElementById('data-table-modal');
             
-            // Aggiorna conteggio
             document.getElementById('table-count').textContent = filteredData.length.toLocaleString('it-IT');
             
             if (filteredData.length === 0) {
@@ -2038,7 +2200,6 @@
                 return;
             }
             
-            // Genera header della tabella
             const keys = Object.keys(filteredData[0]);
             let headerHtml = '<tr>';
             keys.forEach(key => {
@@ -2047,7 +2208,6 @@
             headerHtml += '</tr>';
             document.getElementById('table-header').innerHTML = headerHtml;
             
-            // Genera righe della tabella (limita a 500 righe per performance)
             const displayData = filteredData.slice(0, 500);
             let bodyHtml = '';
             displayData.forEach(row => {
@@ -2131,623 +2291,421 @@
             document.body.removeChild(link);
         }
 
-        // Chiudi modal cliccando fuori
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal')) {
-                e.target.classList.remove('show');
-            }
-        });
-
-        function initMap() {
-            const palermoBounds = [
-                [13.20, 38.00],
-                [13.50, 38.25]
-            ];
+        function openChartsModal() {
+            const modal = document.getElementById('charts-modal');
+            modal.classList.add('show');
             
-            map = new maplibregl.Map({
-                container: 'map',
-                style: basemapStyles['carto-dark'],
-                center: [13.3614, 38.1157],
-                zoom: 11,
-                minZoom: 9,
-                maxZoom: 18,
-                maxBounds: palermoBounds,
-                hash: true
-            });
-
-            map.addControl(new maplibregl.NavigationControl(), 'top-left');
-            
-            class HomeControl {
-                onAdd(map) {
-                    this._map = map;
-                    this._container = document.createElement('div');
-                    this._container.className = 'maplibregl-ctrl maplibregl-ctrl-group';
-                    this._container.innerHTML = '<button class="maplibregl-ctrl-home" type="button" title="Torna alla vista iniziale"></button>';
-                    
-                    this._container.onclick = () => {
-                        map.flyTo({
-                            center: [13.3614, 38.1157],
-                            zoom: 10,
-                            duration: 1500,
-                            essential: true
-                        });
-                    };
-                    
-                    return this._container;
-                }
-                
-                onRemove() {
-                    this._container.parentNode.removeChild(this._container);
-                    this._map = undefined;
-                }
-            }
-            
-            map.addControl(new HomeControl(), 'top-left');
-            map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
-            
-            // Controllo personalizzato per logo ODS
-            class ODSControl {
-                onAdd(map) {
-                    this._map = map;
-                    this._container = document.createElement('div');
-                    this._container.className = 'maplibregl-ctrl maplibregl-ctrl-ods';
-                    
-                    const link = document.createElement('a');
-                    link.href = 'https://opendatasicilia.it/';
-                    link.target = '_blank';
-                    link.rel = 'noopener noreferrer';
-                    link.title = 'OpenDataSicilia';
-                    
-                    const img = document.createElement('img');
-                    img.src = 'https://palermohub.opendatasicilia.it/lib/images/opendatasicilia.png';
-                    img.alt = 'OpenDataSicilia';
-                    
-                    link.appendChild(img);
-                    this._container.appendChild(link);
-                    
-                    return this._container;
-                }
-                
-                onRemove() {
-                    this._container.parentNode.removeChild(this._container);
-                    this._map = undefined;
-                }
-            }
-            
-            map.addControl(new ODSControl(), 'bottom-left');
-            
-            map.setPadding({ top: 80, bottom: 80, left: 50, right: 50 });
-
-            map.on('load', () => {
-                console.log('Mappa caricata, creazione layers...');
-                try {
-                    // Imposta il filtro anno a 2023 di default
-                    currentFilters['filter-anno'] = '2023';
-                    
-                    createMapLayers();
-                    populateFilters();
-                    updateStats();
-                    updateYearStats();
-                    updateLegendActiveState();
-                    console.log('Inizializzazione completata!');
-                } catch (error) {
-                    console.error('Errore durante inizializzazione:', error);
-                } finally {
-                    document.getElementById('loading').classList.add('hidden');
-                }
-            });
-            
-            // Timeout di sicurezza per nascondere il loading
             setTimeout(() => {
-                const loading = document.getElementById('loading');
-                if (loading && !loading.classList.contains('hidden')) {
-                    console.log('Timeout sicurezza: nascondo loading');
-                    loading.classList.add('hidden');
-                }
-            }, 5000);
+                destroyAllCharts();
+                createAllCharts();
+            }, 100);
         }
 
-        function createGeoJSON() {
+        function closeChartsModal() {
+            document.getElementById('charts-modal').classList.remove('show');
+            destroyAllCharts();
+        }
+
+        function destroyAllCharts() {
+            Object.values(chartInstances).forEach(chart => {
+                if (chart) chart.destroy();
+            });
+            chartInstances = {};
+        }
+
+        function createAllCharts() {
             const filteredData = getFilteredData();
             
-            return {
-                type: 'FeatureCollection',
-                features: filteredData.map(row => ({
-                    type: 'Feature',
-                    geometry: {
-                        type: 'Point',
-                        coordinates: [parseFloat(row.longitude), parseFloat(row.latitude)]
-                    },
-                    properties: row
-                }))
-            };
+            if (filteredData.length === 0) {
+                return;
+            }
+
+            createTipologiaChart(filteredData);
+            createPeriodoChart(filteredData);
+            createGiorniChart(filteredData);
+            createStagioniChart(filteredData);
+            createCalendarioChart(filteredData);
         }
 
-        function createMapLayers() {
-            const geojson = createGeoJSON();
-            
-            console.log(`Creazione source con ${geojson.features.length} features`);
-            
-            map.addSource('incidenti', {
-                type: 'geojson',
-                data: geojson
+        function createTipologiaChart(data) {
+            const tipologiaCount = { M: 0, R: 0, F: 0, C: 0 };
+            data.forEach(row => {
+                if (tipologiaCount.hasOwnProperty(row.Tipologia)) {
+                    tipologiaCount[row.Tipologia]++;
+                }
             });
 
-            map.addLayer({
-                id: 'incidenti-heatmap',
-                type: 'heatmap',
-                source: 'incidenti',
-                maxzoom: 15,
-                paint: {
-                    'heatmap-weight': [
-                        'match',
-                        ['get', 'Tipologia'],
-                        'C', 0.5,
-                        'F', 1,
-                        'R', 1.5,
-                        'M', 2,
-                        1
-                    ],
-                    'heatmap-intensity': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        0, 0.8,
-                        9, 1,
-                        15, 2.5
-                    ],
-                    'heatmap-color': [
-                        'interpolate',
-                        ['linear'],
-                        ['heatmap-density'],
-                        0, 'rgba(0,0,255,0)',
-                        0.1, 'rgba(0,0,255,0.6)',
-                        0.3, 'rgba(0,255,255,0.7)',
-                        0.5, 'rgba(0,255,0,0.8)',
-                        0.7, 'rgba(255,255,0,0.85)',
-                        0.9, 'rgba(255,128,0,0.9)',
-                        1, 'rgba(255,0,0,1)'
-                    ],
-                    'heatmap-radius': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        0, 1,
-                        9, 3,
-                        11, 6,
-                        13, 10,
-                        15, 14
-                    ],
-                    'heatmap-opacity': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        7, 0.65,
-                        15, 0.75
-                    ]
+            const ctx = document.getElementById('chart-tipologia').getContext('2d');
+            chartInstances.tipologia = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Mortale', 'Riserva', 'Feriti', 'Cose'],
+                    datasets: [{
+                        label: 'Numero Incidenti',
+                        data: [tipologiaCount.M, tipologiaCount.R, tipologiaCount.F, tipologiaCount.C],
+                        backgroundColor: ['#ef4444', '#f97316', '#f59e0b', '#10b981']
+                    }]
                 },
-                layout: {
-                    visibility: 'none'
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const tipos = ['M', 'R', 'F', 'C'];
+                            const selectedTipo = tipos[index];
+                            
+                            if (currentFilters['filter-tipologia'] === selectedTipo) {
+                                currentFilters['filter-tipologia'] = '';
+                            } else {
+                                currentFilters['filter-tipologia'] = selectedTipo;
+                            }
+                            
+                            document.getElementById('filter-tipologia').value = currentFilters['filter-tipologia'];
+                            updateAllFilters();
+                            updateMapData();
+                            updateStats();
+                            updateYearStats();
+                            updateLegendActiveState();
+                            
+                            destroyAllCharts();
+                            createAllCharts();
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                footer: () => 'Clicca per filtrare'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            ticks: { color: '#cbd5e1' },
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#cbd5e1' },
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createPeriodoChart(data) {
+            const periodoCount = {};
+            data.forEach(row => {
+                const periodo = row['Fascia oraria (4 fasce)'];
+                if (periodo) {
+                    periodoCount[periodo] = (periodoCount[periodo] || 0) + 1;
                 }
             });
 
-            ['C', 'F', 'R', 'M'].forEach(tipo => {
-                const layerId = `incidenti-${tipo}`;
-                
-                map.addLayer({
-                    id: layerId,
-                    type: 'circle',
-                    source: 'incidenti',
-                    filter: ['==', ['get', 'Tipologia'], tipo],
-                    paint: {
-                        'circle-radius': [
-                            'interpolate', ['linear'], ['zoom'],
-                            10, tipo === 'M' ? 4 : tipo === 'R' ? 3 : 2,
-                            16, tipo === 'M' ? 10 : tipo === 'R' ? 8 : 6
-                        ],
-                        'circle-color': colorMap[tipo],
-                        'circle-opacity': 0.8,
-                        'circle-stroke-width': tipo === 'M' ? 2 : 1,
-                        'circle-stroke-color': '#fff'
-                    }
-                });
+            const sortedLabels = Object.keys(periodoCount).sort();
+            const sortedData = sortedLabels.map(label => periodoCount[label]);
 
-                setupLayerInteractions(layerId);
-            });
-
-            console.log('Layers creati con successo');
-        }
-
-        function setupLayerInteractions(layerId) {
-            map.on('click', layerId, (e) => {
-                if (!e.features || e.features.length === 0) return;
-                
-                const props = e.features[0].properties;
-                openDetailPanel(props);
-            });
-
-            map.on('mouseenter', layerId, () => {
-                map.getCanvas().style.cursor = 'pointer';
-            });
-
-            map.on('mouseleave', layerId, () => {
-                map.getCanvas().style.cursor = '';
-            });
-        }
-
-        function getFilteredData() {
-            return allIncidenti.filter(row => {
-                for (const [filterId, property] of Object.entries(filterConfig)) {
-                    const value = currentFilters[filterId];
-                    if (!value) continue;
-
-                    const rowValue = row[property];
-                    
-                    if (property === 'Anno') {
-                        if (Number(rowValue) !== Number(value)) return false;
-                    } else {
-                        if (String(rowValue) !== String(value)) return false;
+            const ctx = document.getElementById('chart-periodo').getContext('2d');
+            chartInstances.periodo = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sortedLabels,
+                    datasets: [{
+                        label: 'Numero Incidenti',
+                        data: sortedData,
+                        backgroundColor: '#8b5cf6'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const selectedPeriodo = sortedLabels[index];
+                            
+                            if (currentFilters['filter-fascia-4'] === selectedPeriodo) {
+                                currentFilters['filter-fascia-4'] = '';
+                            } else {
+                                currentFilters['filter-fascia-4'] = selectedPeriodo;
+                            }
+                            
+                            document.getElementById('filter-fascia-4').value = currentFilters['filter-fascia-4'];
+                            updateAllFilters();
+                            updateMapData();
+                            updateStats();
+                            updateYearStats();
+                            
+                            destroyAllCharts();
+                            createAllCharts();
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                footer: () => 'Clicca per filtrare'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            ticks: { color: '#cbd5e1' },
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#cbd5e1' },
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                        }
                     }
                 }
-                return true;
             });
         }
 
-        function populateFilters() {
-            console.log('Popolamento filtri...');
-
-            Object.entries(filterConfig).forEach(([selectId, property]) => {
-                const select = document.getElementById(selectId);
-                if (!select) return;
-
-                select.addEventListener('change', (e) => {
-                    handleFilterChange(selectId, e.target.value);
-                });
-            });
-
-            updateAllFilters();
-        }
-
-        function handleFilterChange(filterId, value) {
-            currentFilters[filterId] = value;
-
-            if (filterDependencies[filterId]) {
-                filterDependencies[filterId].forEach(dependentId => {
-                    currentFilters[dependentId] = '';
-                    document.getElementById(dependentId).value = '';
-                });
-            }
-
-            updateAllFilters();
-            updateMapData();
+        function createGiorniChart(data) {
+            const giorniOrder = ['lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato', 'domenica'];
+            const giorniCount = {};
             
-            if (filterId === 'filter-circoscrizione' || filterId === 'filter-quartiere') {
-                zoomToFilteredArea();
-            }
-
-            updateStats();
-            updateYearStats();
-            updateLegendActiveState();
-        }
-
-        function updateAllFilters() {
-            const filteredData = getFilteredData();
-
-            Object.entries(filterConfig).forEach(([selectId, property]) => {
-                const select = document.getElementById(selectId);
-                if (!select) return;
-
-                const currentValue = currentFilters[selectId] || '';
-                const values = new Set();
-                
-                filteredData.forEach(row => {
-                    const value = row[property];
-                    if (value !== null && value !== 'null' && value !== '' && value !== undefined) {
-                        values.add(String(value));
-                    }
-                });
-
-                let sortedValues = Array.from(values).sort((a, b) => {
-                    const numA = parseFloat(a);
-                    const numB = parseFloat(b);
-                    if (!isNaN(numA) && !isNaN(numB)) {
-                        return numA - numB;
-                    }
-                    return String(a).localeCompare(String(b), 'it');
-                });
-
-                if (property === 'Anno') {
-                    sortedValues.reverse();
-                }
-
-                select.innerHTML = '<option value="">Tutti</option>';
-                sortedValues.forEach(value => {
-                    const option = document.createElement('option');
-                    option.value = value;
-                    option.textContent = value;
-                    if (value === currentValue) {
-                        option.selected = true;
-                    }
-                    select.appendChild(option);
-                });
-
-                select.disabled = sortedValues.length === 0 && currentValue === '';
-            });
-        }
-
-        function updateMapData() {
-            const geojson = createGeoJSON();
-            console.log(`Aggiornamento mappa con ${geojson.features.length} features`);
-            map.getSource('incidenti').setData(geojson);
-        }
-
-        function updateStats() {
-            const filteredData = getFilteredData();
-            const stats = { M: 0, R: 0, F: 0, C: 0 };
+            giorniOrder.forEach(giorno => giorniCount[giorno] = 0);
             
-            filteredData.forEach(row => {
-                const tipo = row.Tipologia;
-                if (tipo && stats.hasOwnProperty(tipo)) {
-                    stats[tipo]++;
+            data.forEach(row => {
+                const giorno = row['Giorno settimana'];
+                if (giorno) {
+                    const giornoLower = giorno.toLowerCase();
+                    if (giorniCount.hasOwnProperty(giornoLower)) {
+                        giorniCount[giornoLower]++;
+                    }
                 }
             });
 
-            document.getElementById('stat-mortale').textContent = stats.M.toLocaleString('it-IT');
-            document.getElementById('stat-riserva').textContent = stats.R.toLocaleString('it-IT');
-            document.getElementById('stat-feriti').textContent = stats.F.toLocaleString('it-IT');
-            document.getElementById('stat-cose').textContent = stats.C.toLocaleString('it-IT');
-            document.getElementById('stat-total').textContent = (stats.M + stats.R + stats.F + stats.C).toLocaleString('it-IT');
-            
-            // Aggiorna il label del totale con l'anno se filtrato
-            const annoFiltrato = currentFilters['filter-anno'];
-            const labelTotale = document.querySelector('.stat-total .stat-label');
-            if (annoFiltrato) {
-                labelTotale.textContent = `Totale Incidenti (${annoFiltrato})`;
-            } else {
-                labelTotale.textContent = 'Totale Incidenti';
-            }
-
-            console.log('Statistiche:', stats, `su ${filteredData.length} incidenti filtrati`);
-        }
-
-        function updateYearStats() {
-            const selectedYear = currentFilters['filter-anno'];
-            const yearStats = {};
-            
-            const tempFilters = {...currentFilters};
-            delete tempFilters['filter-anno'];
-            
-            const dataForYearCount = allIncidenti.filter(row => {
-                for (const [filterId, property] of Object.entries(filterConfig)) {
-                    if (filterId === 'filter-anno') continue;
-                    const value = tempFilters[filterId];
-                    if (!value) continue;
-
-                    const rowValue = row[property];
-                    
-                    if (property === 'Anno') {
-                        if (Number(rowValue) !== Number(value)) return false;
-                    } else {
-                        if (String(rowValue) !== String(value)) return false;
+            const ctx = document.getElementById('chart-giorni').getContext('2d');
+            chartInstances.giorni = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: giorniOrder.map(g => g.charAt(0).toUpperCase() + g.slice(1)),
+                    datasets: [{
+                        label: 'Numero Incidenti',
+                        data: giorniOrder.map(g => giorniCount[g]),
+                        backgroundColor: '#3b82f6'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const selectedGiorno = giorniOrder[index].charAt(0).toUpperCase() + giorniOrder[index].slice(1);
+                            
+                            if (currentFilters['filter-giorno-settimana'] === selectedGiorno) {
+                                currentFilters['filter-giorno-settimana'] = '';
+                            } else {
+                                currentFilters['filter-giorno-settimana'] = selectedGiorno;
+                            }
+                            
+                            document.getElementById('filter-giorno-settimana').value = currentFilters['filter-giorno-settimana'];
+                            updateAllFilters();
+                            updateMapData();
+                            updateStats();
+                            updateYearStats();
+                            
+                            destroyAllCharts();
+                            createAllCharts();
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                footer: () => 'Clicca per filtrare'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            ticks: { color: '#cbd5e1' },
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#cbd5e1', maxRotation: 45, minRotation: 45 },
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                        }
                     }
                 }
-                return true;
             });
-            
-            dataForYearCount.forEach(row => {
-                const year = row.Anno;
-                if (year) {
-                    yearStats[year] = (yearStats[year] || 0) + 1;
-                }
-            });
-            
-            // Calcola totale di tutti gli anni
-            const totalAllYears = Object.values(yearStats).reduce((sum, count) => sum + count, 0);
-            
-            // Pulsante "Tutti"
-            let gridHtml = `
-                <div class="year-stat-item-all ${selectedYear === '' ? 'active' : ''}" 
-                     onclick="filterAllYears()"
-                     title="Clicca per mostrare tutti gli anni">
-                    <div class="year-stat-year">Tutti gli Anni</div>
-                    <div class="year-stat-count">${totalAllYears.toLocaleString('it-IT')}</div>
-                </div>
-            `;
-            
-            // Mostra tutti gli anni (dal 2023 al 2015)
-            const sortedYears = Object.keys(yearStats).sort((a, b) => b - a);
-            gridHtml += sortedYears.map(year => `
-                <div class="year-stat-item ${selectedYear === String(year) ? 'active' : ''}" 
-                     onclick="filterByYear('${year}')"
-                     title="Clicca per filtrare l'anno ${year}">
-                    <div class="year-stat-year">${year}</div>
-                    <div class="year-stat-count">${yearStats[year].toLocaleString('it-IT')}</div>
-                </div>
-            `).join('');
-            
-            document.getElementById('year-stats-grid').innerHTML = gridHtml;
         }
 
-        function zoomToFilteredArea() {
-            const filteredData = getFilteredData();
-            
-            if (filteredData.length === 0) return;
-
-            const coords = filteredData
-                .filter(row => row.longitude && row.latitude)
-                .map(row => [parseFloat(row.longitude), parseFloat(row.latitude)]);
-
-            if (coords.length === 0) return;
-
-            const bounds = new maplibregl.LngLatBounds();
-            coords.forEach(coord => bounds.extend(coord));
-
-            if (!bounds.isEmpty()) {
-                map.fitBounds(bounds, {
-                    padding: { top: 100, bottom: 100, left: 80, right: 80 },
-                    maxZoom: 17,
-                    duration: 1000
-                });
-            }
-        }
-
-        function toggleHeatmap() {
-            showHeatmap = !showHeatmap;
-            const btn = document.getElementById('btn-toggle-heatmap');
-            
-            if (showHeatmap) {
-                map.setLayoutProperty('incidenti-heatmap', 'visibility', 'visible');
-                ['C', 'F', 'R', 'M'].forEach(tipo => {
-                    map.setLayoutProperty(`incidenti-${tipo}`, 'visibility', 'none');
-                });
-                btn.textContent = '🔵 Localizzaione incidenti';
-                btn.classList.add('active');
-                document.getElementById('points-legend').classList.add('hidden');
-                document.getElementById('heatmap-legend').classList.remove('hidden');
-            } else {
-                map.setLayoutProperty('incidenti-heatmap', 'visibility', 'none');
-                ['C', 'F', 'R', 'M'].forEach(tipo => {
-                    map.setLayoutProperty(`incidenti-${tipo}`, 'visibility', 'visible');
-                });
-                btn.textContent = '🔥 Mappa di Calore';
-                btn.classList.remove('active');
-                document.getElementById('points-legend').classList.remove('hidden');
-                document.getElementById('heatmap-legend').classList.add('hidden');
-            }
-        }
-
-        function changeBasemap() {
-            const selectedBasemap = document.getElementById('basemap-select').value;
-            const currentStyle = basemapStyles[selectedBasemap];
-            
-            const sourceData = map.getSource('incidenti')._data;
-            const heatmapVisibility = map.getLayoutProperty('incidenti-heatmap', 'visibility');
-            const circleVisibility = {};
-            ['C', 'F', 'R', 'M'].forEach(tipo => {
-                circleVisibility[tipo] = map.getLayoutProperty(`incidenti-${tipo}`, 'visibility');
-            });
-
-            const newStyle = JSON.parse(JSON.stringify(currentStyle));
-            
-            newStyle.sources['incidenti'] = {
-                type: 'geojson',
-                data: sourceData
+        function createStagioniChart(data) {
+            const stagioni = ['Inverno', 'Primavera', 'Estate', 'Autunno'];
+            const stagioniData = {
+                feriali: {},
+                weekend: {}
             };
             
-            newStyle.layers.push({
-                id: 'incidenti-heatmap',
-                type: 'heatmap',
-                source: 'incidenti',
-                maxzoom: 15,
-                paint: {
-                    'heatmap-weight': [
-                        'match',
-                        ['get', 'Tipologia'],
-                        'C', 0.5,
-                        'F', 1,
-                        'R', 1.5,
-                        'M', 2,
-                        1
-                    ],
-                    'heatmap-intensity': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        0, 0.8,
-                        9, 1,
-                        15, 2.5
-                    ],
-                    'heatmap-color': [
-                        'interpolate',
-                        ['linear'],
-                        ['heatmap-density'],
-                        0, 'rgba(0,0,255,0)',
-                        0.1, 'rgba(0,0,255,0.6)',
-                        0.3, 'rgba(0,255,255,0.7)',
-                        0.5, 'rgba(0,255,0,0.8)',
-                        0.7, 'rgba(255,255,0,0.85)',
-                        0.9, 'rgba(255,128,0,0.9)',
-                        1, 'rgba(255,0,0,1)'
-                    ],
-                    'heatmap-radius': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        0, 1,
-                        9, 3,
-                        11, 6,
-                        13, 10,
-                        15, 14
-                    ],
-                    'heatmap-opacity': [
-                        'interpolate',
-                        ['linear'],
-                        ['zoom'],
-                        7, 0.65,
-                        15, 0.75
-                    ]
-                },
-                layout: {
-                    visibility: heatmapVisibility
+            stagioni.forEach(stagione => {
+                stagioniData.feriali[stagione] = 0;
+                stagioniData.weekend[stagione] = 0;
+            });
+            
+            data.forEach(row => {
+                const stagione = row['Stagione'];
+                const tipo = row['Feriale/Weekend'];
+                
+                if (stagione && tipo) {
+                    const tipoLower = tipo.toLowerCase();
+                    if (tipoLower === 'feriale' && stagioniData.feriali[stagione] !== undefined) {
+                        stagioniData.feriali[stagione]++;
+                    } else if (tipoLower === 'weekend' && stagioniData.weekend[stagione] !== undefined) {
+                        stagioniData.weekend[stagione]++;
+                    }
                 }
             });
 
-            ['C', 'F', 'R', 'M'].forEach(tipo => {
-                newStyle.layers.push({
-                    id: `incidenti-${tipo}`,
-                    type: 'circle',
-                    source: 'incidenti',
-                    filter: ['==', ['get', 'Tipologia'], tipo],
-                    paint: {
-                        'circle-radius': [
-                            'interpolate', ['linear'], ['zoom'],
-                            10, tipo === 'M' ? 4 : tipo === 'R' ? 3 : 2,
-                            16, tipo === 'M' ? 10 : tipo === 'R' ? 8 : 6
-                        ],
-                        'circle-color': colorMap[tipo],
-                        'circle-opacity': 0.8,
-                        'circle-stroke-width': tipo === 'M' ? 2 : 1,
-                        'circle-stroke-color': '#fff'
+            const ctx = document.getElementById('chart-stagioni').getContext('2d');
+            chartInstances.stagioni = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: stagioni,
+                    datasets: [{
+                        label: 'Feriali',
+                        data: stagioni.map(s => stagioniData.feriali[s]),
+                        backgroundColor: '#10b981'
+                    }, {
+                        label: 'Weekend',
+                        data: stagioni.map(s => stagioniData.weekend[s]),
+                        backgroundColor: '#f59e0b'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const element = elements[0];
+                            const stagione = stagioni[element.index];
+                            const dataset = element.datasetIndex;
+                            
+                            if (currentFilters['filter-stagione'] === stagione && 
+                                ((dataset === 0 && currentFilters['filter-feriale-weekend'] === 'Feriale') ||
+                                 (dataset === 1 && currentFilters['filter-feriale-weekend'] === 'Weekend'))) {
+                                currentFilters['filter-stagione'] = '';
+                                currentFilters['filter-feriale-weekend'] = '';
+                            } else {
+                                currentFilters['filter-stagione'] = stagione;
+                                currentFilters['filter-feriale-weekend'] = dataset === 0 ? 'Feriale' : 'Weekend';
+                            }
+                            
+                            document.getElementById('filter-stagione').value = currentFilters['filter-stagione'];
+                            document.getElementById('filter-feriale-weekend').value = currentFilters['filter-feriale-weekend'];
+                            updateAllFilters();
+                            updateMapData();
+                            updateStats();
+                            updateYearStats();
+                            
+                            destroyAllCharts();
+                            createAllCharts();
+                        }
                     },
-                    layout: {
-                        visibility: circleVisibility[tipo]
+                    plugins: {
+                        legend: { 
+                            display: true,
+                            labels: { color: '#cbd5e1' }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                footer: () => 'Clicca per filtrare'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            ticks: { color: '#cbd5e1' },
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#cbd5e1' },
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                        }
                     }
-                });
-            });
-
-            map.setStyle(newStyle);
-
-            map.once('styledata', () => {
-                ['C', 'F', 'R', 'M'].forEach(tipo => {
-                    setupLayerInteractions(`incidenti-${tipo}`);
-                });
+                }
             });
         }
 
-        function resetFilters() {
-            currentFilters = {};
-            document.querySelectorAll('select').forEach(select => {
-                select.value = '';
-                select.disabled = false;
+        function createCalendarioChart(data) {
+            const dateCount = {};
+            
+            data.forEach(row => {
+                const data_str = row['Data'];
+                if (data_str) {
+                    dateCount[data_str] = (dateCount[data_str] || 0) + 1;
+                }
             });
-            
-            currentFilters['filter-anno'] = '2023';
-            
-            updateAllFilters();
-            updateMapData();
-            updateStats();
-            updateYearStats();
-            updateLegendActiveState();
 
-            map.flyTo({
-                center: [13.3614, 38.1157],
-                zoom: 11,
-                duration: 1000,
-                padding: { top: 80, bottom: 80, left: 50, right: 50 }
+            const sortedDates = Object.keys(dateCount).sort((a, b) => {
+                return dateCount[b] - dateCount[a];
+            });
+
+            const top30Dates = sortedDates.slice(0, 30);
+            const top30Counts = top30Dates.map(date => dateCount[date]);
+
+            const backgroundColors = top30Dates.map((date, idx) => {
+                if (idx < 5) return '#ef4444';
+                if (idx < 10) return '#f97316';
+                if (idx < 20) return '#f59e0b';
+                return '#ec4899';
+            });
+
+            const ctx = document.getElementById('chart-calendario').getContext('2d');
+            chartInstances.calendario = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: top30Dates,
+                    datasets: [{
+                        label: 'Incidenti per Data',
+                        data: top30Counts,
+                        backgroundColor: backgroundColors
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Top 30 giorni con più incidenti',
+                            color: '#cbd5e1',
+                            font: { size: 14 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.parsed.x} incidenti`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { 
+                            beginAtZero: true,
+                            ticks: { color: '#cbd5e1' },
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                        },
+                        y: {
+                            ticks: { 
+                                color: '#cbd5e1',
+                                font: { size: 10 }
+                            },
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                        }
+                    }
+                }
             });
         }
-
-        init();
-    </script>
-</body>
-</html>
