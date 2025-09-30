@@ -537,10 +537,6 @@
 .maplibregl-ctrl-home:hover {
     background-color: #f0f0f0;
 }
-
-#total-info {
-    white-space: pre-line;
-}
     </style>
 </head>
 <body>
@@ -877,7 +873,7 @@
                         });
                         
                         console.log(`CSV processato: ${allIncidenti.length} incidenti validi su ${results.data.length} righe totali`);
-                        document.getElementById('total-info').textContent = `✓ Tutti i ${allIncidenti.length.toLocaleString('it-IT')} incidenti caricati. \nDei 26.618 incidenti esaminati, 788 sono stati scartati in quanto le relative coordinate risultavano esterne al Comune di Palermo.`;
+                        document.getElementById('total-info').textContent = `✓ Tutti i ${allIncidenti.length.toLocaleString('it-IT')} incidenti caricati`;
                         resolve();
                     },
                     error: function(error) {
