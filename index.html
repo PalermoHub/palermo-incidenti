@@ -525,6 +525,18 @@
             color: #94a3b8;
             font-weight: 600;
         }
+		
+		.maplibregl-ctrl-home {
+    background-color: #fff;
+    background-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="29" height="29" viewBox="0 0 29 29" fill="%23333"><path d="M14.5 3l-11 9h3v11h5v-7h6v7h5V12h3z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 70%;
+}
+
+.maplibregl-ctrl-home:hover {
+    background-color: #f0f0f0;
+}
     </style>
 </head>
 <body>
@@ -872,28 +884,68 @@
             });
         }
 
-        function initMap() {
-            map = new maplibregl.Map({
-                container: 'map',
-                style: basemapStyles['carto-dark'],
-                center: [13.3614, 38.1157],
-                zoom: 11,
-                hash: true
-            });
 
-            map.addControl(new maplibregl.NavigationControl(), 'top-left');
-            map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
+function initMap() {
+    const palermoBounds = [
+        [13.20, 38.00],
+        [13.50, 38.25]
+    ];
+    
+    map = new maplibregl.Map({
+        container: 'map',
+        style: basemapStyles['carto-dark'],
+        center: [13.3614, 38.1157],
+        zoom: 11,
+        minZoom: 9,
+        maxZoom: 18,
+        maxBounds: palermoBounds,
+        hash: true
+    });
 
-            map.on('load', () => {
-                console.log('Mappa caricata, creazione layers...');
-                createMapLayers();
-                populateFilters();
-                updateStats();
-                updateYearStats();
-                document.getElementById('loading').classList.add('hidden');
-                console.log('Inizializzazione completata!');
-            });
+    map.addControl(new maplibregl.NavigationControl(), 'top-left');
+    
+    // Controllo personalizzato Home
+    class HomeControl {
+        onAdd(map) {
+            this._map = map;
+            this._container = document.createElement('div');
+            this._container.className = 'maplibregl-ctrl maplibregl-ctrl-group';
+            this._container.innerHTML = '<button class="maplibregl-ctrl-home" type="button" title="Torna alla vista iniziale"></button>';
+            
+            this._container.onclick = () => {
+                map.flyTo({
+                    center: [13.3614, 38.1157],
+                    zoom: 10,
+                    duration: 1500,
+                    essential: true
+                });
+            };
+            
+            return this._container;
         }
+        
+        onRemove() {
+            this._container.parentNode.removeChild(this._container);
+            this._map = undefined;
+        }
+    }
+    
+    map.addControl(new HomeControl(), 'top-left');
+    map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
+    map.setPadding({ top: 80, bottom: 80, left: 50, right: 50 });
+
+    map.on('load', () => {
+        console.log('Mappa caricata, creazione layers...');
+        createMapLayers();
+        populateFilters();
+        updateStats();
+        updateYearStats();
+        document.getElementById('loading').classList.add('hidden');
+        console.log('Inizializzazione completata!');
+    });
+}
+	
+
 
         function createGeoJSON() {
             const filteredData = getFilteredData();
@@ -1214,11 +1266,11 @@
             coords.forEach(coord => bounds.extend(coord));
 
             if (!bounds.isEmpty()) {
-                map.fitBounds(bounds, {
-                    padding: 50,
-                    maxZoom: 14,
-                    duration: 1000
-                });
+map.fitBounds(bounds, {
+    padding: { top: 100, bottom: 100, left: 80, right: 80 },
+    maxZoom: 17,
+    duration: 1000
+});
             }
         }
 
@@ -1357,10 +1409,11 @@
             updateYearStats();
 
             map.flyTo({
-                center: [13.3614, 38.1157],
-                zoom: 11,
-                duration: 1000
-            });
+    center: [13.3614, 38.1157],
+    zoom: 11,
+    duration: 1000,
+    padding: { top: 80, bottom: 80, left: 50, right: 50 }
+});
         }
 
         init();
