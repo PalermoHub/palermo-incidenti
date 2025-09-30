@@ -1830,3 +1830,43 @@ select option {
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
     background: linear-gradient(135deg, #059669 0%, #047857 100%);
 }
+
+/* Legend Chart Container - Posizionamento in basso a destra */
+#points-legend {
+    position: absolute;
+    bottom: 80px;
+    right: 20px;
+    background: rgb(15 23 42 / 35%);
+    backdrop-filter: blur5px);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    z-index: 10;
+    width: 280px;
+    pointer-events: auto;
+}
+
+#points-legend h4 {
+    margin: 0 0 12px 0;
+    font-size: 13px;
+    color:#fff;
+    font-weight: 600;
+}
+
+#points-legend p {
+    margin: 10px 0 0 0;
+    font-size: 10px;
+    color: #64748b;
+    font-style: italic;
+}
+
+/* Responsive per mobile */
+@media (max-width: 768px) {
+    #points-legend {
+        bottom: 60px;
+        right: 10px;
+        width: 240px;
+        padding: 12px;
+    }
+}

@@ -28,7 +28,7 @@ const basemapStyles = {
                 type: 'raster',
                 tiles: ['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'],
                 tileSize: 256,
-                attribution: 'Â© CARTO'
+                attribution: '© CARTO'
             }
         },
         layers: [{
@@ -44,7 +44,7 @@ const basemapStyles = {
                 type: 'raster',
                 tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
                 tileSize: 256,
-                attribution: 'Â© OpenStreetMap contributors'
+                attribution: '© OpenStreetMap contributors'
             }
         },
         layers: [{
@@ -60,7 +60,7 @@ const basemapStyles = {
                 type: 'raster',
                 tiles: ['https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'],
                 tileSize: 256,
-                attribution: 'Â© Google'
+                attribution: '© Google'
             }
         },
         layers: [{
@@ -76,7 +76,7 @@ const basemapStyles = {
                 type: 'raster',
                 tiles: ['https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'],
                 tileSize: 256,
-                attribution: 'Â© CARTO'
+                attribution: '© CARTO'
             }
         },
         layers: [{
@@ -98,7 +98,7 @@ const filterConfig = {
     'filter-giorno-settimana': 'Giorno settimana',
     'filter-feriale-weekend': 'Feriale/Weekend',
     'filter-giorno-notte': 'Giorno/Notte',
-    'filter-condizioni-luce': 'Condizioni luce (VisibilitÃ )',
+    'filter-condizioni-luce': 'Condizioni luce (Visibilità)',
     'filter-fascia-4': 'Fascia oraria (4 fasce)',
     'filter-fascia-6': 'Fascia oraria dettagliata (6 fasce)',
     'filter-ora-punta': 'Ora di punta (Picchi di traffico)'
@@ -251,7 +251,7 @@ function initMap() {
             populateFilters();
             updateStats();
             updateYearStats();
-            updateLegendActiveState();
+            updateLegendChart();
             console.log('Inizializzazione completata!');
         } catch (error) {
             console.error('Errore durante inizializzazione:', error);
@@ -455,7 +455,7 @@ function handleFilterChange(filterId, value) {
 
     updateStats();
     updateYearStats();
-    updateLegendActiveState();
+    updateLegendChart();
     
     // Update analytics if panel is open
     if (document.getElementById('analytics-panel').classList.contains('open')) {
@@ -642,13 +642,13 @@ function show2019InfoPopup() {
     
     popup.innerHTML = `
         <div style="text-align: center;">
-            <div style="font-size: 48px; margin-bottom: 16px;">âš ï¸</div>
+            <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
             <h3 style="color: #3b82f6; margin: 0 0 16px 0; font-size: 20px; font-weight: 700;">
                 Anno 2019 - Dati Parziali
             </h3>
             <p style="color: #cbd5e1; margin: 0 0 16px 0; font-size: 14px; line-height: 1.6;">
                 Il <strong style="color: #f1f5f9;">2019</strong> include <strong style="color: #3b82f6;">3.192 incidenti non mappati</strong> 
-                perchÃ© nel dataset non erano presenti le coordinate geografiche.
+                perché nel dataset non erano presenti le coordinate geografiche.
             </p>
             <p style="color: #94a3b8; margin: 0 0 20px 0; font-size: 13px; font-style: italic;">
                 Questi incidenti sono conteggiati nelle statistiche ma non visualizzati sulla mappa.
@@ -734,32 +734,177 @@ function filterByTipologia(tipo) {
     updateMapData();
     updateStats();
     updateYearStats();
-    updateLegendActiveState();
+   updateLegendChart();
     
     if (document.getElementById('analytics-panel').classList.contains('open')) {
         updateAnalytics();
     }
 }
 
-// Update Legend Active State
-function updateLegendActiveState() {
-    const selectedTipo = currentFilters['filter-tipologia'];
+// Update Legend Chart
+let legendChart = null;
+
+function updateLegendChart() {
+    const filteredData = getFilteredData();
+    const stats = { M: 0, R: 0, F: 0, C: 0 };
     
-    const legendItems = document.querySelectorAll('.legend-item');
-    if (!legendItems || legendItems.length === 0) return;
-    
-    legendItems.forEach(item => {
-        item.classList.remove('active');
+    filteredData.forEach(row => {
+        const tipo = row.Tipologia;
+        if (tipo && stats.hasOwnProperty(tipo)) {
+            stats[tipo]++;
+        }
     });
     
-    if (selectedTipo === '') {
-        const allItem = document.querySelector('.legend-item[data-tipo=""]');
-        if (allItem) allItem.classList.add('active');
-    } else {
-        const specificItem = document.querySelector(`.legend-item[data-tipo="${selectedTipo}"]`);
-        if (specificItem) specificItem.classList.add('active');
+    const selectedTipo = currentFilters['filter-tipologia'];
+    
+    // Crea array con tutti i dati
+    const total = stats.M + stats.R + stats.F + stats.C;
+    const items = [
+        { label: 'Reset', value: total, tipo: '', color: '#64748b' },
+        { label: 'F - Feriti', value: stats.F, tipo: 'F', color: '#f59e0b' },
+        { label: 'C - Cose', value: stats.C, tipo: 'C', color: '#10b981' },
+        { label: 'R - Rserva', value: stats.R, tipo: 'R', color: '#a855f7' },
+        { label: 'M - Mortale', value: stats.M, tipo: 'M', color: '#ef4444' }
+    ];
+    
+    // Ordina dal valore più alto al più basso (escluso "tutti" che resta in cima)
+    const tuttiItem = items[0];
+    const otherItems = items.slice(1).sort((a, b) => b.value - a.value);
+    const sortedItems = [tuttiItem, ...otherItems];
+    
+    const labels = sortedItems.map(item => item.label);
+    const data = sortedItems.map(item => item.value);
+    const tipos = sortedItems.map(item => item.tipo);
+    const colors = sortedItems.map(item => item.color);
+    
+    // Evidenzia la barra selezionata
+    const backgroundColors = tipos.map((tipo, idx) => 
+        selectedTipo === tipo ? colors[idx] : colors[idx] + 'CC'
+    );
+    
+    const borderColors = tipos.map((tipo, idx) => 
+        selectedTipo === tipo ? colors[idx] : 'transparent'
+    );
+    
+    const borderWidths = tipos.map(tipo => 
+        selectedTipo === tipo ? 3 : 0
+    );
+    
+    const canvas = document.getElementById('legend-chart');
+    if (!canvas) return;
+    
+    if (legendChart) {
+        legendChart.destroy();
     }
+    
+    legendChart = new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: backgroundColors,
+                borderColor: borderColors,
+                borderWidth: borderWidths
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    left: 0,
+                    right: 10,
+                    top: 5,
+                    bottom: 5
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    enabled: true,
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                    padding: 12,
+                    titleFont: { size: 13, weight: 'bold' },
+                    bodyFont: { size: 12 },
+                    callbacks: {
+                        title: function(context) {
+                            const tipo = tipos[context[0].dataIndex];
+                            const names = { '': 'Tutti gli incidenti', M: 'Mortale', R: 'Riserva', F: 'Feriti', C: 'Cose' };
+                            return names[tipo];
+                        },
+                        label: function(context) {
+                            const value = context.parsed.x;
+                            const tipo = tipos[context.dataIndex];
+                            
+                            if (tipo === '') {
+                                return `${value.toLocaleString('it-IT')} incidenti totali`;
+                            }
+                            
+                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                            return `${value.toLocaleString('it-IT')} incidenti (${percentage}%)`;
+                        },
+                        afterLabel: function(context) {
+                            const tipo = tipos[context.dataIndex];
+                            if (selectedTipo === tipo) {
+                                return tipo === '' ? '' : 'Clicca per deselezionare';
+                            }
+                            return 'Clicca per filtrare';
+                        }
+                    }
+                },
+                datalabels: {
+                    display: true,
+                    anchor: 'end',
+                    align: 'end',
+                    color: '#f1f5f9',
+                    font: {
+                        size: 11,
+                        weight: 'bold'
+                    },
+                    formatter: (value) => value > 0 ? value.toLocaleString('it-IT') : '',
+                    offset: 4
+                }
+            },
+            scales: {
+                x: {
+                    display: false,
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#cbd5e1',
+                        font: {
+                            size: 11,
+                            weight: '500'
+                        },
+                        padding: 8
+                    }
+                }
+            },
+            onClick: (e, items) => {
+                if (items.length > 0) {
+                    const tipo = tipos[items[0].index];
+                    filterByTipologia(tipo);
+                }
+            }
+        }
+    });
 }
+
+// Update Legacy Function Name for Compatibility
+function updateLegendActiveState() {
+    updateLegendChart();
+}
+
 
 // Zoom To Filtered Area
 function zoomToFilteredArea() {
@@ -796,9 +941,9 @@ function toggleHeatmap() {
         ['C', 'F', 'R', 'M'].forEach(tipo => {
             map.setLayoutProperty(`incidenti-${tipo}`, 'visibility', 'none');
         });
-        btn.textContent = 'ðŸ”µ Localizzazione incidenti';
+        btn.textContent = '🔵 Localizzazione incidenti';
         btn.classList.add('active');
-        btnMap.textContent = 'ðŸ”µ Punti';
+        btnMap.textContent = '🔵 Punti';
         btnMap.classList.add('active');
         document.getElementById('points-legend').classList.add('hidden');
         document.getElementById('heatmap-legend').classList.remove('hidden');
@@ -807,9 +952,9 @@ function toggleHeatmap() {
         ['C', 'F', 'R', 'M'].forEach(tipo => {
             map.setLayoutProperty(`incidenti-${tipo}`, 'visibility', 'visible');
         });
-        btn.textContent = 'ðŸ”¥ Mappa di Calore';
+        btn.textContent = '🔥 Mappa di Calore';
         btn.classList.remove('active');
-        btnMap.textContent = 'ðŸ”¥ Calore';
+        btnMap.textContent = '🔥 Calore';
         btnMap.classList.remove('active');
         document.getElementById('points-legend').classList.remove('hidden');
         document.getElementById('heatmap-legend').classList.add('hidden');
@@ -818,112 +963,45 @@ function toggleHeatmap() {
 
 // Change Basemap
 function changeBasemap() {
-    const selectedBasemap = document.getElementById('basemap-select').value;
-    const currentStyle = basemapStyles[selectedBasemap];
+    const selectedStyle = document.getElementById('basemap-select').value;
     
-    const sourceData = map.getSource('incidenti')._data;
-    const heatmapVisibility = map.getLayoutProperty('incidenti-heatmap', 'visibility');
-    const circleVisibility = {};
-    ['C', 'F', 'R', 'M'].forEach(tipo => {
-        circleVisibility[tipo] = map.getLayoutProperty(`incidenti-${tipo}`, 'visibility');
-    });
-
-    const newStyle = JSON.parse(JSON.stringify(currentStyle));
+    if (!basemapStyles[selectedStyle]) {
+        console.error('Stile mappa non trovato:', selectedStyle);
+        return;
+    }
     
-    newStyle.sources['incidenti'] = {
-        type: 'geojson',
-        data: sourceData
-    };
+    // Salva lo stato corrente della mappa
+    const currentCenter = map.getCenter();
+    const currentZoom = map.getZoom();
+    const currentBearing = map.getBearing();
+    const currentPitch = map.getPitch();
     
-    newStyle.layers.push({
-        id: 'incidenti-heatmap',
-        type: 'heatmap',
-        source: 'incidenti',
-        maxzoom: 15,
-        paint: {
-            'heatmap-weight': [
-                'match',
-                ['get', 'Tipologia'],
-                'C', 0.5,
-                'F', 1,
-                'R', 1.5,
-                'M', 2,
-                1
-            ],
-            'heatmap-intensity': [
-                'interpolate',
-                ['linear'],
-                ['zoom'],
-                0, 0.8,
-                9, 1,
-                15, 2.5
-            ],
-            'heatmap-color': [
-                'interpolate',
-                ['linear'],
-                ['heatmap-density'],
-                0, 'rgba(0,0,255,0)',
-                0.1, 'rgba(0,0,255,0.6)',
-                0.3, 'rgba(0,255,255,0.7)',
-                0.5, 'rgba(0,255,0,0.8)',
-                0.7, 'rgba(255,255,0,0.85)',
-                0.9, 'rgba(255,128,0,0.9)',
-                1, 'rgba(255,0,0,1)'
-            ],
-            'heatmap-radius': [
-                'interpolate',
-                ['linear'],
-                ['zoom'],
-                0, 1,
-                9, 3,
-                11, 6,
-                13, 10,
-                15, 14
-            ],
-            'heatmap-opacity': [
-                'interpolate',
-                ['linear'],
-                ['zoom'],
-                7, 0.65,
-                15, 0.75
-            ]
-        },
-        layout: {
-            visibility: heatmapVisibility
+    // Cambia lo stile della mappa
+    map.setStyle(basemapStyles[selectedStyle]);
+    
+    // Quando il nuovo stile è caricato, ripristina i layer degli incidenti
+    map.once('styledata', () => {
+        // Ripristina la vista
+        map.jumpTo({
+            center: currentCenter,
+            zoom: currentZoom,
+            bearing: currentBearing,
+            pitch: currentPitch
+        });
+        
+        // Ricrea i layer degli incidenti
+        createMapLayers();
+        
+        // Ripristina la visibilità corretta (heatmap o punti)
+        if (showHeatmap) {
+            map.setLayoutProperty('incidenti-heatmap', 'visibility', 'visible');
+            ['C', 'F', 'R', 'M'].forEach(tipo => {
+                map.setLayoutProperty(`incidenti-${tipo}`, 'visibility', 'none');
+            });
         }
     });
-
-    ['C', 'F', 'R', 'M'].forEach(tipo => {
-        newStyle.layers.push({
-            id: `incidenti-${tipo}`,
-            type: 'circle',
-            source: 'incidenti',
-            filter: ['==', ['get', 'Tipologia'], tipo],
-            paint: {
-                'circle-radius': [
-                    'interpolate', ['linear'], ['zoom'],
-                    10, tipo === 'M' ? 4 : tipo === 'R' ? 3 : 2,
-                    16, tipo === 'M' ? 10 : tipo === 'R' ? 8 : 6
-                ],
-                'circle-color': colorMap[tipo],
-                'circle-opacity': 0.8,
-                'circle-stroke-width': tipo === 'M' ? 2 : 1,
-                'circle-stroke-color': '#fff'
-            },
-            layout: {
-                visibility: circleVisibility[tipo]
-            }
-        });
-    });
-
-    map.setStyle(newStyle);
-
-    map.once('styledata', () => {
-        ['C', 'F', 'R', 'M'].forEach(tipo => {
-            setupLayerInteractions(`incidenti-${tipo}`);
-        });
-    });
 }
+
 
 // Reset Filters
 function resetFilters() {
@@ -939,7 +1017,7 @@ function resetFilters() {
     updateMapData();
     updateStats();
     updateYearStats();
-    updateLegendActiveState();
+    updateLegendChart()
 
     map.flyTo({
         center: [13.3614, 38.1157],
@@ -1002,20 +1080,20 @@ function openDetailPanel(properties) {
     };
     
     const tipologiaIcons = {
-        'M': 'ðŸ’€',
-        'R': 'ðŸš‘',
-        'F': 'ðŸ¤•',
-        'C': 'ðŸ”§'
+        'M': '💀',
+        'R': '🚑',
+        'F': '🤕',
+        'C': '🔧'
     };
     
-    document.getElementById('detail-tipo-icon').textContent = tipologiaIcons[properties.Tipologia] || 'ðŸš—';
+    document.getElementById('detail-tipo-icon').textContent = tipologiaIcons[properties.Tipologia] || '🚗';
     document.getElementById('detail-subtitle').textContent = `Incidente del ${properties.Data || 'Data non disponibile'}`;
     
     let html = '';
     
     html += `
         <div class="detail-section">
-            <h3>âš ï¸ Tipologia e GravitÃ </h3>
+            <h3>⚠️ Tipologia e Gravità</h3>
             <div class="detail-row">
                 <span class="detail-label">Tipo Incidente</span>
                 <span class="tipo-badge ${properties.Tipologia}">${properties.Tipologia} - ${tipologiaNames[properties.Tipologia]}</span>
@@ -1023,7 +1101,7 @@ function openDetailPanel(properties) {
         </div>
     `;
     
-    html += '<div class="detail-section"><h3>ðŸ“… Quando Ã¨ Avvenuto</h3>';
+    html += '<div class="detail-section"><h3>📅 Quando è Avvenuto</h3>';
     const temporalFields = [
         { key: 'Data', label: 'Data' },
         { key: 'Anno', label: 'Anno' },
@@ -1049,11 +1127,11 @@ function openDetailPanel(properties) {
     });
     html += '</div>';
     
-    html += '<div class="detail-section"><h3>ðŸ“ Dove Ã¨ Avvenuto</h3>';
+    html += '<div class="detail-section"><h3>📍 Dove è Avvenuto</h3>';
     const locationFields = [
         { key: 'Circoscrizione', label: 'Circoscrizione' },
         { key: 'Quartiere', label: 'Quartiere' },
-        { key: 'UPL', label: 'UnitÃ  di Primo Livello' }
+        { key: 'UPL', label: 'Unità di Primo Livello' }
     ];
     
     locationFields.forEach(field => {
@@ -1082,12 +1160,12 @@ function openDetailPanel(properties) {
     }
     html += '</div>';
     
-    html += '<div class="detail-section"><h3>ðŸŒ¤ï¸ Condizioni Ambientali</h3>';
-    if (properties['Condizioni luce (VisibilitÃ )'] && properties['Condizioni luce (VisibilitÃ )'] !== 'null') {
+    html += '<div class="detail-section"><h3>🌤️ Condizioni Ambientali</h3>';
+    if (properties['Condizioni luce (Visibilità)'] && properties['Condizioni luce (Visibilità)'] !== 'null') {
         html += `
             <div class="detail-row">
                 <span class="detail-label">Condizioni Luce</span>
-                <span class="detail-value">${properties['Condizioni luce (VisibilitÃ )']}</span>
+                <span class="detail-value">${properties['Condizioni luce (Visibilità)']}</span>
             </div>
         `;
     }
@@ -1183,9 +1261,9 @@ function updateActiveFiltersDisplay() {
     let displayHTML = '';
     
     if (filterText.length === 0) {
-        displayHTML = `Tutti gli incidenti (2015-2023) â€¢ ${totalData.toLocaleString('it-IT')} incidenti totali`;
+        displayHTML = `Tutti gli incidenti (2015-2023) • ${totalData.toLocaleString('it-IT')} incidenti totali`;
     } else {
-        displayHTML = `${filteredData.length.toLocaleString('it-IT')} di ${totalData.toLocaleString('it-IT')} incidenti â€¢ `;
+        displayHTML = `${filteredData.length.toLocaleString('it-IT')} di ${totalData.toLocaleString('it-IT')} incidenti • `;
         displayHTML += filterText.map(f => `<span class="filter-badge">${f}</span>`).join('');
     }
     
@@ -1236,7 +1314,7 @@ function addChartDownloadButtons() {
         // Create download button
         const btn = document.createElement('button');
         btn.className = 'chart-download-btn';
-        btn.innerHTML = 'â¬‡ï¸ PNG';
+        btn.innerHTML = '⬇️ PNG';
         btn.title = 'Scarica grafico come PNG';
         
         btn.onclick = () => {
@@ -1322,7 +1400,7 @@ async function downloadChartAsPNG(chartId, filename) {
 
 // Panoramica Charts
 function updatePanoramicaCharts(data) {
-    // Common chart options with labels - COLORE SCURO per leggibilitÃ  su sfondo bianco
+    // Common chart options with labels - COLORE SCURO per leggibilità su sfondo bianco
     const commonOptions = {
         responsive: true,
         maintainAspectRatio: false,
@@ -1463,18 +1541,26 @@ function updatePanoramicaCharts(data) {
                     }
                 }
             },
-            onClick: (e, items) => {
-                if (items.length > 0) {
-                    const year = allYears[items[0].index];
-                    currentFilters['filter-anno'] = String(year);
-                    document.getElementById('filter-anno').value = String(year);
-                    handleFilterChange('filter-anno', String(year));
-                }
-            }
+onClick: (e, items) => {
+    if (items.length > 0) {
+        const year = allYears[items[0].index];
+        const currentYear = currentFilters['filter-anno'];
+        
+        // Toggle: se l'anno è già selezionato, deselezionalo
+        if (currentYear === String(year)) {
+            currentFilters['filter-anno'] = '';
+        } else {
+            currentFilters['filter-anno'] = String(year);
+        }
+        
+        document.getElementById('filter-anno').value = currentFilters['filter-anno'];
+        handleFilterChange('filter-anno', currentFilters['filter-anno']);
+    }
+}
         }
     });
     
-    // AGGIUNGI NOTA SOTTO IL GRAFICO - QUESTA Ãˆ LA PARTE CRITICA
+    // AGGIUNGI NOTA SOTTO IL GRAFICO - QUESTA È LA PARTE CRITICA
     const chartContainer = document.getElementById('chart-trend-annuale').closest('.chart-container');
     let existingNote = chartContainer.querySelector('.chart-note-2019');
     if (existingNote) {
@@ -1522,7 +1608,7 @@ function updatePanoramicaCharts(data) {
                 ...commonOptions.plugins,
                 datalabels: {
                     display: true,
-                    color: '#1e293b', // SCURO per leggibilitÃ 
+                    color: '#1e293b', // SCURO per leggibilità
                     font: { weight: 'bold', size: 10 },
                     formatter: (value, ctx) => {
                         const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
@@ -1706,7 +1792,7 @@ function updateTemporaleCharts(data) {
         }
     });
     
-    const giorni = ['LunedÃ¬', 'MartedÃ¬', 'MercoledÃ¬', 'GiovedÃ¬', 'VenerdÃ¬', 'Sabato', 'Domenica'];
+    const giorni = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
     const giorniCounts = giorni.map(g => giornoData[g] || 0);
     
     if (analyticsCharts.giornoSettimana) analyticsCharts.giornoSettimana.destroy();
@@ -2084,7 +2170,7 @@ function updateCondizioniCharts(data) {
                 ...commonOptions.plugins,
                 datalabels: {
                     display: true,
-                    color: '#1e293b', // SCURO per leggibilitÃ  su sfondo bianco
+                    color: '#1e293b', // SCURO per leggibilità su sfondo bianco
                     font: { weight: 'bold', size: 10 },
                     formatter: (value, ctx) => {
                         const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
@@ -2109,7 +2195,7 @@ function updateCondizioniCharts(data) {
     
     const condizioniData = {};
     data.forEach(row => {
-        const cond = row['Condizioni luce (VisibilitÃ )'];
+        const cond = row['Condizioni luce (Visibilità)'];
         if (cond) {
             condizioniData[cond] = (condizioniData[cond] || 0) + 1;
         }
@@ -2282,7 +2368,7 @@ function updateInsights(data) {
     
     const condizioneData = {};
     data.forEach(row => {
-        const cond = row['Condizioni luce (VisibilitÃ )'];
+        const cond = row['Condizioni luce (Visibilità)'];
         if (cond) {
             condizioneData[cond] = (condizioneData[cond] || 0) + 1;
         }
@@ -2398,70 +2484,118 @@ function downloadJSON() {
 
 // Setup Event Listeners
 function setupEventListeners() {
+    // Helper per gestire sia touch che click
+    function addTouchClickListener(element, handler) {
+        if (!element) return;
+        
+        let touchStartTime = 0;
+        let touchMoved = false;
+        
+        element.addEventListener('touchstart', (e) => {
+            touchStartTime = Date.now();
+            touchMoved = false;
+        }, { passive: true });
+        
+        element.addEventListener('touchmove', () => {
+            touchMoved = true;
+        }, { passive: true });
+        
+        element.addEventListener('touchend', (e) => {
+            const touchDuration = Date.now() - touchStartTime;
+            if (!touchMoved && touchDuration < 500) {
+                e.preventDefault();
+                handler(e);
+            }
+        });
+        
+        element.addEventListener('click', handler);
+    }
+    
     // Mobile Toggle
     const mobileToggle = document.getElementById('mobile-toggle');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
-    if (mobileToggle) mobileToggle.addEventListener('click', toggleSidebar);
-    if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+    if (mobileToggle) addTouchClickListener(mobileToggle, toggleSidebar);
+    if (sidebarOverlay) addTouchClickListener(sidebarOverlay, closeSidebar);
     
     // Filter Sections
     document.querySelectorAll('.filter-section-header').forEach(header => {
-        header.addEventListener('click', () => {
+        addTouchClickListener(header, () => {
             const section = header.dataset.section;
             toggleSection(section);
         });
     });
     
-    // Year Stats
-    const yearStatsGrid = document.getElementById('year-stats-grid');
-    if (yearStatsGrid) {
-        yearStatsGrid.addEventListener('click', (e) => {
-            const item = e.target.closest('.year-stat-item, .year-stat-item-all');
-            if (item) {
-                const year = item.dataset.year;
-                
-                // Se Ã¨ il 2019, mostra il popup informativo
-                if (year === '2019') {
-                    show2019InfoPopup();
-                    // Poi applica comunque il filtro
-                    setTimeout(() => {
-                        filterByYear(year);
-                    }, 100);
-                } else if (year === '') {
-                    filterByYear('');
-                } else {
-                    filterByYear(year);
-                }
-            }
-        });
-    }
+    // Year Stats - VERSIONE CORRETTA
+const yearStatsGrid = document.getElementById('year-stats-grid');
+if (yearStatsGrid) {
+    // Usa la delega degli eventi sul container
+    yearStatsGrid.addEventListener('click', (e) => {
+        const item = e.target.closest('.year-stat-item, .year-stat-item-all');
+        if (!item) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const year = item.dataset.year;
+        
+        // Se è il 2019, mostra il popup informativo
+        if (year === '2019') {
+            show2019InfoPopup();
+            // Aspetta che l'utente chiuda il popup, poi filtra
+            setTimeout(() => filterByYear(year), 100);
+        } else {
+            // Per tutti gli altri anni, filtra direttamente
+            filterByYear(year);
+        }
+    });
+    
+    // Gestione touch per feedback visivo
+    yearStatsGrid.addEventListener('touchstart', (e) => {
+        const item = e.target.closest('.year-stat-item, .year-stat-item-all');
+        if (item) {
+            item.style.opacity = '0.7';
+        }
+    }, { passive: true });
+    
+    yearStatsGrid.addEventListener('touchend', (e) => {
+        const item = e.target.closest('.year-stat-item, .year-stat-item-all');
+        if (item) {
+            item.style.opacity = '';
+        }
+    }, { passive: true });
+    
+    yearStatsGrid.addEventListener('touchcancel', (e) => {
+        const item = e.target.closest('.year-stat-item, .year-stat-item-all');
+        if (item) {
+            item.style.opacity = '';
+        }
+    }, { passive: true });
+}
     
     // Legend
     document.querySelectorAll('.legend-item').forEach(item => {
-        item.addEventListener('click', () => {
+        addTouchClickListener(item, () => {
             const tipo = item.dataset.tipo;
             filterByTipologia(tipo);
         });
     });
     
     // Buttons - with null checks
-    const btnHeatmap = document.getElementById('btn-toggle-heatmap');
-    const btnHeatmapMap = document.getElementById('btn-heatmap-map');
-    const btnReset = document.getElementById('btn-reset');
-    const btnResetMap = document.getElementById('btn-reset-map');
-    const btnDataTable = document.getElementById('btn-data-table');
-    const btnDataTableMap = document.getElementById('btn-data-table-map');
-    const btnAnalytics = document.getElementById('btn-analytics');
-    const btnAnalyticsMap = document.getElementById('btn-analytics-map');
+    const buttonsConfig = [
+        { id: 'btn-toggle-heatmap', handler: toggleHeatmap },
+        { id: 'btn-heatmap-map', handler: toggleHeatmap },
+        { id: 'btn-reset', handler: resetFilters },
+        { id: 'btn-reset-map', handler: resetFilters },
+        { id: 'btn-data-table', handler: openDataTable },
+        { id: 'btn-data-table-map', handler: openDataTable },
+        { id: 'btn-analytics', handler: openAnalytics },
+        { id: 'btn-analytics-map', handler: openAnalytics }
+    ];
     
-    if (btnHeatmap) btnHeatmap.addEventListener('click', toggleHeatmap);
-    if (btnHeatmapMap) btnHeatmapMap.addEventListener('click', toggleHeatmap);
-    if (btnReset) btnReset.addEventListener('click', resetFilters);
-    if (btnResetMap) btnResetMap.addEventListener('click', resetFilters);
-    if (btnDataTable) btnDataTable.addEventListener('click', openDataTable);
-    if (btnDataTableMap) btnDataTableMap.addEventListener('click', openDataTable);
-    if (btnAnalytics) btnAnalytics.addEventListener('click', openAnalytics);
-    if (btnAnalyticsMap) btnAnalyticsMap.addEventListener('click', openAnalytics);
+    buttonsConfig.forEach(config => {
+        const btn = document.getElementById(config.id);
+        if (btn) addTouchClickListener(btn, config.handler);
+    });
     
     // Basemap
     const basemapSelect = document.getElementById('basemap-select');
@@ -2469,33 +2603,35 @@ function setupEventListeners() {
     
     // Modals Close Buttons
     const infoIconBtn = document.getElementById('info-icon-btn');
-    if (infoIconBtn) {
-        infoIconBtn.addEventListener('click', () => {
-            const modal = document.getElementById('info-modal');
-            if (modal) modal.classList.add('show');
-        });
-    }
+    if (infoIconBtn) addTouchClickListener(infoIconBtn, () => {
+        const modal = document.getElementById('info-modal');
+        if (modal) modal.classList.add('show');
+    });
     
-    const infoModalClose = document.getElementById('info-modal-close');
-    if (infoModalClose) {
-        infoModalClose.addEventListener('click', () => {
-            const modal = document.getElementById('info-modal');
-            if (modal) modal.classList.remove('show');
-        });
-    }
+    const modalsConfig = [
+        { id: 'info-modal-close', modalId: 'info-modal' },
+        { id: 'data-table-close', handler: closeDataTable },
+        { id: 'detail-close', handler: closeDetailPanel },
+        { id: 'analytics-close', handler: closeAnalytics }
+    ];
     
-    const dataTableClose = document.getElementById('data-table-close');
-    if (dataTableClose) dataTableClose.addEventListener('click', closeDataTable);
-    
-    const detailClose = document.getElementById('detail-close');
-    if (detailClose) detailClose.addEventListener('click', closeDetailPanel);
-    
-    const analyticsClose = document.getElementById('analytics-close');
-    if (analyticsClose) analyticsClose.addEventListener('click', closeAnalytics);
+    modalsConfig.forEach(config => {
+        const btn = document.getElementById(config.id);
+        if (btn) {
+            if (config.handler) {
+                addTouchClickListener(btn, config.handler);
+            } else {
+                addTouchClickListener(btn, () => {
+                    const modal = document.getElementById(config.modalId);
+                    if (modal) modal.classList.remove('show');
+                });
+            }
+        }
+    });
     
     // Analytics Tabs
     document.querySelectorAll('.analytics-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
+        addTouchClickListener(tab, () => {
             const tabName = tab.dataset.tab;
             switchAnalyticsTab(tabName);
         });
@@ -2503,10 +2639,10 @@ function setupEventListeners() {
     
     // Download Buttons
     const btnDownloadCSV = document.getElementById('btn-download-csv');
-    if (btnDownloadCSV) btnDownloadCSV.addEventListener('click', downloadCSV);
+    if (btnDownloadCSV) addTouchClickListener(btnDownloadCSV, downloadCSV);
     
     const btnDownloadJSON = document.getElementById('btn-download-json');
-    if (btnDownloadJSON) btnDownloadJSON.addEventListener('click', downloadJSON);
+    if (btnDownloadJSON) addTouchClickListener(btnDownloadJSON, downloadJSON);
     
     // Modal Close on Click Outside
     document.addEventListener('click', (e) => {
@@ -2514,7 +2650,17 @@ function setupEventListeners() {
             e.target.classList.remove('show');
         }
     });
+    
+    // Previeni zoom su double-tap per tutti i pulsanti
+    document.addEventListener('touchend', (e) => {
+        if (e.target.closest('button, .legend-item, .year-stat-item, .year-stat-item-all')) {
+            e.preventDefault();
+        }
+    }, { passive: false });
 }
+
+
+
 
 // Initialize App
 init();

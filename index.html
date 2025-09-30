@@ -212,41 +212,15 @@
     </div>
     
     <!-- Legend -->
-    <div class="legend" id="points-legend">
-        <h3>Legenda (clicca per filtrare)</h3>
-        <div class="legend-item" data-tipo="">
-            <div style="display: flex; align-items: center;">
-                <div style="width: 24px; height: 24px; margin-right: 12px; border-radius: 50%; background: linear-gradient(135deg, #ef4444, #f97316, #f59e0b, #10b981); border: 2px solid rgba(241, 245, 249, 0.3);"></div>
-                <span><strong>Tutte</strong> - Tutte le tipologie</span>
-            </div>
-        </div>
-        <div class="legend-item" data-tipo="M">
-            <div style="display: flex; align-items: center;">
-                <div class="legend-color" style="background-color: #ef4444;"></div>
-                <span><strong>M</strong> - Mortale</span>
-            </div>
-        </div>
-        <div class="legend-item" data-tipo="R">
-            <div style="display: flex; align-items: center;">
-                <div class="legend-color" style="background-color: #a855f7;"></div>
-                <span><strong>R</strong> - Riserva</span>
-            </div>
-        </div>
-        <div class="legend-item" data-tipo="F">
-            <div style="display: flex; align-items: center;">
-                <div class="legend-color" style="background-color: #f59e0b;"></div>
-                <span><strong>F</strong> - Feriti</span>
-            </div>
-        </div>
-        <div class="legend-item" data-tipo="C">
-            <div style="display: flex; align-items: center;">
-                <div class="legend-color" style="background-color: #10b981;"></div>
-                <span><strong>C</strong> - Cose</span>
-            </div>
-        </div>
+<div id="points-legend">
+    <h4>Tipologie Incidenti</h4>
+    <div style="height: 170px; position: relative;">
+        <canvas id="legend-chart"></canvas>
     </div>
+    <p>Clicca su una barra per filtrare</p>
+</div>
 
-    <!-- Heatmap Legend -->
+   <!-- Heatmap Legend -->
     <div class="heatmap-legend hidden" id="heatmap-legend">
         <h3>Densità Incidenti</h3>
         <div class="heatmap-gradient"></div>
@@ -498,6 +472,6 @@
         </div>
     </div>
 
-<script src="js/incidenti.js"></script>
+<script src="js/incidenti_smart.js"></script>
 </body>
 </html>
