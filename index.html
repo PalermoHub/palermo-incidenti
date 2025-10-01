@@ -189,14 +189,17 @@
     
     <!-- Map Controls Container -->
     <div class="map-controls-container">
-        <div class="map-control-panel">
+   </div>
+    
+    <!-- Legend -->
+<div id="points-legend">
             <select id="basemap-select" title="Seleziona Mappa di Base">
-                <option value="carto-dark" selected>Carto Dark</option>
+                <option value="carto-dark" >Carto Dark</option>
                 <option value="osm">OpenStreetMap</option>
                 <option value="satellite">Satellite</option>
-                <option value="carto-light">Carto Light</option>
+                <option value="carto-light" selected>Carto Light</option>
             </select>
-            <button class="btn-map-control btn-heatmap-map" id="btn-heatmap-map" title="Attiva/Disattiva Mappa di Calore">
+		            <button class="btn-map-control btn-heatmap-map" id="btn-heatmap-map" title="Attiva/Disattiva Mappa di Calore">
                 🔥 Calore
             </button>
             <button class="btn-map-control btn-data-table-map" id="btn-data-table-map" title="Visualizza Tabella Dati">
@@ -205,14 +208,10 @@
             <button class="btn-map-control btn-analytics-map" id="btn-analytics-map" title="Analisi Avanzata">
                 📈 Analisi
             </button>
-            <button class="btn-map-control btn-reset-map" id="btn-reset-map" title="Reset Filtri">
+   <!--         <button class="btn-map-control btn-reset-map" id="btn-reset-map" title="Reset Filtri">
                 🔄 Reset
-            </button>
-        </div>
-    </div>
-    
-    <!-- Legend -->
-<div id="points-legend">
+            </button>	-->
+			
     <h4>Tipologie Incidenti</h4>
     <div style="height: 170px; top: -10px; position: relative;">
         <canvas id="legend-chart"></canvas>
@@ -242,8 +241,10 @@
      Feriti/Morti per Mese
     </h4>
     <canvas id="monthly-injuries-chart"></canvas>
-</div>
-
+</div> <br>
+<button class="btn-map-control btn-reset-map" id="btn-reset-map" title="Reset Filtri">
+ 🔄 Reset
+ </button>	
 <button id="btn-reset-charts" class="btn-reset-charts" title="Resetta tutti i filtri grafici">
     <span style="font-size: 12px;">↻</span> Reset Filtri Grafici
 </button>

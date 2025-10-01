@@ -29,7 +29,7 @@ const basemapStyles = {
                 type: 'raster',
                 tiles: ['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'],
                 tileSize: 256,
-                attribution: '© CARTO'
+                attribution: '© CARTO | <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" title="Agenzia per l&#180;Italia Digitale" target="_blank">  Fonte Dati: dati.gov.it - Comune di Palermo</a> - Rielaborazione: <a href="https://www.linkedin.com/in/gbvitrano/" title="Giovan Battista Vitrano" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" title="opendatasicilia.it" target="_blank">opendatasicilia.it</a>'
             }
         },
         layers: [{
@@ -45,7 +45,7 @@ const basemapStyles = {
                 type: 'raster',
                 tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
                 tileSize: 256,
-                attribution: '© OpenStreetMap contributors'
+                attribution: '© OpenStreetMap contributors | <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" title="Agenzia per l&#180;Italia Digitale" target="_blank">  Fonte Dati: dati.gov.it - Comune di Palermo</a> - Rielaborazione: <a href="https://www.linkedin.com/in/gbvitrano/" title="Giovan Battista Vitrano" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" title="opendatasicilia.it" target="_blank">opendatasicilia.it</a>'
             }
         },
         layers: [{
@@ -61,7 +61,7 @@ const basemapStyles = {
                 type: 'raster',
                 tiles: ['https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'],
                 tileSize: 256,
-                attribution: '© Google'
+                attribution: '© Google | <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" title="Agenzia per l&#180;Italia Digitale" target="_blank">  Fonte Dati: dati.gov.it - Comune di Palermo</a> - Rielaborazione: <a href="https://www.linkedin.com/in/gbvitrano/" title="Giovan Battista Vitrano" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" title="opendatasicilia.it" target="_blank">opendatasicilia.it</a>'
             }
         },
         layers: [{
@@ -77,7 +77,7 @@ const basemapStyles = {
                 type: 'raster',
                 tiles: ['https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'],
                 tileSize: 256,
-                attribution: '© CARTO'
+                attribution: '© CARTO | <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" title="Agenzia per l&#180;Italia Digitale" target="_blank">  Fonte Dati: dati.gov.it - Comune di Palermo</a> - Rielaborazione: <a href="https://www.linkedin.com/in/gbvitrano/" title="Giovan Battista Vitrano" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" title="opendatasicilia.it" target="_blank">opendatasicilia.it</a>'
             }
         },
         layers: [{
@@ -180,7 +180,7 @@ function initMap() {
     
     map = new maplibregl.Map({
         container: 'map',
-        style: basemapStyles['carto-dark'],
+        style: basemapStyles['carto-light'],
         center: [13.3614, 38.1157],
         zoom: 11,
         minZoom: 9,
@@ -1362,12 +1362,13 @@ function resetFilters() {
     updatePeriodSwitches();
     updateMonthlyInjuriesChart();
 	
-    map.flyTo({
-        center: [13.3614, 38.1157],
-        zoom: 11,
-        duration: 1000,
-        padding: { top: 80, bottom: 80, left: 50, right: 50 }
-    });
+	// Reset mappa allo zoom 12.7
+  //  map.flyTo({
+ //       center: [13.35361, 38.12585],
+ //       zoom: 12.7,
+//        duration: 1000,
+ //       padding: { top: 80, bottom: 80, left: 50, right: 50 }
+  //  });
     
     const analyticsPanel = document.getElementById('analytics-panel');
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
