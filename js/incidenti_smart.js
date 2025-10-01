@@ -7,6 +7,8 @@ let analyticsCharts = {};
 let monthlyInjuriesChart = null;
 let showClustering = false;
 let topLuoghiData = [];
+let calendarInstance = null;
+let incidentsByDate = {};
 
 // Register Chart.js plugins globally
 Chart.register(ChartDataLabels);
@@ -113,33 +115,27 @@ const filterDependencies = {
 };
 
 // Initialization
+// Initialization (MODIFICA)
 async function init() {
     try {
         console.log('Inizio caricamento CSV...');
-        const loadingEl = document.getElementById('loading');
-        if (loadingEl) {
-            loadingEl.innerHTML = '<div>Caricamento CSV...</div><small>Download in corso</small>';
-        }
+        document.getElementById('loading').innerHTML = '<div>Caricamento CSV...</div><small>Download in corso</small>';
         
         await loadCSV();
         
         console.log('CSV caricato, inizializzazione mappa...');
-        if (loadingEl) {
-            loadingEl.innerHTML = '<div>Creazione mappa...</div><small>Attendere</small>';
-        }
+        document.getElementById('loading').innerHTML = '<div>Creazione mappa...</div><small>Attendere</small>';
         
         initMap();
+        initCalendar(); // AGGIUNGI QUESTA RIGA
         setupEventListeners();
 
     } catch (error) {
         console.error('Errore inizializzazione:', error);
-        const loadingEl = document.getElementById('loading');
-        if (loadingEl) {
-            loadingEl.innerHTML = '<div>Errore caricamento</div><small>' + error.message + '</small>';
-            setTimeout(() => {
-                loadingEl.classList.add('hidden');
-            }, 2000);
-        }
+        document.getElementById('loading').innerHTML = '<div>Errore caricamento</div><small>' + error.message + '</small>';
+        setTimeout(() => {
+            document.getElementById('loading').classList.add('hidden');
+        }, 2000);
     }
 }
 
@@ -873,9 +869,17 @@ function setupLayerInteractions(layerId) {
     });
 }
 
-// Get Filtered Data
+// Get Filtered Data (MODIFICATA)
 function getFilteredData() {
     return allIncidenti.filter(row => {
+        // Filtro data calendario
+        if (currentFilters['filter-data-selezionata']) {
+            if (row.Data !== currentFilters['filter-data-selezionata']) {
+                return false;
+            }
+        }
+        
+        // Altri filtri esistenti
         for (const [filterId, property] of Object.entries(filterConfig)) {
             const value = currentFilters[filterId];
             if (!value) continue;
@@ -911,6 +915,18 @@ function populateFilters() {
 // Handle Filter Change
 function handleFilterChange(filterId, value) {
     currentFilters[filterId] = value;
+    
+    // Se si cambia anno, mese o altri filtri temporali, rimuovi il filtro data specifico
+    if (filterId === 'filter-anno' || filterId === 'filter-mese') {
+        delete currentFilters['filter-data-selezionata'];
+        if (calendarInstance) {
+            calendarInstance.clear();
+            // Se si cambia anno, sposta il calendario a quell'anno
+            if (filterId === 'filter-anno' && value) {
+                calendarInstance.jumpToDate(`${value}-01-01`);
+            }
+        }
+    }
 
     if (filterDependencies[filterId]) {
         filterDependencies[filterId].forEach(dependentId => {
@@ -933,10 +949,9 @@ function handleFilterChange(filterId, value) {
     updatePeriodSwitches();
     updateMonthlyInjuriesChart();
     
-    // Aggiorna top luoghi se il clustering è attivo
     if (showClustering) {
         calculateTopLuoghi();
-        console.log('Top luoghi ricalcolati dopo cambio filtro');
+        updateTopLuoghiModalIfOpen();
     }
     
     const analyticsPanel = document.getElementById('analytics-panel');
@@ -944,13 +959,6 @@ function handleFilterChange(filterId, value) {
         updateActiveFiltersDisplay();
         updateAnalytics();
     }
-	// Aggiorna top luoghi se il clustering è attivo
-if (showClustering) {
-    calculateTopLuoghi();
-    updateTopLuoghiModalIfOpen();  // AGGIUNGI QUESTA RIGA
-    console.log('Top luoghi ricalcolati dopo cambio filtro');
-}
-	
 }
 
 // Update All Filters
@@ -1213,9 +1221,20 @@ function filterByYear(year) {
     
     if (currentYear === String(year)) {
         currentFilters['filter-anno'] = '';
+        // Reset calendario quando si deseleziona l'anno
+        if (calendarInstance) {
+            calendarInstance.clear();
+        }
     } else {
         currentFilters['filter-anno'] = String(year);
+        // Sincronizza calendario con il nuovo anno
+        if (calendarInstance && year) {
+            calendarInstance.jumpToDate(`${year}-01-01`);
+        }
     }
+    
+    // Rimuovi filtro data specifica quando si cambia anno manualmente
+    delete currentFilters['filter-data-selezionata'];
     
     const filterAnno = document.getElementById('filter-anno');
     if (filterAnno) {
@@ -1230,6 +1249,11 @@ function filterByYear(year) {
     updatePeriodSwitches();
     updateMonthlyInjuriesChart();
     
+    if (showClustering) {
+        calculateTopLuoghi();
+        updateTopLuoghiModalIfOpen();
+    }
+    
     if (window.innerWidth <= 768) {
         closeSidebar();
     }
@@ -1239,6 +1263,8 @@ function filterByYear(year) {
         updateAnalytics();
     }
 }
+
+
 
 // Filter By Tipologia
 function filterByTipologia(tipo) {
@@ -1840,6 +1866,13 @@ function resetFilters() {
     
     currentFilters['filter-anno'] = '2023';
     
+    // Reset anche il calendario
+    if (calendarInstance) {
+        calendarInstance.clear();
+        calendarInstance.jumpToDate('2023-01-01');
+    }
+    delete currentFilters['filter-data-selezionata'];
+    
     updateAllFilters();
     updateMapData();
     updateStats();
@@ -1848,16 +1881,30 @@ function resetFilters() {
     updatePeriodSwitches();
     updateMonthlyInjuriesChart();
     
-    // Ricalcola top luoghi se il clustering è attivo
     if (showClustering) {
         calculateTopLuoghi();
-        console.log('Top luoghi ricalcolati dopo reset');
+        updateTopLuoghiModalIfOpen();
     }
     
     const analyticsPanel = document.getElementById('analytics-panel');
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
         updateAnalytics();
     }
+}
+
+function updateLegendActiveState() {
+    // Questa funzione può essere chiamata per evidenziare la legenda in base ai filtri attivi
+    const selectedTipo = currentFilters['filter-tipologia'];
+    
+    // Aggiorna visivamente la legenda se necessario
+    document.querySelectorAll('.legend-item').forEach(item => {
+        const tipo = item.dataset.tipo;
+        if (selectedTipo === tipo) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
+    });
 }
 
 // Toggle Section
@@ -2035,68 +2082,23 @@ function closeAnalytics() {
     if (panel) panel.classList.remove('open');
 }
 
+
 function updateActiveFiltersDisplay() {
     const filteredData = getFilteredData();
     const totalData = allIncidenti.length;
     
     let filterText = [];
     
+    // AGGIUNGI visualizzazione data calendario
+    if (currentFilters['filter-data-selezionata']) {
+        filterText.push(`Data: ${currentFilters['filter-data-selezionata']}`);
+    }
+    
     if (currentFilters['filter-anno']) {
         filterText.push(`Anno: ${currentFilters['filter-anno']}`);
     }
     
-    if (currentFilters['filter-tipologia']) {
-        const tipologiaNames = { 'M': 'Mortale', 'R': 'Riserva', 'F': 'Feriti', 'C': 'Cose' };
-        filterText.push(`Tipologia: ${tipologiaNames[currentFilters['filter-tipologia']]}`);
-    }
-    
-    if (currentFilters['filter-circoscrizione']) {
-        filterText.push(`Circoscrizione: ${currentFilters['filter-circoscrizione']}`);
-    }
-    
-    if (currentFilters['filter-quartiere']) {
-        filterText.push(`Quartiere: ${currentFilters['filter-quartiere']}`);
-    }
-    
-    if (currentFilters['filter-upl']) {
-        filterText.push(`UPL: ${currentFilters['filter-upl']}`);
-    }
-    
-    if (currentFilters['filter-stagione']) {
-        filterText.push(`Stagione: ${currentFilters['filter-stagione']}`);
-    }
-    
-    if (currentFilters['filter-mese']) {
-        filterText.push(`Mese: ${currentFilters['filter-mese']}`);
-    }
-    
-    if (currentFilters['filter-giorno-settimana']) {
-        filterText.push(`Giorno: ${currentFilters['filter-giorno-settimana']}`);
-    }
-    
-    if (currentFilters['filter-feriale-weekend']) {
-        filterText.push(`${currentFilters['filter-feriale-weekend']}`);
-    }
-    
-    if (currentFilters['filter-giorno-notte']) {
-        filterText.push(`${currentFilters['filter-giorno-notte']}`);
-    }
-    
-    if (currentFilters['filter-condizioni-luce']) {
-        filterText.push(`Luce: ${currentFilters['filter-condizioni-luce']}`);
-    }
-    
-    if (currentFilters['filter-fascia-4']) {
-        filterText.push(`Fascia: ${currentFilters['filter-fascia-4']}`);
-    }
-    
-    if (currentFilters['filter-fascia-6']) {
-        filterText.push(`Fascia: ${currentFilters['filter-fascia-6']}`);
-    }
-    
-    if (currentFilters['filter-ora-punta']) {
-        filterText.push(`${currentFilters['filter-ora-punta']}`);
-    }
+    // ... resto del codice esistente ...
     
     let displayHTML = '';
     
@@ -3556,7 +3558,176 @@ if (btnTopLuoghiClose) addTouchClickListener(btnTopLuoghiClose, closeTopLuoghiMo
 
 const btnDownloadLuoghi = document.getElementById('btn-download-luoghi-csv');
 if (btnDownloadLuoghi) addTouchClickListener(btnDownloadLuoghi, downloadTopLuoghiCSV);
+
+    // Calendar reset button
+    const btnResetCalendar = document.getElementById('btn-reset-calendar');
+    if (btnResetCalendar) {
+        btnResetCalendar.addEventListener('click', resetCalendar);
+    }
+
 }
+
+
+// Initialize Calendar
+function initCalendar() {
+    // Pre-calcola incidenti per data per performance
+    calculateIncidentsByDate();
+    
+    calendarInstance = flatpickr("#calendar-container", {
+        inline: true,
+        locale: "it",
+        minDate: "2015-01-01",
+        maxDate: "2023-12-31",
+        defaultDate: currentFilters['filter-anno'] ? `${currentFilters['filter-anno']}-01-01` : "2023-01-01",
+        onChange: function(selectedDates, dateStr, instance) {
+            if (selectedDates.length > 0) {
+                handleCalendarSelection(selectedDates[0]);
+            }
+        },
+        onMonthChange: function(selectedDates, dateStr, instance) {
+            updateCalendarIndicators(instance);
+        },
+        onYearChange: function(selectedDates, dateStr, instance) {
+            updateCalendarIndicators(instance);
+        },
+        onReady: function(selectedDates, dateStr, instance) {
+            updateCalendarIndicators(instance);
+        }
+    });
+}
+
+// Calcola incidenti per data
+function calculateIncidentsByDate() {
+    incidentsByDate = {};
+    
+    allIncidenti.forEach(row => {
+        if (row.Data) {
+            const date = row.Data; // Formato: DD/MM/YYYY
+            const [day, month, year] = date.split('/');
+            const isoDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+            
+            if (!incidentsByDate[isoDate]) {
+                incidentsByDate[isoDate] = 0;
+            }
+            incidentsByDate[isoDate]++;
+        }
+    });
+}
+
+// Aggiorna indicatori visivi sul calendario
+function updateCalendarIndicators(instance) {
+    setTimeout(() => {
+        const days = instance.calendarContainer.querySelectorAll('.flatpickr-day');
+        
+        days.forEach(day => {
+            if (day.classList.contains('disabled') || day.classList.contains('nextMonthDay') || day.classList.contains('prevMonthDay')) {
+                return;
+            }
+            
+            const dateStr = day.dateObj ? 
+                `${day.dateObj.getFullYear()}-${String(day.dateObj.getMonth() + 1).padStart(2, '0')}-${String(day.dateObj.getDate()).padStart(2, '0')}` 
+                : null;
+            
+            if (dateStr && incidentsByDate[dateStr]) {
+                const count = incidentsByDate[dateStr];
+                day.classList.add('has-incidents');
+                
+                // Classifica densità
+                if (count > 15) {
+                    day.classList.add('high-density');
+                } else if (count > 5) {
+                    day.classList.add('medium-density');
+                }
+                
+                // Tooltip
+                day.title = `${count} incidenti`;
+            }
+        });
+    }, 10);
+}
+
+// Gestisci selezione data dal calendario
+
+function handleCalendarSelection(date) {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    
+    const mesiItaliani = [
+        'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
+        'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
+    ];
+    
+    const dataFiltro = `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
+    
+    currentFilters['filter-data-selezionata'] = dataFiltro;
+    currentFilters['filter-anno'] = String(year);
+    
+    const selectAnno = document.getElementById('filter-anno');
+    if (selectAnno) {
+        selectAnno.value = String(year);
+    }
+    
+    const selectMese = document.getElementById('filter-mese');
+    if (selectMese) {
+        selectMese.value = mesiItaliani[month - 1];
+    }
+    
+    console.log(`Filtro data: ${dataFiltro}`);
+    
+    // AGGIUNGI QUESTE CHIAMATE MANCANTI:
+    updateAllFilters();
+    updateMapData();
+    updateStats();
+    updateYearStats();
+    updateLegendChart();           // ← AGGIUNTO
+    updatePeriodSwitches();        // ← AGGIUNTO
+    updateMonthlyInjuriesChart();  // ← AGGIUNTO
+    
+    // Ricalcola top luoghi se clustering attivo
+    if (showClustering) {
+        calculateTopLuoghi();
+        updateTopLuoghiModalIfOpen();
+    }
+    
+    if (window.innerWidth <= 768) {
+        closeSidebar();
+    }
+    
+    const analyticsPanel = document.getElementById('analytics-panel');
+    if (analyticsPanel && analyticsPanel.classList.contains('open')) {
+        updateActiveFiltersDisplay();
+        updateAnalytics();
+    }
+}
+
+// Reset calendario
+function resetCalendar() {
+    if (calendarInstance) {
+        calendarInstance.clear();
+    }
+    delete currentFilters['filter-data-selezionata'];
+    
+    updateAllFilters();
+    updateMapData();
+    updateStats();
+    updateYearStats();
+    updateLegendChart();           // ← AGGIUNTO
+    updatePeriodSwitches();        // ← AGGIUNTO
+    updateMonthlyInjuriesChart();  // ← AGGIUNTO
+    
+    if (showClustering) {
+        calculateTopLuoghi();
+        updateTopLuoghiModalIfOpen();
+    }
+    
+    const analyticsPanel = document.getElementById('analytics-panel');
+    if (analyticsPanel && analyticsPanel.classList.contains('open')) {
+        updateActiveFiltersDisplay();
+        updateAnalytics();
+    }
+}
+
 
 // Initialize App
 init();

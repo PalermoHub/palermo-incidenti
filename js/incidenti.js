@@ -1,9 +1,11 @@
 // Global Variables
-let map;
+let map;  // <-- SOLO UNA VOLTA
 let allIncidenti = [];
 let currentFilters = {};
 let showHeatmap = false;
 let analyticsCharts = {};
+let calendarInstance = null;  // <-- AGGIUNTE PER IL CALENDARIO
+let incidentsByDate = {};     // <-- AGGIUNTE PER IL CALENDARIO
 
 // Register Chart.js plugins globally
 Chart.register(ChartDataLabels);
@@ -28,7 +30,7 @@ const basemapStyles = {
                 type: 'raster',
                 tiles: ['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'],
                 tileSize: 256,
-                attribution: 'Â© CARTO'
+                attribution: '© CARTO'
             }
         },
         layers: [{
@@ -121,6 +123,7 @@ async function init() {
         document.getElementById('loading').innerHTML = '<div>Creazione mappa...</div><small>Attendere</small>';
         
         initMap();
+        initCalendar(); // AGGIUNGI QUESTA RIGA
         setupEventListeners();
 
     } catch (error) {
@@ -403,6 +406,14 @@ function setupLayerInteractions(layerId) {
 // Get Filtered Data
 function getFilteredData() {
     return allIncidenti.filter(row => {
+        // Filtro data calendario
+        if (currentFilters['filter-data-selezionata']) {
+            if (row.Data !== currentFilters['filter-data-selezionata']) {
+                return false;
+            }
+        }
+        
+        // Altri filtri esistenti
         for (const [filterId, property] of Object.entries(filterConfig)) {
             const value = currentFilters[filterId];
             if (!value) continue;
@@ -418,6 +429,7 @@ function getFilteredData() {
         return true;
     });
 }
+
 
 // Populate Filters
 function populateFilters() {
@@ -704,6 +716,17 @@ function filterByYear(year) {
     
     document.getElementById('filter-anno').value = currentFilters['filter-anno'];
     
+    // AGGIUNGI: Aggiorna il calendario
+    if (calendarInstance && currentFilters['filter-anno']) {
+        const newYear = parseInt(currentFilters['filter-anno']);
+        calendarInstance.jumpToDate(new Date(newYear, 0, 1)); // Gennaio dell'anno selezionato
+        updateCalendarIndicators(calendarInstance);
+    } else if (calendarInstance && !currentFilters['filter-anno']) {
+        // Se deselezionato, torna al 2023
+        calendarInstance.jumpToDate(new Date(2023, 0, 1));
+        updateCalendarIndicators(calendarInstance);
+    }
+    
     updateAllFilters();
     updateMapData();
     updateStats();
@@ -925,8 +948,11 @@ function changeBasemap() {
     });
 }
 
-// Reset Filters
+// Reset Filters - MODIFICA se vuoi preservare il calendario
 function resetFilters() {
+    // Salva il filtro data se esiste
+    const savedDataFiltro = currentFilters['filter-data-selezionata'];
+    
     currentFilters = {};
     document.querySelectorAll('select').forEach(select => {
         select.value = '';
@@ -934,6 +960,11 @@ function resetFilters() {
     });
     
     currentFilters['filter-anno'] = '2023';
+    
+    // Ripristina il filtro data se esisteva
+    if (savedDataFiltro) {
+        currentFilters['filter-data-selezionata'] = savedDataFiltro;
+    }
     
     updateAllFilters();
     updateMapData();
@@ -1124,6 +1155,10 @@ function updateActiveFiltersDisplay() {
     // Check each filter
     if (currentFilters['filter-anno']) {
         filterText.push(`Anno: ${currentFilters['filter-anno']}`);
+    }
+	
+	  if (currentFilters['filter-data-selezionata']) {
+        filterText.push(`Data: ${currentFilters['filter-data-selezionata']}`);
     }
     
     if (currentFilters['filter-tipologia']) {
@@ -2404,7 +2439,7 @@ function setupEventListeners() {
     if (mobileToggle) mobileToggle.addEventListener('click', toggleSidebar);
     if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
     
-    // Filter Sections
+    // Filter Sections - Toggle collapse/expand
     document.querySelectorAll('.filter-section-header').forEach(header => {
         header.addEventListener('click', () => {
             const section = header.dataset.section;
@@ -2412,7 +2447,7 @@ function setupEventListeners() {
         });
     });
     
-    // Year Stats
+    // Year Stats - Click su anni per filtrare
     const yearStatsGrid = document.getElementById('year-stats-grid');
     if (yearStatsGrid) {
         yearStatsGrid.addEventListener('click', (e) => {
@@ -2420,10 +2455,9 @@ function setupEventListeners() {
             if (item) {
                 const year = item.dataset.year;
                 
-                // Se Ã¨ il 2019, mostra il popup informativo
+                // Se è il 2019, mostra il popup informativo
                 if (year === '2019') {
                     show2019InfoPopup();
-                    // Poi applica comunque il filtro
                     setTimeout(() => {
                         filterByYear(year);
                     }, 100);
@@ -2436,7 +2470,7 @@ function setupEventListeners() {
         });
     }
     
-    // Legend
+    // Legend - Click su tipologie incidenti per filtrare
     document.querySelectorAll('.legend-item').forEach(item => {
         item.addEventListener('click', () => {
             const tipo = item.dataset.tipo;
@@ -2444,30 +2478,35 @@ function setupEventListeners() {
         });
     });
     
-    // Buttons - with null checks
+    // Heatmap Buttons
     const btnHeatmap = document.getElementById('btn-toggle-heatmap');
     const btnHeatmapMap = document.getElementById('btn-heatmap-map');
-    const btnReset = document.getElementById('btn-reset');
-    const btnResetMap = document.getElementById('btn-reset-map');
-    const btnDataTable = document.getElementById('btn-data-table');
-    const btnDataTableMap = document.getElementById('btn-data-table-map');
-    const btnAnalytics = document.getElementById('btn-analytics');
-    const btnAnalyticsMap = document.getElementById('btn-analytics-map');
-    
     if (btnHeatmap) btnHeatmap.addEventListener('click', toggleHeatmap);
     if (btnHeatmapMap) btnHeatmapMap.addEventListener('click', toggleHeatmap);
+    
+    // Reset Buttons
+    const btnReset = document.getElementById('btn-reset');
+    const btnResetMap = document.getElementById('btn-reset-map');
     if (btnReset) btnReset.addEventListener('click', resetFilters);
     if (btnResetMap) btnResetMap.addEventListener('click', resetFilters);
+    
+    // Data Table Buttons
+    const btnDataTable = document.getElementById('btn-data-table');
+    const btnDataTableMap = document.getElementById('btn-data-table-map');
     if (btnDataTable) btnDataTable.addEventListener('click', openDataTable);
     if (btnDataTableMap) btnDataTableMap.addEventListener('click', openDataTable);
+    
+    // Analytics Buttons
+    const btnAnalytics = document.getElementById('btn-analytics');
+    const btnAnalyticsMap = document.getElementById('btn-analytics-map');
     if (btnAnalytics) btnAnalytics.addEventListener('click', openAnalytics);
     if (btnAnalyticsMap) btnAnalyticsMap.addEventListener('click', openAnalytics);
     
-    // Basemap
+    // Basemap Select
     const basemapSelect = document.getElementById('basemap-select');
     if (basemapSelect) basemapSelect.addEventListener('change', changeBasemap);
     
-    // Modals Close Buttons
+    // Info Modal
     const infoIconBtn = document.getElementById('info-icon-btn');
     if (infoIconBtn) {
         infoIconBtn.addEventListener('click', () => {
@@ -2484,12 +2523,15 @@ function setupEventListeners() {
         });
     }
     
+    // Data Table Modal
     const dataTableClose = document.getElementById('data-table-close');
     if (dataTableClose) dataTableClose.addEventListener('click', closeDataTable);
     
+    // Detail Panel
     const detailClose = document.getElementById('detail-close');
     if (detailClose) detailClose.addEventListener('click', closeDetailPanel);
     
+    // Analytics Panel
     const analyticsClose = document.getElementById('analytics-close');
     if (analyticsClose) analyticsClose.addEventListener('click', closeAnalytics);
     
@@ -2508,6 +2550,15 @@ function setupEventListeners() {
     const btnDownloadJSON = document.getElementById('btn-download-json');
     if (btnDownloadJSON) btnDownloadJSON.addEventListener('click', downloadJSON);
     
+    // Calendar Reset Button - Event delegation per gestire sezione collassata
+    document.addEventListener('click', function(e) {
+        if (e.target && (e.target.id === 'btn-reset-calendar' || e.target.closest('#btn-reset-calendar'))) {
+            e.preventDefault();
+            e.stopPropagation();
+            resetCalendar();
+        }
+    });
+    
     // Modal Close on Click Outside
     document.addEventListener('click', (e) => {
         if (e.target.classList.contains('modal')) {
@@ -2515,6 +2566,169 @@ function setupEventListeners() {
         }
     });
 }
+
+
+// Initialize Calendar
+function initCalendar() {
+    // Pre-calcola incidenti per data per performance
+    calculateIncidentsByDate();
+    
+    calendarInstance = flatpickr("#calendar-container", {
+        inline: true,
+        locale: "it",
+        minDate: "2015-01-01",
+        maxDate: "2023-12-31",
+        defaultDate: currentFilters['filter-anno'] ? `${currentFilters['filter-anno']}-01-01` : "2023-01-01",
+        onChange: function(selectedDates, dateStr, instance) {
+            if (selectedDates.length > 0) {
+                handleCalendarSelection(selectedDates[0]);
+            }
+        },
+        onMonthChange: function(selectedDates, dateStr, instance) {
+            updateCalendarIndicators(instance);
+        },
+        onYearChange: function(selectedDates, dateStr, instance) {
+            updateCalendarIndicators(instance);
+        },
+        onReady: function(selectedDates, dateStr, instance) {
+            updateCalendarIndicators(instance);
+        }
+    });
+}
+
+// Calcola incidenti per data
+function calculateIncidentsByDate() {
+    incidentsByDate = {};
+    
+    allIncidenti.forEach(row => {
+        if (row.Data) {
+            const date = row.Data; // Formato: DD/MM/YYYY
+            const [day, month, year] = date.split('/');
+            const isoDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+            
+            if (!incidentsByDate[isoDate]) {
+                incidentsByDate[isoDate] = 0;
+            }
+            incidentsByDate[isoDate]++;
+        }
+    });
+}
+
+// Aggiorna indicatori visivi sul calendario
+function updateCalendarIndicators(instance) {
+    setTimeout(() => {
+        const days = instance.calendarContainer.querySelectorAll('.flatpickr-day');
+        
+        days.forEach(day => {
+            if (day.classList.contains('disabled') || day.classList.contains('nextMonthDay') || day.classList.contains('prevMonthDay')) {
+                return;
+            }
+            
+            const dateStr = day.dateObj ? 
+                `${day.dateObj.getFullYear()}-${String(day.dateObj.getMonth() + 1).padStart(2, '0')}-${String(day.dateObj.getDate()).padStart(2, '0')}` 
+                : null;
+            
+            if (dateStr && incidentsByDate[dateStr]) {
+                const count = incidentsByDate[dateStr];
+                day.classList.add('has-incidents');
+                
+                // Classifica densità
+                if (count > 15) {
+                    day.classList.add('high-density');
+                } else if (count > 5) {
+                    day.classList.add('medium-density');
+                }
+                
+                // Tooltip
+                day.title = `${count} incidenti`;
+            }
+        });
+    }, 10);
+}
+
+// Gestisci selezione data dal calendario
+function handleCalendarSelection(date) {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1; // 0-based
+    const day = date.getDate();
+    
+    // Mappa mesi in italiano
+    const mesiItaliani = [
+        'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
+        'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
+    ];
+    
+    // Formatta data come nel dataset (DD/MM/YYYY)
+    const dataFiltro = `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
+    
+    // Applica filtri
+    currentFilters['filter-data-selezionata'] = dataFiltro;
+    currentFilters['filter-anno'] = String(year);
+    
+    // Aggiorna select anno
+    const selectAnno = document.getElementById('filter-anno');
+    if (selectAnno) {
+        selectAnno.value = String(year);
+    }
+    
+    // Aggiorna select mese se esiste
+    const selectMese = document.getElementById('filter-mese');
+    if (selectMese) {
+        selectMese.value = mesiItaliani[month - 1];
+    }
+    
+    console.log(`Filtro data: ${dataFiltro}`);
+    
+    // Trigger update globale
+    updateAllFilters();
+    updateMapData();
+    updateStats();
+    updateYearStats();
+    updateLegendActiveState();
+    
+    // Chiudi sidebar su mobile
+    if (window.innerWidth <= 768) {
+        closeSidebar();
+    }
+    
+    // Update analytics se aperto
+    if (document.getElementById('analytics-panel').classList.contains('open')) {
+        updateActiveFiltersDisplay();
+        updateAnalytics();
+    }
+}
+
+// Reset calendario
+function resetCalendar() {
+    console.log('Reset calendario chiamato'); // DEBUG
+    
+    if (calendarInstance) {
+        calendarInstance.clear();
+        console.log('Calendario pulito');
+    }
+    
+    delete currentFilters['filter-data-selezionata'];
+    
+    // Reset anche select anno e mese se necessario
+    const selectAnno = document.getElementById('filter-anno');
+    if (selectAnno && currentFilters['filter-anno']) {
+        // Non resettare anno se già filtrato manualmente
+    }
+    
+    updateAllFilters();
+    updateMapData();
+    updateStats();
+    updateYearStats();
+    updateLegendActiveState();
+    
+    if (document.getElementById('analytics-panel').classList.contains('open')) {
+        updateActiveFiltersDisplay();
+        updateAnalytics();
+    }
+    
+    console.log('Reset completato');
+}
+
 
 // Initialize App
 init();

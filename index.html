@@ -96,6 +96,22 @@
             </div>
             <br>
             <div class="filter-section">
+			<!-- NUOVO: Sezione Calendario -->
+<div class="filter-section">
+    <div class="filter-section-header"  data-section="calendario">
+        <span>📅 Calendario Interattivo</span>
+        <span class="toggle-icon collapsed">▼</span>
+    </div>
+    <div class="filter-section-content collapsed" id="content-calendario">
+        <div class="calendar-info">
+            <small>Clicca su una data per filtrare gli incidenti</small>
+        </div>
+        <div id="calendar-container"></div>
+        <button class="btn-reset-calendar" style="margin-top: 10px;" id="btn-reset-calendar">
+            🔄 Reset Data
+        </button>
+    </div>
+</div>
                 <div class="filter-section-header" data-section="localizzazione">
                     <span>📍 Localizzazione</span>
                     <span class="toggle-icon collapsed">▼</span>
@@ -541,6 +557,10 @@
         </div>
     </div>
 </div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/it.js"></script>
 <script src="js/incidenti_smart.js"></script>
 </body>
 </html>

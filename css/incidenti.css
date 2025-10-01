@@ -379,7 +379,7 @@ button, .legend-item, .year-stat-item, .year-stat-item-all {
 
 /* Filters */
 .filters {
-    padding: 24px;
+    padding: 8px;
 }
 
 .filter-group {
@@ -533,7 +533,7 @@ select option {
 }
 
 .filter-section-content {
-    padding: 20px;
+    padding: 5px;
     background: rgba(15, 23, 42, 0.5);
 }
 
@@ -2184,3 +2184,146 @@ input:checked + .slider:before {
     font-size: 12px;
     font-weight: 600;
 }
+
+/* Calendar Section */
+.calendar-info {
+    font-size: 11px;
+    color: #94a3b8;
+    padding: 8px 12px;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 6px;
+    margin-bottom: 12px;
+    text-align: center;
+    border-left: 3px solid #3b82f6;
+}
+
+#calendar-container {
+    margin-bottom: 12px;
+}
+
+/* Flatpickr Custom Styling */
+.flatpickr-calendar {
+    background: rgba(30, 41, 59, 0.95) !important;
+    border: 1px solid rgba(148, 163, 184, 0.3) !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
+    border-radius: 8px !important;
+}
+
+.flatpickr-months {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%) !important;
+    border-radius: 8px 8px 0 0 !important;
+}
+
+.flatpickr-current-month {
+    color: #f1f5f9 !important;
+}
+
+.flatpickr-weekdays {
+    background: rgba(51, 65, 85, 0.8) !important;
+}
+
+.flatpickr-weekday {
+    color: #cbd5e1 !important;
+    font-weight: 700 !important;
+}
+
+.flatpickr-day {
+    color: #f1f5f9 !important;
+    border: 1px solid rgba(148, 163, 184, 0.1) !important;
+}
+
+.flatpickr-day:hover {
+    background: rgba(59, 130, 246, 0.3) !important;
+    border-color: #3b82f6 !important;
+}
+
+.flatpickr-day.selected {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+    border-color: #3b82f6 !important;
+    color: white !important;
+}
+
+.flatpickr-day.today {
+    border-color: #10b981 !important;
+    font-weight: 700;
+}
+
+.flatpickr-day.disabled {
+    color: #475569 !important;
+}
+
+/* Indicator dots per giorni con incidenti */
+.flatpickr-day.has-incidents::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #10b981;
+}
+
+.flatpickr-day.has-incidents.high-density::after {
+    background: #ef4444;
+    width: 6px;
+    height: 6px;
+}
+
+.flatpickr-day.has-incidents.medium-density::after {
+    background: #f59e0b;
+    width: 5px;
+    height: 5px;
+}
+
+.btn-reset-calendar {
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+.btn-reset-calendar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .flatpickr-calendar {
+        width: 100% !important;
+    }
+    
+    .flatpickr-day {
+        height: 32px !important;
+        line-height: 32px !important;
+    }
+}
+
+/*Dimensione calendario*/
+}
+.flatpickr-innerContainer .flatpickr-days  {  width: 280px!important;
+		}
+
+.dayContainer {    width: 275px!important;
+    min-width: 275px!important;
+    max-width: 275px!important;
+		}
+	
+	.flatpickr-weekdays { width: 275px!important;
+    min-width: 275px!important;
+    max-width: 275px!important;
+	}
+	
+	.flatpickr-months .flatpickr-month {width: 275px!important;
+    min-width:275px!important;
+    max-width: 275px!important;
+	}
