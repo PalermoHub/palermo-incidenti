@@ -252,7 +252,6 @@ function initMap() {
             updateStats();
             updateYearStats();
             updateLegendChart();
-			updateDayNightChart(); 
             console.log('Inizializzazione completata!');
         } catch (error) {
             console.error('Errore durante inizializzazione:', error);
@@ -457,7 +456,6 @@ function handleFilterChange(filterId, value) {
     updateStats();
     updateYearStats();
     updateLegendChart();
-	updateDayNightChart();
     
     // Update analytics if panel is open
     if (document.getElementById('analytics-panel').classList.contains('open')) {
@@ -710,7 +708,6 @@ function filterByYear(year) {
     updateStats();
     updateYearStats();
     updateLegendChart(); // ✅ AGGIUNTO
-	updateDayNightChart();
     
     if (window.innerWidth <= 768) {
         closeSidebar();
@@ -760,18 +757,27 @@ function updateLegendChart() {
     
     const selectedTipo = currentFilters['filter-tipologia'];
     
+    // Crea array con tutti i dati
+    const total = stats.M + stats.R + stats.F + stats.C;
     const items = [
+        { label: 'Reset', value: total, tipo: '', color: '#64748b' },
         { label: 'F - Feriti', value: stats.F, tipo: 'F', color: '#f59e0b' },
         { label: 'C - Cose', value: stats.C, tipo: 'C', color: '#10b981' },
         { label: 'R - Riserva', value: stats.R, tipo: 'R', color: '#a855f7' },
         { label: 'M - Mortale', value: stats.M, tipo: 'M', color: '#ef4444' }
     ];
     
-    const labels = items.map(item => item.label);
-    const data = items.map(item => item.value);
-    const tipos = items.map(item => item.tipo);
-    const colors = items.map(item => item.color);
+    // Ordina dal valore piÃ¹ alto al piÃ¹ basso (escluso "tutti" che resta in cima)
+    const tuttiItem = items[0];
+    const otherItems = items.slice(1).sort((a, b) => b.value - a.value);
+    const sortedItems = [tuttiItem, ...otherItems];
     
+    const labels = sortedItems.map(item => item.label);
+    const data = sortedItems.map(item => item.value);
+    const tipos = sortedItems.map(item => item.tipo);
+    const colors = sortedItems.map(item => item.color);
+    
+    // Evidenzia la barra selezionata
     const backgroundColors = tipos.map((tipo, idx) => 
         selectedTipo === tipo ? colors[idx] : colors[idx] + 'CC'
     );
@@ -810,8 +816,8 @@ function updateLegendChart() {
                 padding: {
                     left: 0,
                     right: 10,
-                    top: 8,
-                    bottom: 8
+                    top: 5,
+                    bottom: 5
                 }
             },
             plugins: {
@@ -822,24 +828,29 @@ function updateLegendChart() {
                     enabled: true,
                     backgroundColor: 'rgba(15, 23, 42, 0.95)',
                     padding: 12,
-                    titleFont: { size: 11, weight: 'bold' },
-                    bodyFont: { size: 10 },
+                    titleFont: { size: 13, weight: 'bold' },
+                    bodyFont: { size: 12 },
                     callbacks: {
                         title: function(context) {
                             const tipo = tipos[context[0].dataIndex];
-                            const names = { F: 'Feriti', C: 'Cose', R: 'Riserva', M: 'Mortale' };
+                            const names = { '': 'Tutti gli incidenti', M: 'Mortale', R: 'Riserva', F: 'Feriti', C: 'Cose' };
                             return names[tipo];
                         },
                         label: function(context) {
                             const value = context.parsed.x;
-                            const total = data.reduce((a, b) => a + b, 0);
+                            const tipo = tipos[context.dataIndex];
+                            
+                            if (tipo === '') {
+                                return `${value.toLocaleString('it-IT')} incidenti totali`;
+                            }
+                            
                             const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
                             return `${value.toLocaleString('it-IT')} incidenti (${percentage}%)`;
                         },
                         afterLabel: function(context) {
                             const tipo = tipos[context.dataIndex];
                             if (selectedTipo === tipo) {
-                                return 'Clicca per deselezionare';
+                                return tipo === '' ? '' : 'Clicca per deselezionare';
                             }
                             return 'Clicca per filtrare';
                         }
@@ -851,7 +862,7 @@ function updateLegendChart() {
                     align: 'end',
                     color: '#f1f5f9',
                     font: {
-                        size: 10,
+                        size: 11,
                         weight: 'bold'
                     },
                     formatter: (value) => value > 0 ? value.toLocaleString('it-IT') : '',
@@ -872,15 +883,12 @@ function updateLegendChart() {
                     ticks: {
                         color: '#ffffff',
                         font: {
-                            size: 10,
+                            size: 11,
                             weight: '500'
                         },
                         padding: 8
                     }
                 }
-            },
-            onHover: (event, activeElements) => {
-                event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
             },
             onClick: (e, items) => {
                 if (items.length > 0) {
@@ -892,198 +900,9 @@ function updateLegendChart() {
     });
 }
 
-// Update Day/Night Chart
-let dayNightChart = null;
-
-function updateDayNightChart() {
-    const filteredData = getFilteredData();
-    const stats = { 'Giorno': 0, 'Notte': 0 };
-    
-    filteredData.forEach(row => {
-        const periodo = row['Giorno/Notte'];
-        if (periodo && stats.hasOwnProperty(periodo)) {
-            stats[periodo]++;
-        }
-    });
-    
-    const selectedPeriodo = currentFilters['filter-giorno-notte'];
-    
-    const items = [
-        { label: 'Giorno', value: stats.Giorno, periodo: 'Giorno', color: '#76d0f1' },
-        { label: 'Notte', value: stats.Notte, periodo: 'Notte', color: '#0a46cb' }
-    ];
-    
-    const total = stats.Giorno + stats.Notte;
-    const labels = items.map(item => item.label);
-    const data = items.map(item => item.value);
-    const periodos = items.map(item => item.periodo);
-    const colors = items.map(item => item.color);
-    
-    const backgroundColors = periodos.map((periodo, idx) => 
-        selectedPeriodo === periodo ? colors[idx] : colors[idx] + 'CC'
-    );
-    
-    const borderColors = periodos.map((periodo, idx) => 
-        selectedPeriodo === periodo ? colors[idx] : 'transparent'
-    );
-    
-    const borderWidths = periodos.map(periodo => 
-        selectedPeriodo === periodo ? 3 : 0
-    );
-    
-    const canvas = document.getElementById('day-night-chart');
-    if (!canvas) return;
-    
-    if (dayNightChart) {
-        dayNightChart.destroy();
-    }
-    
-    dayNightChart = new Chart(canvas, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                data: data,
-                backgroundColor: backgroundColors,
-                borderColor: borderColors,
-                borderWidth: borderWidths
-            }]
-        },
-        options: {
-			backgroundColor: 'transparent',
-			
-            indexAxis: 'y',
-            responsive: true,
-            maintainAspectRatio: false,
-            layout: {
-                padding: {
-                    left: 0,
-                    right: 10,
-                    top: 8,
-                    bottom: 8
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    enabled: true,
-                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                    padding: 12,
-                    titleFont: { size: 11, weight: 'bold' },
-                    bodyFont: { size: 10 },
-                    callbacks: {
-                        title: function(context) {
-                            const periodo = periodos[context[0].dataIndex];
-                            return periodo;
-                        },
-                        label: function(context) {
-                            const value = context.parsed.x;
-                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                            return `${value.toLocaleString('it-IT')} incidenti (${percentage}%)`;
-                        },
-                        afterLabel: function(context) {
-                            const periodo = periodos[context.dataIndex];
-                            if (selectedPeriodo === periodo) {
-                                return 'Clicca per deselezionare';
-                            }
-                            return 'Clicca per filtrare';
-                        }
-                    }
-                },
-                datalabels: {
-                    display: true,
-                    anchor: 'end',
-                    align: 'end',
-                    color: '#f1f5f9',
-                    font: {
-                        size: 10,
-                        weight: 'bold'
-                    },
-                    formatter: (value) => value > 0 ? value.toLocaleString('it-IT') : '',
-                    offset: 4
-                }
-            },
-            scales: {
-                x: {
-                    display: false,
-                    grid: {
-                        display: false
-                    }
-                },
-                y: {
-                    grid: {
-                        display: false
-                    },
-                    ticks: {
-                        color: '#ffffff',
-                        font: {
-                            size: 10,
-                            weight: '500'
-                        },
-                        padding: 8
-                    }
-                }
-            },
-            onHover: (event, activeElements) => {
-                event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
-            },
-            onClick: (e, items) => {
-                if (items.length > 0) {
-                    const periodo = periodos[items[0].index];
-                    filterByDayNight(periodo);
-                }
-            }
-        }
-    });
-}
-
-// Reset Charts Filters
-function resetChartsFilters() {
-    // Reset filtro tipologia
-    currentFilters['filter-tipologia'] = '';
-    document.getElementById('filter-tipologia').value = '';
-    
-    // Reset filtro giorno/notte
-    currentFilters['filter-giorno-notte'] = '';
-    document.getElementById('filter-giorno-notte').value = '';
-    
-    // Aggiorna tutto
-    updateAllFilters();
-    updateMapData();
-    updateStats();
-    updateYearStats();
+// Update Legacy Function Name for Compatibility
+function updateLegendActiveState() {
     updateLegendChart();
-    updateDayNightChart();
-    
-    if (document.getElementById('analytics-panel').classList.contains('open')) {
-        updateAnalytics();
-    }
-}
-
-// Filter By Day/Night
-function filterByDayNight(periodo) {
-    const currentPeriodo = currentFilters['filter-giorno-notte'];
-    
-    if (currentPeriodo === periodo) {
-        currentFilters['filter-giorno-notte'] = '';
-    } else {
-        currentFilters['filter-giorno-notte'] = periodo;
-    }
-    
-    document.getElementById('filter-giorno-notte').value = currentFilters['filter-giorno-notte'];
-    
-    updateAllFilters();
-    updateMapData();
-    updateStats();
-    updateYearStats();
-    updateLegendChart();
-    updateDayNightChart();
-    
-    if (document.getElementById('analytics-panel').classList.contains('open')) {
-        updateAnalytics();
-    }
 }
 
 
@@ -1199,8 +1018,7 @@ function resetFilters() {
     updateStats();
     updateYearStats();
     updateLegendChart()
-    updateDayNightChart();
-	
+
     map.flyTo({
         center: [13.3614, 38.1157],
         zoom: 11,
@@ -2693,10 +2511,6 @@ function setupEventListeners() {
         element.addEventListener('click', handler);
     }
     
-	// Reset Charts Button
-const btnResetCharts = document.getElementById('btn-reset-charts');
-if (btnResetCharts) addTouchClickListener(btnResetCharts, resetChartsFilters);
-	
     // Mobile Toggle
     const mobileToggle = document.getElementById('mobile-toggle');
     const sidebarOverlay = document.getElementById('sidebar-overlay');

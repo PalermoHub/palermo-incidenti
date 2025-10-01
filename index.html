@@ -216,12 +216,19 @@
     <h4>Tipologie Incidenti</h4>
     <div style="height: 170px; position: relative;">
         <canvas id="legend-chart"></canvas>
-		<div style="margin-top: 16px;">
-    <canvas id="giorno-notte-chart" height="80"></canvas>
-</div>
+
     </div>
     <p>Clicca su una barra per filtrare</p>
-	
+
+	<div class="chart-container" style="height: 120px; margin-top: 16px;">
+    <h4 style="margin-bottom: 8px;">
+        🌞🌙 Periodo del Giorno
+    </h4>
+    <canvas id="day-night-chart"></canvas>
+</div>
+<button id="btn-reset-charts" class="btn-reset-charts" title="Resetta entrambi i filtri grafici">
+    <span style="font-size: 12px;">↻</span> Reset Filtri Grafici
+</button>
 </div>
 
    <!-- Heatmap Legend -->

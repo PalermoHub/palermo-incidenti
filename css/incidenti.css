@@ -1293,7 +1293,7 @@ select option {
 
 .chart-container canvas {
     position: absolute !important;
-    top: 0;
+    top: 15px;
     left: 0;
     width: 100% !important;
     height: 100% !important;
@@ -1783,13 +1783,13 @@ select option {
 }
 
 .chart-container {
-    background: rgba(30, 41, 59, 0.6);
+   /* */background: rgba(30, 41, 59, 0);
     backdrop-filter: blur(10px);
-    border-radius: 16px;
-    padding: 16px;
-    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 0px;
+    padding: 0px;
+    border: 0px solid rgba(148, 163, 184, 0.2);
     box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    min-height: 300px;
+    min-height: 150px;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -1836,14 +1836,14 @@ select option {
     position: absolute;
     bottom: 80px;
     right: 20px;
-    background: rgb(15 23 42 / 35%);
-    backdrop-filter: blur5px);
+    background:   transparent!important; 
+    backdrop-filter: blur(5px);
     border-radius: 12px;
     padding: 16px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(148, 163, 184, 0.2);
     z-index: 10;
-    width: 280px;
+    width: 300px;
     pointer-events: auto;
 }
 
@@ -1869,4 +1869,88 @@ select option {
         width: 240px;
         padding: 12px;
     }
+}
+
+/* Uniforma altezza grafici 
+#legend-chart, {
+    height: 160px !important; 
+}
+
+#day-night-chart {
+    height: 85px !important; 
+}
+*/
+
+
+.btn-reset-charts {
+    width: 100%;
+    padding: 10px 16px;
+    margin: 16px 0;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-reset-charts:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+}
+
+.btn-reset-charts:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+/* Stile pulsante reset unificato */
+.btn-reset-charts {
+    width: 100%;
+    padding: 8px 12px;
+    margin: 12px 0;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.btn-reset-charts:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+}
+
+.btn-reset-charts:active {
+    transform: translateY(0);
+}
+
+/* Per mobile */
+@media (max-width: 768px) {
+    #legend-chart,
+    #day-night-chart {
+        height: 150px !important;
+    }
+    
+    .btn-reset-charts {
+        padding: 10px;
+        font-size: 13px;
+    }
+}
+
+#legend-chart,
+#day-night-chart {
+        background: transparent !important;
 }
