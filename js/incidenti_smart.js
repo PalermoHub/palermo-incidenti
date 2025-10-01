@@ -1082,7 +1082,7 @@ function updateMonthlyInjuriesChart() {
                     display: true,
                     position: 'bottom',
                     labels: {
-                        color: '#cbd5e1',
+                        color: '#fff',
                         font: { size: 10 },
                         padding: 8,
                         usePointStyle: true,
@@ -1145,6 +1145,7 @@ function updateMonthlyInjuriesChart() {
             }
         }
     });
+	
 }
 
 // Filter By Month
@@ -1175,6 +1176,7 @@ function filterByMonth(mese) {
         updateAnalytics();
     }
 }
+
 
 // Reset Charts Filters
 function resetChartsFilters() {

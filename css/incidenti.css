@@ -72,8 +72,8 @@ button, .legend-item, .year-stat-item, .year-stat-item-all {
     
     /* Year stats più grandi */
     .year-stat-item, .year-stat-item-all {
-        min-height: 50px;
-        padding: 12px 14px;
+        min-height: 35px;
+        padding: 5px 5px;
     }
 }
 
@@ -96,7 +96,7 @@ button, .legend-item, .year-stat-item, .year-stat-item-all {
 
 /* Sidebar */
 #sidebar {
-    width: 380px;
+    width: 320px;
     background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
     box-shadow: 4px 0 20px rgba(0,0,0,0.5);
     overflow-y: auto;
@@ -172,7 +172,7 @@ button, .legend-item, .year-stat-item, .year-stat-item-all {
 
 /* Stats */
 .stats {
-    padding: 24px;
+    padding: 10px;
     background: rgba(30, 41, 59, 0.6);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(148, 163, 184, 0.1);
@@ -184,7 +184,7 @@ button, .legend-item, .year-stat-item, .year-stat-item-all {
     text-transform: uppercase;
     font-weight: 700;
     letter-spacing: 1px;
-    margin-bottom: 16px;
+    margin-bottom: 5px;
 }
 
 .stat-grid {
@@ -198,7 +198,7 @@ button, .legend-item, .year-stat-item, .year-stat-item-all {
     padding: 16px;
     background: linear-gradient(135deg, rgba(51, 65, 85, 0.8) 0%, rgba(30, 41, 59, 0.8) 100%);
     backdrop-filter: blur(10px);
-    border-radius: 12px;
+    border-radius: 8px;
     border-left: 3px solid;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     transition: all 0.3s ease;
@@ -244,10 +244,10 @@ button, .legend-item, .year-stat-item, .year-stat-item-all {
 
 .stat-total {
     text-align: center;
-    padding: 20px;
+    padding: 5px;
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
     backdrop-filter: blur(10px);
-    border-radius: 12px;
+    border-radius: 8px;
     border: 1px solid rgba(148, 163, 184, 0.2);
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     position: relative;
@@ -291,7 +291,7 @@ button, .legend-item, .year-stat-item, .year-stat-item-all {
     padding: 16px;
     background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(30, 41, 59, 0.8) 100%);
     backdrop-filter: blur(10px);
-    border-radius: 12px;
+    border-radius: 8px;
     border: 1px solid rgba(139, 92, 246, 0.3);
 }
 
@@ -312,11 +312,11 @@ button, .legend-item, .year-stat-item, .year-stat-item-all {
 
 .year-stat-item-all {
     width: 100%;
-    padding: 10px 12px;
+    padding: 5px 5px;
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.4) 0%, rgba(139, 92, 246, 0.4) 100%);
     border-radius: 8px;
     text-align: center;
-    border: 2px solid rgba(59, 130, 246, 0.5);
+    border: 1px solid rgba(59, 130, 246, 0.5);
     cursor: pointer;
     transition: all 0.3s ease;
     margin-bottom: 8px;
@@ -507,7 +507,7 @@ select option {
 .filter-section {
     margin-bottom: 16px;
     border: 1px solid rgba(148, 163, 184, 0.2);
-    border-radius: 12px;
+    border-radius: 8px;
     overflow: hidden;
     background: rgba(30, 41, 59, 0.4);
     backdrop-filter: blur(10px);
@@ -567,12 +567,12 @@ select option {
 }
 
 .map-control-panel {
-    background: rgba(15, 23, 42, 0.95);
-    backdrop-filter: blur(10px);
-    padding: 10px;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    border: 1px solid rgba(148, 163, 184, 0.2);
+       background: #0f172abd !important;
+    backdrop-filter: blur(2px);
+    padding: 8px;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    border: 0px solid rgba(148, 163, 184, 0.2);
 }
 
 .map-control-panel select {
@@ -877,7 +877,7 @@ select option {
     margin-bottom: 24px;
     background: rgba(30, 41, 59, 0.6);
     backdrop-filter: blur(10px);
-    border-radius: 12px;
+    border-radius: 8px;
     padding: 20px;
     border: 1px solid rgba(148, 163, 184, 0.1);
 }
@@ -1166,7 +1166,7 @@ select option {
     display: inline-block;
     background: rgba(255, 255, 255, 0.25);
     padding: 4px 10px;
-    border-radius: 12px;
+    border-radius: 8px;
     margin-right: 8px;
     margin-bottom: 4px;
     font-size: 12px;
@@ -1270,7 +1270,8 @@ select option {
     display: flex;
     flex-direction: column;
     position: relative;
-}
+	
+	}
 
 .chart-container.chart-full {
     grid-column: 1 / -1;
@@ -1294,7 +1295,7 @@ select option {
 
 .chart-container canvas {
     position: absolute !important;
-    top: 35px;
+    top: 25px;
     left: 0;
     width: 100% !important;
     height: 100% !important;
@@ -1333,7 +1334,7 @@ select option {
 .stat-realtime-item {
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
     padding: 20px;
-    border-radius: 12px;
+    border-radius: 8px;
     text-align: center;
     border: 1px solid rgba(148, 163, 184, 0.2);
 }
@@ -1360,7 +1361,7 @@ select option {
     gap: 16px;
     padding: 16px;
     background: rgba(15, 23, 42, 0.5);
-    border-radius: 12px;
+    border-radius: 8px;
     margin-bottom: 16px;
     border: 1px solid rgba(148, 163, 184, 0.1);
 }
@@ -1369,7 +1370,7 @@ select option {
     width: 50px;
     height: 50px;
     background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-    border-radius: 12px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1407,7 +1408,7 @@ select option {
     color: white;
     width: 50px;
     height: 50px;
-    border-radius: 12px;
+    border-radius: 8px;
     border: none;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
@@ -1837,14 +1838,14 @@ select option {
     position: absolute;
     bottom: 40px;
     right: 20px;
-    background:   transparent!important; 
-    backdrop-filter: blur(5px);
+        background: #0f172abd !important;
+    backdrop-filter: blur(2px);
     border-radius: 8px;
     padding: 8px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(148, 163, 184, 0.2);
     z-index: 10;
-    width: 300px;
+    width: 250px;
     pointer-events: auto;
 }
 
@@ -1865,10 +1866,10 @@ select option {
 /* Responsive per mobile */
 @media (max-width: 768px) {
     #points-legend {
-        bottom: 60px;
+        bottom:40px;
         right: 10px;
-        width: 240px;
-        padding: 12px;
+        width: 220px;
+        padding: padding: 0px 10px 0px 10px;
     }
 }
 
@@ -1917,7 +1918,7 @@ select option {
 .btn-reset-charts {
     width: 100%;
     padding: 8px 12px;
-    margin: 25px 0;
+    margin: 15px 0;
     background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     color: white;
     border: none;
@@ -1942,17 +1943,17 @@ select option {
 .period-switch {
     flex: 1;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 4px;
-    padding: 12px 8px;
+        gap: 2px;
+    padding: 2px 2px;
     background: rgba(51, 65, 85, 0.6);
     border: 2px solid rgba(148, 163, 184, 0.2);
     border-radius: 8px;
     color: #cbd5e1;
     cursor: pointer;
     transition: all 0.3s ease;
-    min-height: 80px;
+    min-height: 40px;
     justify-content: center;
 }
 
@@ -1978,7 +1979,7 @@ select option {
 @media (max-width: 768px) {
     #legend-chart,
     #monthly-injuries-chart {
-        height: 150px !important;
+        height: 150px;
     }
     
     .btn-reset-charts {
@@ -1987,9 +1988,10 @@ select option {
     }
     
     .period-switch {
-        min-height: 70px;
+        min-height: 35px;
         padding: 10px 6px;
-    }
+		
+		    }
 }
 
 #legend-chart,
@@ -2091,7 +2093,7 @@ input:checked + .slider:before {
     font-weight: 700;
     padding: 4px 10px;
     background: rgba(59, 130, 246, 0.2);
-    border-radius: 12px;
+    border-radius: 8px;
     min-width: 40px;
     text-align: center;
 }
