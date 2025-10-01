@@ -460,7 +460,7 @@ function createClusteringLayers() {
         filter: [
             'all',
             ['has', 'point_count'],
-            ['>=', ['get', 'point_count'], 5]
+            ['>=', ['get', 'point_count'], 2]
         ],
         layout: {
             'text-field': ['to-string', ['get', 'point_count']],
@@ -613,7 +613,7 @@ function toggleClustering() {
         
         // Aggiorna pulsante
         if (btn) {
-            btn.textContent = '📍 Punti';
+            btn.textContent = '📍 Mappa di localizzazione';
             btn.classList.add('active');
         }
         
@@ -642,7 +642,7 @@ function toggleClustering() {
         
         // Aggiorna pulsante
         if (btn) {
-            btn.textContent = '🔵 Cluster';
+            btn.textContent = '🔵 Mappa con clustering geografico';
             btn.classList.remove('active');
         }
         
@@ -1757,7 +1757,7 @@ function toggleHeatmap() {
             btn.classList.add('active');
         }
         if (btnMap) {
-            btnMap.textContent = '🗺️ Punti';
+            btnMap.textContent = '🗺️ Mappa di localizzazione';
             btnMap.classList.add('active');
         }
         const pointsLegend = document.getElementById('points-legend');
@@ -1770,11 +1770,11 @@ function toggleHeatmap() {
             map.setLayoutProperty(`incidenti-${tipo}`, 'visibility', 'visible');
         });
         if (btn) {
-            btn.textContent = '🔥 Mappa di Calore';
+            btn.textContent = '🔥 Heatmap';
             btn.classList.remove('active');
         }
         if (btnMap) {
-            btnMap.textContent = '🔥 Calore';
+            btnMap.textContent = '🔥 Heatmap';
             btnMap.classList.remove('active');
         }
         const pointsLegend = document.getElementById('points-legend');
