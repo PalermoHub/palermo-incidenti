@@ -28,7 +28,7 @@ const basemapStyles = {
                 type: 'raster',
                 tiles: ['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'],
                 tileSize: 256,
-                attribution: '© CARTO'
+                attribution: 'Â© CARTO'
             }
         },
         layers: [{
@@ -44,7 +44,7 @@ const basemapStyles = {
                 type: 'raster',
                 tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
                 tileSize: 256,
-                attribution: '© OpenStreetMap contributors'
+                attribution: 'Â© OpenStreetMap contributors'
             }
         },
         layers: [{
@@ -60,7 +60,7 @@ const basemapStyles = {
                 type: 'raster',
                 tiles: ['https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'],
                 tileSize: 256,
-                attribution: '© Google'
+                attribution: 'Â© Google'
             }
         },
         layers: [{
@@ -76,7 +76,7 @@ const basemapStyles = {
                 type: 'raster',
                 tiles: ['https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'],
                 tileSize: 256,
-                attribution: '© CARTO'
+                attribution: 'Â© CARTO'
             }
         },
         layers: [{
@@ -98,7 +98,7 @@ const filterConfig = {
     'filter-giorno-settimana': 'Giorno settimana',
     'filter-feriale-weekend': 'Feriale/Weekend',
     'filter-giorno-notte': 'Giorno/Notte',
-    'filter-condizioni-luce': 'Condizioni luce (Visibilità)',
+    'filter-condizioni-luce': 'Condizioni luce (VisibilitÃ )',
     'filter-fascia-4': 'Fascia oraria (4 fasce)',
     'filter-fascia-6': 'Fascia oraria dettagliata (6 fasce)',
     'filter-ora-punta': 'Ora di punta (Picchi di traffico)'
@@ -642,13 +642,13 @@ function show2019InfoPopup() {
     
     popup.innerHTML = `
         <div style="text-align: center;">
-            <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+            <div style="font-size: 48px; margin-bottom: 16px;">âš ï¸</div>
             <h3 style="color: #3b82f6; margin: 0 0 16px 0; font-size: 20px; font-weight: 700;">
                 Anno 2019 - Dati Parziali
             </h3>
             <p style="color: #cbd5e1; margin: 0 0 16px 0; font-size: 14px; line-height: 1.6;">
                 Il <strong style="color: #f1f5f9;">2019</strong> include <strong style="color: #3b82f6;">3.192 incidenti non mappati</strong> 
-                perché nel dataset non erano presenti le coordinate geografiche.
+                perchÃ© nel dataset non erano presenti le coordinate geografiche.
             </p>
             <p style="color: #94a3b8; margin: 0 0 20px 0; font-size: 13px; font-style: italic;">
                 Questi incidenti sono conteggiati nelle statistiche ma non visualizzati sulla mappa.
@@ -692,7 +692,6 @@ function show2019InfoPopup() {
     document.body.appendChild(popup);
 }
 
-// Filter By Year
 function filterByYear(year) {
     const currentYear = currentFilters['filter-anno'];
     
@@ -708,6 +707,7 @@ function filterByYear(year) {
     updateMapData();
     updateStats();
     updateYearStats();
+    updateLegendChart(); // ✅ AGGIUNTO
     
     if (window.innerWidth <= 768) {
         closeSidebar();
@@ -763,11 +763,11 @@ function updateLegendChart() {
         { label: 'Reset', value: total, tipo: '', color: '#64748b' },
         { label: 'F - Feriti', value: stats.F, tipo: 'F', color: '#f59e0b' },
         { label: 'C - Cose', value: stats.C, tipo: 'C', color: '#10b981' },
-        { label: 'R - Rserva', value: stats.R, tipo: 'R', color: '#a855f7' },
+        { label: 'R - Riserva', value: stats.R, tipo: 'R', color: '#a855f7' },
         { label: 'M - Mortale', value: stats.M, tipo: 'M', color: '#ef4444' }
     ];
     
-    // Ordina dal valore più alto al più basso (escluso "tutti" che resta in cima)
+    // Ordina dal valore piÃ¹ alto al piÃ¹ basso (escluso "tutti" che resta in cima)
     const tuttiItem = items[0];
     const otherItems = items.slice(1).sort((a, b) => b.value - a.value);
     const sortedItems = [tuttiItem, ...otherItems];
@@ -881,7 +881,7 @@ function updateLegendChart() {
                         display: false
                     },
                     ticks: {
-                        color: '#cbd5e1',
+                        color: '#ffffff',
                         font: {
                             size: 11,
                             weight: '500'
@@ -941,9 +941,9 @@ function toggleHeatmap() {
         ['C', 'F', 'R', 'M'].forEach(tipo => {
             map.setLayoutProperty(`incidenti-${tipo}`, 'visibility', 'none');
         });
-        btn.textContent = '🔵 Localizzazione incidenti';
+        btn.textContent = 'ðŸ”µ Localizzazione incidenti';
         btn.classList.add('active');
-        btnMap.textContent = '🔵 Punti';
+        btnMap.textContent = 'ðŸ”µ Punti';
         btnMap.classList.add('active');
         document.getElementById('points-legend').classList.add('hidden');
         document.getElementById('heatmap-legend').classList.remove('hidden');
@@ -952,9 +952,9 @@ function toggleHeatmap() {
         ['C', 'F', 'R', 'M'].forEach(tipo => {
             map.setLayoutProperty(`incidenti-${tipo}`, 'visibility', 'visible');
         });
-        btn.textContent = '🔥 Mappa di Calore';
+        btn.textContent = 'ðŸ”¥ Mappa di Calore';
         btn.classList.remove('active');
-        btnMap.textContent = '🔥 Calore';
+        btnMap.textContent = 'ðŸ”¥ Calore';
         btnMap.classList.remove('active');
         document.getElementById('points-legend').classList.remove('hidden');
         document.getElementById('heatmap-legend').classList.add('hidden');
@@ -979,7 +979,7 @@ function changeBasemap() {
     // Cambia lo stile della mappa
     map.setStyle(basemapStyles[selectedStyle]);
     
-    // Quando il nuovo stile è caricato, ripristina i layer degli incidenti
+    // Quando il nuovo stile Ã¨ caricato, ripristina i layer degli incidenti
     map.once('styledata', () => {
         // Ripristina la vista
         map.jumpTo({
@@ -992,7 +992,7 @@ function changeBasemap() {
         // Ricrea i layer degli incidenti
         createMapLayers();
         
-        // Ripristina la visibilità corretta (heatmap o punti)
+        // Ripristina la visibilitÃ  corretta (heatmap o punti)
         if (showHeatmap) {
             map.setLayoutProperty('incidenti-heatmap', 'visibility', 'visible');
             ['C', 'F', 'R', 'M'].forEach(tipo => {
@@ -1080,20 +1080,20 @@ function openDetailPanel(properties) {
     };
     
     const tipologiaIcons = {
-        'M': '💀',
-        'R': '🚑',
-        'F': '🤕',
-        'C': '🔧'
+        'M': 'ðŸ’€',
+        'R': 'ðŸš‘',
+        'F': 'ðŸ¤•',
+        'C': 'ðŸ”§'
     };
     
-    document.getElementById('detail-tipo-icon').textContent = tipologiaIcons[properties.Tipologia] || '🚗';
+    document.getElementById('detail-tipo-icon').textContent = tipologiaIcons[properties.Tipologia] || 'ðŸš—';
     document.getElementById('detail-subtitle').textContent = `Incidente del ${properties.Data || 'Data non disponibile'}`;
     
     let html = '';
     
     html += `
         <div class="detail-section">
-            <h3>⚠️ Tipologia e Gravità</h3>
+            <h3>âš ï¸ Tipologia e GravitÃ </h3>
             <div class="detail-row">
                 <span class="detail-label">Tipo Incidente</span>
                 <span class="tipo-badge ${properties.Tipologia}">${properties.Tipologia} - ${tipologiaNames[properties.Tipologia]}</span>
@@ -1101,7 +1101,7 @@ function openDetailPanel(properties) {
         </div>
     `;
     
-    html += '<div class="detail-section"><h3>📅 Quando è Avvenuto</h3>';
+    html += '<div class="detail-section"><h3>ðŸ“… Quando Ã¨ Avvenuto</h3>';
     const temporalFields = [
         { key: 'Data', label: 'Data' },
         { key: 'Anno', label: 'Anno' },
@@ -1127,11 +1127,11 @@ function openDetailPanel(properties) {
     });
     html += '</div>';
     
-    html += '<div class="detail-section"><h3>📍 Dove è Avvenuto</h3>';
+    html += '<div class="detail-section"><h3>ðŸ“ Dove Ã¨ Avvenuto</h3>';
     const locationFields = [
         { key: 'Circoscrizione', label: 'Circoscrizione' },
         { key: 'Quartiere', label: 'Quartiere' },
-        { key: 'UPL', label: 'Unità di Primo Livello' }
+        { key: 'UPL', label: 'UnitÃ  di Primo Livello' }
     ];
     
     locationFields.forEach(field => {
@@ -1160,12 +1160,12 @@ function openDetailPanel(properties) {
     }
     html += '</div>';
     
-    html += '<div class="detail-section"><h3>🌤️ Condizioni Ambientali</h3>';
-    if (properties['Condizioni luce (Visibilità)'] && properties['Condizioni luce (Visibilità)'] !== 'null') {
+    html += '<div class="detail-section"><h3>ðŸŒ¤ï¸ Condizioni Ambientali</h3>';
+    if (properties['Condizioni luce (VisibilitÃ )'] && properties['Condizioni luce (VisibilitÃ )'] !== 'null') {
         html += `
             <div class="detail-row">
                 <span class="detail-label">Condizioni Luce</span>
-                <span class="detail-value">${properties['Condizioni luce (Visibilità)']}</span>
+                <span class="detail-value">${properties['Condizioni luce (VisibilitÃ )']}</span>
             </div>
         `;
     }
@@ -1261,9 +1261,9 @@ function updateActiveFiltersDisplay() {
     let displayHTML = '';
     
     if (filterText.length === 0) {
-        displayHTML = `Tutti gli incidenti (2015-2023) • ${totalData.toLocaleString('it-IT')} incidenti totali`;
+        displayHTML = `Tutti gli incidenti (2015-2023) â€¢ ${totalData.toLocaleString('it-IT')} incidenti totali`;
     } else {
-        displayHTML = `${filteredData.length.toLocaleString('it-IT')} di ${totalData.toLocaleString('it-IT')} incidenti • `;
+        displayHTML = `${filteredData.length.toLocaleString('it-IT')} di ${totalData.toLocaleString('it-IT')} incidenti â€¢ `;
         displayHTML += filterText.map(f => `<span class="filter-badge">${f}</span>`).join('');
     }
     
@@ -1314,7 +1314,7 @@ function addChartDownloadButtons() {
         // Create download button
         const btn = document.createElement('button');
         btn.className = 'chart-download-btn';
-        btn.innerHTML = '⬇️ PNG';
+        btn.innerHTML = 'â¬‡ï¸ PNG';
         btn.title = 'Scarica grafico come PNG';
         
         btn.onclick = () => {
@@ -1400,7 +1400,7 @@ async function downloadChartAsPNG(chartId, filename) {
 
 // Panoramica Charts
 function updatePanoramicaCharts(data) {
-    // Common chart options with labels - COLORE SCURO per leggibilità su sfondo bianco
+    // Common chart options with labels - COLORE SCURO per leggibilitÃ  su sfondo bianco
     const commonOptions = {
         responsive: true,
         maintainAspectRatio: false,
@@ -1546,7 +1546,7 @@ onClick: (e, items) => {
         const year = allYears[items[0].index];
         const currentYear = currentFilters['filter-anno'];
         
-        // Toggle: se l'anno è già selezionato, deselezionalo
+        // Toggle: se l'anno Ã¨ giÃ  selezionato, deselezionalo
         if (currentYear === String(year)) {
             currentFilters['filter-anno'] = '';
         } else {
@@ -1560,7 +1560,7 @@ onClick: (e, items) => {
         }
     });
     
-    // AGGIUNGI NOTA SOTTO IL GRAFICO - QUESTA È LA PARTE CRITICA
+    // AGGIUNGI NOTA SOTTO IL GRAFICO - QUESTA Ãˆ LA PARTE CRITICA
     const chartContainer = document.getElementById('chart-trend-annuale').closest('.chart-container');
     let existingNote = chartContainer.querySelector('.chart-note-2019');
     if (existingNote) {
@@ -1608,7 +1608,7 @@ onClick: (e, items) => {
                 ...commonOptions.plugins,
                 datalabels: {
                     display: true,
-                    color: '#1e293b', // SCURO per leggibilità
+                    color: '#1e293b', // SCURO per leggibilitÃ 
                     font: { weight: 'bold', size: 10 },
                     formatter: (value, ctx) => {
                         const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
@@ -1792,7 +1792,7 @@ function updateTemporaleCharts(data) {
         }
     });
     
-    const giorni = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
+    const giorni = ['LunedÃ¬', 'MartedÃ¬', 'MercoledÃ¬', 'GiovedÃ¬', 'VenerdÃ¬', 'Sabato', 'Domenica'];
     const giorniCounts = giorni.map(g => giornoData[g] || 0);
     
     if (analyticsCharts.giornoSettimana) analyticsCharts.giornoSettimana.destroy();
@@ -2170,7 +2170,7 @@ function updateCondizioniCharts(data) {
                 ...commonOptions.plugins,
                 datalabels: {
                     display: true,
-                    color: '#1e293b', // SCURO per leggibilità su sfondo bianco
+                    color: '#1e293b', // SCURO per leggibilitÃ  su sfondo bianco
                     font: { weight: 'bold', size: 10 },
                     formatter: (value, ctx) => {
                         const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
@@ -2195,7 +2195,7 @@ function updateCondizioniCharts(data) {
     
     const condizioniData = {};
     data.forEach(row => {
-        const cond = row['Condizioni luce (Visibilità)'];
+        const cond = row['Condizioni luce (VisibilitÃ )'];
         if (cond) {
             condizioniData[cond] = (condizioniData[cond] || 0) + 1;
         }
@@ -2368,7 +2368,7 @@ function updateInsights(data) {
     
     const condizioneData = {};
     data.forEach(row => {
-        const cond = row['Condizioni luce (Visibilità)'];
+        const cond = row['Condizioni luce (VisibilitÃ )'];
         if (cond) {
             condizioneData[cond] = (condizioneData[cond] || 0) + 1;
         }
@@ -2538,7 +2538,7 @@ if (yearStatsGrid) {
         
         const year = item.dataset.year;
         
-        // Se è il 2019, mostra il popup informativo
+        // Se Ã¨ il 2019, mostra il popup informativo
         if (year === '2019') {
             show2019InfoPopup();
             // Aspetta che l'utente chiuda il popup, poi filtra
