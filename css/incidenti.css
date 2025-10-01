@@ -1260,15 +1260,16 @@ select option {
 }
 
 .chart-container {
-    background: rgba(30, 41, 59, 0.6);
-    backdrop-filter: blur(10px);
-    border-radius: 16px;
-    padding: 16px;
-    border: 1px solid rgba(148, 163, 184, 0.2);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    min-height: 300px;
+    background: rgba(30, 41, 59, 0) !important;  /* Assicura trasparenza totale */
+    backdrop-filter: none !important;  /* RIMUOVI l'effetto blur che crea lo sfondo */
+    border-radius: 0px;
+    padding: 0px;
+    border: 0px solid rgba(148, 163, 184, 0.2);
+    box-shadow: none !important;  /* RIMUOVI anche l'ombra */
+    min-height: 150px;
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 .chart-container.chart-full {
@@ -1293,7 +1294,7 @@ select option {
 
 .chart-container canvas {
     position: absolute !important;
-    top: 25px;
+    top: 35px;
     left: 0;
     width: 100% !important;
     height: 100% !important;
@@ -1834,12 +1835,12 @@ select option {
 /* Legend Chart Container - Posizionamento in basso a destra */
 #points-legend {
     position: absolute;
-    bottom: 80px;
+    bottom: 40px;
     right: 20px;
     background:   transparent!important; 
     backdrop-filter: blur(5px);
-    border-radius: 12px;
-    padding: 16px;
+    border-radius: 8px;
+    padding: 8px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(148, 163, 184, 0.2);
     z-index: 10;
@@ -1848,8 +1849,8 @@ select option {
 }
 
 #points-legend h4 {
-    margin: 0 0 12px 0;
-    font-size: 13px;
+    margin: 5px 0 12px 0;
+    font-size: 12px;
     color:#fff;
     font-weight: 600;
 }

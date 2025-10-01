@@ -214,14 +214,11 @@
     <!-- Legend -->
 <div id="points-legend">
     <h4>Tipologie Incidenti</h4>
-    <div style="height: 170px; position: relative;">
+    <div style="height: 170px; top: -10px; position: relative;">
         <canvas id="legend-chart"></canvas>
-
     </div>
-    <p>Clicca su una barra per filtrare</p>
-
 <!-- Switch Giorno/Notte -->
-<div style="margin-top: 16px; padding: 12px; /*background: rgba(30, 41, 59, 0.6);*/ border-radius: 8px;">
+<div style="margin-top: -20px; padding: 12px; /*background: rgba(30, 41, 59, 0.6);*/ border-radius: 8px;">
   <!--   <h4 style="margin: 0 0 12px 0; font-size: 13px; color: #fff; font-weight: 600; text-align: center;">
         🌞🌙 Periodo del Giorno
     </h4> -->
@@ -229,20 +226,20 @@
         <button id="switch-giorno" class="period-switch" data-period="Giorno" title="Filtra incidenti diurni">
             <span style="font-size: 16px;">☀️</span>
             <span style="font-size: 11px; font-weight: 600;">Giorno</span>
-            <span id="count-giorno" style="font-size: 13px; font-weight: 700;">0</span>
+            <span id="count-giorno" style="font-size: 12x; font-weight: 600;">0</span>
         </button>
         <button id="switch-notte" class="period-switch" data-period="Notte" title="Filtra incidenti notturni">
             <span style="font-size: 16px;">🌙</span>
             <span style="font-size: 11px; font-weight: 600;">Notte</span>
-            <span id="count-notte" style="font-size: 13px; font-weight: 700;">0</span>
+            <span id="count-notte" style="font-size: 12px; font-weight: 700;">0</span>
         </button>
     </div>
 </div>
 
 <!-- Grafico Radar Incidenti con Feriti/Morti per Mese -->
-<div class="chart-container" style="height: 220px; margin-top: 16px;">
-    <h4 style="margin-bottom: 8px; font-size: 13px; color: #fff; font-weight: 600; text-align: center;">
-        📊 Feriti/Morti per Mese
+<div class="chart-container" style="height: 220px; margin-top: 15px; bottom: 20px;">
+    <h4 style="margin-bottom: 8px; font-size: 13px; color: #fff; font-weight: 600; text-align: left;">
+     Feriti/Morti per Mese
     </h4>
     <canvas id="monthly-injuries-chart"></canvas>
 </div>

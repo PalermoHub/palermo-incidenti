@@ -1106,7 +1106,7 @@ function updateMonthlyInjuriesChart() {
                             if (selectedMese === mese) {
                                 return '\nClicca per deselezionare';
                             }
-                            return '\nClicca per filtrare';
+                            //return '\nClicca per filtrare';
                         }
                     }
                 },
@@ -1118,15 +1118,15 @@ function updateMonthlyInjuriesChart() {
                 r: {
                     beginAtZero: true,
                     ticks: {
-                        color: '#94a3b8',
+                        color: '#fff',
                         backdropColor: 'transparent',
-                        font: { size: 9 }
+                        font: { size: 8 }
                     },
                     grid: {
-                        color: 'rgba(148, 163, 184, 0.2)'
+                        color: 'rgba(148, 163, 184, 0)'
                     },
                     pointLabels: {
-                        color: '#cbd5e1',
+                        color: '#fff',
                         font: { 
                             size: 10,
                             weight: '600'
