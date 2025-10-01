@@ -5,6 +5,8 @@ let currentFilters = {};
 let showHeatmap = false;
 let analyticsCharts = {};
 let monthlyInjuriesChart = null;
+let showClustering = false;
+let topLuoghiData = [];
 
 // Register Chart.js plugins globally
 Chart.register(ChartDataLabels);
@@ -396,6 +398,455 @@ function createMapLayers() {
     console.log('Layers creati con successo');
 }
 
+// Create Clustering Layers
+function createClusteringLayers() {
+    const geojson = createGeoJSON();
+    
+    // Rimuovi i layer esistenti se ci sono
+    if (map.getLayer('cluster-count')) map.removeLayer('cluster-count');
+    if (map.getLayer('clusters')) map.removeLayer('clusters');
+    if (map.getLayer('unclustered-point')) map.removeLayer('unclustered-point');
+    if (map.getSource('incidenti-cluster')) map.removeSource('incidenti-cluster');
+    
+    // Aggiungi source per clustering
+    map.addSource('incidenti-cluster', {
+        type: 'geojson',
+        data: geojson,
+        cluster: true,
+        clusterMaxZoom: 14,
+        clusterRadius: 50
+    });
+
+    // Layer per i cluster circles
+    map.addLayer({
+        id: 'clusters',
+        type: 'circle',
+        source: 'incidenti-cluster',
+        filter: ['has', 'point_count'],
+        paint: {
+            'circle-color': [
+                'step',
+                ['get', 'point_count'],
+                '#3b82f6',
+                10,
+                '#f59e0b',
+                25,
+                '#f97316',
+                50,
+                '#ef4444'
+            ],
+            'circle-radius': [
+                'step',
+                ['get', 'point_count'],
+                20,
+                10,
+                25,
+                25,
+                30,
+                50,
+                35
+            ],
+            'circle-opacity': 0.85,
+            'circle-stroke-width': 3,
+            'circle-stroke-color': '#ffffff'
+        }
+    });
+
+    // Layer per i numeri sui cluster - SOPRA i cerchi
+    map.addLayer({
+        id: 'cluster-count',
+        type: 'symbol',
+        source: 'incidenti-cluster',
+        filter: [
+            'all',
+            ['has', 'point_count'],
+            ['>=', ['get', 'point_count'], 5]
+        ],
+        layout: {
+            'text-field': ['to-string', ['get', 'point_count']],
+            'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+            'text-size': [
+                'step',
+                ['get', 'point_count'],
+                13,
+                10,
+                15,
+                25,
+                17,
+                50,
+                19
+            ],
+            'text-allow-overlap': true,
+            'text-ignore-placement': true
+        },
+        paint: {
+            'text-color': '#ffffff',
+            'text-halo-color': 'rgba(0, 0, 0, 0.9)',
+            'text-halo-width': 2
+        }
+    });
+
+    // Layer per i punti non clusterizzati
+    map.addLayer({
+        id: 'unclustered-point',
+        type: 'circle',
+        source: 'incidenti-cluster',
+        filter: ['!', ['has', 'point_count']],
+        paint: {
+            'circle-color': [
+                'match',
+                ['get', 'Tipologia'],
+                'M', '#ef4444',
+                'R', '#a855f7',
+                'F', '#f59e0b',
+                'C', '#10b981',
+                '#94a3b8'
+            ],
+            'circle-radius': [
+                'interpolate', ['linear'], ['zoom'],
+                10, 5,
+                16, 8
+            ],
+            'circle-opacity': 0.8,
+            'circle-stroke-width': 2,
+            'circle-stroke-color': '#fff'
+        }
+    });
+
+    // Setup event handlers solo la prima volta
+    if (!map._clusterHandlersAdded) {
+        // Click handler per espandere i cluster
+        map.on('click', 'clusters', (e) => {
+            const features = map.queryRenderedFeatures(e.point, {
+                layers: ['clusters']
+            });
+            if (!features.length) return;
+            
+            const clusterId = features[0].properties.cluster_id;
+            const pointCount = features[0].properties.point_count;
+            
+            console.log(`Cluster cliccato: ${pointCount} incidenti`);
+            
+            map.getSource('incidenti-cluster').getClusterExpansionZoom(
+                clusterId,
+                (err, zoom) => {
+                    if (err) return;
+                    map.easeTo({
+                        center: features[0].geometry.coordinates,
+                        zoom: zoom + 1,
+                        duration: 1000
+                    });
+                }
+            );
+        });
+
+        // Tooltip sui cluster
+        const popup = new maplibregl.Popup({
+            closeButton: false,
+            closeOnClick: false,
+            offset: 15
+        });
+
+        map.on('mouseenter', 'clusters', (e) => {
+            map.getCanvas().style.cursor = 'pointer';
+            
+            const coordinates = e.features[0].geometry.coordinates.slice();
+            const pointCount = e.features[0].properties.point_count;
+            
+            popup.setLngLat(coordinates)
+                .setHTML(`<div style="padding: 10px; font-weight: 600;">
+                    <div style="font-size: 18px; color: #3b82f6; margin-bottom: 4px;">${pointCount} incidenti</div>
+                    <small style="color: #64748b;">Clicca per espandere</small>
+                </div>`)
+                .addTo(map);
+        });
+
+        map.on('mouseleave', 'clusters', () => {
+            map.getCanvas().style.cursor = '';
+            popup.remove();
+        });
+
+        // Click handler per i punti non clusterizzati
+        map.on('click', 'unclustered-point', (e) => {
+            if (!e.features || e.features.length === 0) return;
+            const props = e.features[0].properties;
+            openDetailPanel(props);
+        });
+
+        map.on('mouseenter', 'unclustered-point', () => {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+        
+        map.on('mouseleave', 'unclustered-point', () => {
+            map.getCanvas().style.cursor = '';
+        });
+
+        map._clusterHandlersAdded = true;
+    }
+    
+    console.log('Cluster layers creati con numeri visibili');
+}
+
+
+// Toggle Clustering
+function toggleClustering() {
+    showClustering = !showClustering;
+    const btn = document.getElementById('btn-clustering-map');
+    const btnTopLuoghi = document.getElementById('btn-top-luoghi-map');
+    
+    if (showClustering) {
+        // Nascondi heatmap se attiva
+        if (showHeatmap) {
+            toggleHeatmap();
+        }
+        
+        // Nascondi layer normali
+        ['C', 'F', 'R', 'M'].forEach(tipo => {
+            map.setLayoutProperty(`incidenti-${tipo}`, 'visibility', 'none');
+        });
+        
+        // Crea/aggiorna e mostra cluster CON I FILTRI ATTUALI
+        createClusteringLayers();
+        map.setLayoutProperty('clusters', 'visibility', 'visible');
+        map.setLayoutProperty('cluster-count', 'visibility', 'visible');
+        map.setLayoutProperty('unclustered-point', 'visibility', 'visible');
+        
+        // Aggiorna pulsante
+        if (btn) {
+            btn.textContent = '📍 Punti';
+            btn.classList.add('active');
+        }
+        
+        // Mostra pulsante Top Luoghi
+        if (btnTopLuoghi) {
+            btnTopLuoghi.style.display = 'block';
+        }
+        
+        // Calcola top luoghi CON I FILTRI ATTUALI
+        calculateTopLuoghi();
+        
+        console.log('Clustering attivato - filtri applicati:', Object.keys(currentFilters).filter(k => currentFilters[k]).length);
+        
+    } else {
+        // Nascondi cluster
+        if (map.getLayer('clusters')) {
+            map.setLayoutProperty('clusters', 'visibility', 'none');
+            map.setLayoutProperty('cluster-count', 'visibility', 'none');
+            map.setLayoutProperty('unclustered-point', 'visibility', 'none');
+        }
+        
+        // Mostra layer normali
+        ['C', 'F', 'R', 'M'].forEach(tipo => {
+            map.setLayoutProperty(`incidenti-${tipo}`, 'visibility', 'visible');
+        });
+        
+        // Aggiorna pulsante
+        if (btn) {
+            btn.textContent = '🔵 Cluster';
+            btn.classList.remove('active');
+        }
+        
+        // Nascondi pulsante Top Luoghi e chiudi modale se aperta
+        if (btnTopLuoghi) {
+            btnTopLuoghi.style.display = 'none';
+        }
+        
+        const modal = document.getElementById('top-luoghi-modal');
+        if (modal && modal.classList.contains('show')) {
+            closeTopLuoghiModal();
+        }
+        
+        console.log('Clustering disattivato');
+    }
+}
+
+// Calculate Top Luoghi
+function calculateTopLuoghi() {
+    const filteredData = getFilteredData();
+    const luoghiMap = {};
+    
+    filteredData.forEach(row => {
+        const luogo = row.Luogo || 'Non specificato';
+        
+        if (!luoghiMap[luogo]) {
+            luoghiMap[luogo] = {
+                luogo: luogo,
+                total: 0,
+                M: 0,
+                R: 0,
+                F: 0,
+                C: 0,
+                coordinates: []
+            };
+        }
+        
+        luoghiMap[luogo].total++;
+        const tipo = row.Tipologia;
+        if (tipo && luoghiMap[luogo].hasOwnProperty(tipo)) {
+            luoghiMap[luogo][tipo]++;
+        }
+        
+        // Memorizza le coordinate (prendi la prima occorrenza)
+        if (luoghiMap[luogo].coordinates.length === 0 && row.longitude && row.latitude) {
+            luoghiMap[luogo].coordinates = [
+                parseFloat(row.longitude),
+                parseFloat(row.latitude)
+            ];
+        }
+    });
+    
+    // Converti in array e ordina
+    topLuoghiData = Object.values(luoghiMap)
+        .sort((a, b) => b.total - a.total)
+        .slice(0, 50);
+    
+    console.log('Top 50 luoghi calcolati:', topLuoghiData.length);
+}
+
+// Update Top Luoghi Modal if open
+function updateTopLuoghiModalIfOpen() {
+    const modal = document.getElementById('top-luoghi-modal');
+    if (modal && modal.classList.contains('show')) {
+        // Riapri il modale con i dati aggiornati
+        openTopLuoghiModal();
+    }
+}
+
+// Open Top Luoghi Modal
+function openTopLuoghiModal() {
+    const modal = document.getElementById('top-luoghi-modal');
+    const tbody = document.getElementById('top-luoghi-body');
+    const countEl = document.getElementById('top-luoghi-count');
+    
+    if (!modal || !tbody) return;
+    
+    if (countEl) {
+        countEl.textContent = topLuoghiData.length;
+    }
+    
+    // Mostra filtri attivi
+    const activeFilters = Object.entries(currentFilters)
+        .filter(([key, value]) => value && value !== '')
+        .map(([key, value]) => {
+            const label = filterConfig[key] || key;
+            return `${label}: ${value}`;
+        });
+    
+    let filterInfo = '';
+    if (activeFilters.length > 0) {
+        filterInfo = `<div style="margin-bottom: 16px; padding: 12px; background: rgba(59, 130, 246, 0.1); border-left: 3px solid #3b82f6; border-radius: 6px;">
+            <strong style="color: #60a5fa;">Filtri applicati:</strong><br>
+            <span style="color: #cbd5e1; font-size: 13px;">${activeFilters.join(' • ')}</span>
+        </div>`;
+    }
+    
+    let html = filterInfo;
+    topLuoghiData.forEach((item, index) => {
+        const rank = index + 1;
+        let rankClass = '';
+        if (rank === 1) rankClass = 'rank-1';
+        else if (rank === 2) rankClass = 'rank-2';
+        else if (rank === 3) rankClass = 'rank-3';
+        
+        html += `
+            <tr>
+                <td style="text-align: center;">
+                    <span class="rank-badge ${rankClass}">${rank}</span>
+                </td>
+                <td style="font-weight: 600; color: #f1f5f9;">${item.luogo}</td>
+                <td style="text-align: center; font-weight: 700; color: #3b82f6; font-size: 16px;">
+                    ${item.total}
+                </td>
+                <td style="text-align: center;">
+                    <span class="tipo-count" style="background: rgba(239, 68, 68, 0.2); color: #ef4444;">
+                        ${item.M}
+                    </span>
+                </td>
+                <td style="text-align: center;">
+                    <span class="tipo-count" style="background: rgba(168, 85, 247, 0.2); color: #a855f7;">
+                        ${item.R}
+                    </span>
+                </td>
+                <td style="text-align: center;">
+                    <span class="tipo-count" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b;">
+                        ${item.F}
+                    </span>
+                </td>
+                <td style="text-align: center;">
+                    <span class="tipo-count" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">
+                        ${item.C}
+                    </span>
+                </td>
+                <td style="text-align: center;">
+                    <button class="btn-zoom-location" onclick="zoomToLocation(${item.coordinates[0]}, ${item.coordinates[1]})">
+                        📍 Visualizza
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    if (filterInfo) {
+        const modalBody = modal.querySelector('.modal-body');
+        modalBody.insertAdjacentHTML('afterbegin', filterInfo);
+    }
+    
+    tbody.innerHTML = html;
+    modal.classList.add('show');
+}
+
+// Close Top Luoghi Modal
+function closeTopLuoghiModal() {
+    const modal = document.getElementById('top-luoghi-modal');
+    if (modal) modal.classList.remove('show');
+}
+
+// Zoom to Location
+function zoomToLocation(lng, lat) {
+    closeTopLuoghiModal();
+    
+    map.flyTo({
+        center: [lng, lat],
+        zoom: 16,
+        duration: 2000,
+        essential: true
+    });
+    
+    // Chiudi sidebar su mobile
+    if (window.innerWidth <= 768) {
+        closeSidebar();
+    }
+}
+
+// Download Top Luoghi CSV
+function downloadTopLuoghiCSV() {
+    if (topLuoghiData.length === 0) {
+        alert('Nessun dato da scaricare');
+        return;
+    }
+    
+    let csv = 'Posizione,Luogo,Totale Incidenti,Mortali,Riserva,Feriti,Cose\n';
+    
+    topLuoghiData.forEach((item, index) => {
+        const luogo = item.luogo.replace(/"/g, '""');
+        csv += `${index + 1},"${luogo}",${item.total},${item.M},${item.R},${item.F},${item.C}\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    const annoFiltro = currentFilters['filter-anno'] || 'tutti';
+    link.setAttribute('href', url);
+    link.setAttribute('download', `top_50_luoghi_palermo_${annoFiltro}_${new Date().getTime()}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+
 // Setup Layer Interactions
 function setupLayerInteractions(layerId) {
     map.on('click', layerId, (e) => {
@@ -474,11 +925,24 @@ function handleFilterChange(filterId, value) {
     updatePeriodSwitches();
     updateMonthlyInjuriesChart();
     
+    // Aggiorna top luoghi se il clustering è attivo
+    if (showClustering) {
+        calculateTopLuoghi();
+        console.log('Top luoghi ricalcolati dopo cambio filtro');
+    }
+    
     const analyticsPanel = document.getElementById('analytics-panel');
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
         updateActiveFiltersDisplay();
         updateAnalytics();
     }
+	// Aggiorna top luoghi se il clustering è attivo
+if (showClustering) {
+    calculateTopLuoghi();
+    updateTopLuoghiModalIfOpen();  // AGGIUNGI QUESTA RIGA
+    console.log('Top luoghi ricalcolati dopo cambio filtro');
+}
+	
 }
 
 // Update All Filters
@@ -531,9 +995,23 @@ function updateAllFilters() {
 function updateMapData() {
     const geojson = createGeoJSON();
     console.log(`Aggiornamento mappa con ${geojson.features.length} features`);
+    
+    // Aggiorna source normale
     const source = map.getSource('incidenti');
     if (source) {
         source.setData(geojson);
+    }
+    
+    // Aggiorna source cluster se esiste
+    const clusterSource = map.getSource('incidenti-cluster');
+    if (clusterSource) {
+        clusterSource.setData(geojson);
+        console.log('Cluster aggiornati con i nuovi filtri');
+    }
+    
+    // Ricalcola top luoghi se il clustering è attivo
+    if (showClustering) {
+        calculateTopLuoghi();
     }
 }
 
@@ -1361,14 +1839,12 @@ function resetFilters() {
     updateLegendChart();
     updatePeriodSwitches();
     updateMonthlyInjuriesChart();
-	
-	// Reset mappa allo zoom 12.7
-  //  map.flyTo({
- //       center: [13.35361, 38.12585],
- //       zoom: 12.7,
-//        duration: 1000,
- //       padding: { top: 80, bottom: 80, left: 50, right: 50 }
-  //  });
+    
+    // Ricalcola top luoghi se il clustering è attivo
+    if (showClustering) {
+        calculateTopLuoghi();
+        console.log('Top luoghi ricalcolati dopo reset');
+    }
     
     const analyticsPanel = document.getElementById('analytics-panel');
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
@@ -3059,6 +3535,19 @@ function setupEventListeners() {
             e.preventDefault();
         }
     }, { passive: false });
+	
+	// Clustering e Top Luoghi
+const btnClustering = document.getElementById('btn-clustering-map');
+if (btnClustering) addTouchClickListener(btnClustering, toggleClustering);
+
+const btnTopLuoghi = document.getElementById('btn-top-luoghi-map');
+if (btnTopLuoghi) addTouchClickListener(btnTopLuoghi, openTopLuoghiModal);
+
+const btnTopLuoghiClose = document.getElementById('top-luoghi-close');
+if (btnTopLuoghiClose) addTouchClickListener(btnTopLuoghiClose, closeTopLuoghiModal);
+
+const btnDownloadLuoghi = document.getElementById('btn-download-luoghi-csv');
+if (btnDownloadLuoghi) addTouchClickListener(btnDownloadLuoghi, downloadTopLuoghiCSV);
 }
 
 // Initialize App

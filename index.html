@@ -198,9 +198,16 @@
                 <option value="osm">OpenStreetMap</option>
                 <option value="satellite">Satellite</option>
                 <option value="carto-light" selected>Carto Light</option>
-            </select>		            <button class="btn-map-control btn-heatmap-map" id="btn-heatmap-map" title="Attiva/Disattiva Mappa di Calore">
+            </select>	
+			<button class="btn-map-control btn-clustering-map" id="btn-clustering-map" title="Visualizza raggruppamento incidenti per zona"> 🔵 Cluster
+</button>
+<button class="btn-map-control btn-top-luoghi-map" id="btn-top-luoghi-map" style="display: none;" title="Visualizza Top 50 Luoghi">
+    🏆 Top Luoghi
+</button>			
+			<button class="btn-map-control btn-heatmap-map" id="btn-heatmap-map" title="Attiva/Disattiva Mappa di Calore">
                 🔥 Calore
             </button>
+
             <button class="btn-map-control btn-data-table-map" id="btn-data-table-map" title="Visualizza Tabella Dati">
                 📊 Tabella
             </button>
@@ -500,7 +507,40 @@
             </div>
         </div>
     </div>
-
+<!-- Top Luoghi Modal -->
+<div class="modal" id="top-luoghi-modal">
+    <div class="modal-content" style="max-width: 1000px;">
+        <div class="modal-header">
+            <h3>🏆 Top 50 Luoghi con Più Incidenti</h3>
+            <button class="modal-close" id="top-luoghi-close">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="table-actions">
+                <button class="btn-download" id="btn-download-luoghi-csv">Scarica CSV</button>
+                <div style="color: #94a3b8; font-size: 12px;">
+                    <strong id="top-luoghi-count">0</strong> luoghi analizzati
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="data-table" id="top-luoghi-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">#</th>
+                            <th>Luogo</th>
+                            <th style="width: 100px;">Totale</th>
+                            <th style="width: 80px;">Mortali</th>
+                            <th style="width: 80px;">Riserva</th>
+                            <th style="width: 80px;">Feriti</th>
+                            <th style="width: 80px;">Cose</th>
+                            <th style="width: 120px;">Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody id="top-luoghi-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="js/incidenti_smart.js"></script>
 </body>
 </html>

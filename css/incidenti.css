@@ -720,7 +720,7 @@ select option {
     box-shadow: 0 8px 32px rgba(0,0,0,0.4);
     position: absolute;
     bottom: 20px;
-    right: 20px;
+    right: 260px;
     z-index: 1000;
     border: 1px solid rgba(148, 163, 184, 0.2);
     max-width: 200px;
@@ -2102,4 +2102,85 @@ input:checked + .slider:before {
 /* Monthly Injuries Radar Chart */
 #monthly-injuries-radar {
     background: transparent !important;
+}
+
+/* Clustering Button */
+.btn-clustering-map {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+.btn-clustering-map:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.btn-clustering-map.active {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.btn-top-luoghi-map {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+.btn-top-luoghi-map:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+}
+
+/* Zoom to location button in table */
+.btn-zoom-location {
+    padding: 6px 12px;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-zoom-location:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+}
+
+/* Top Luoghi Table Enhancements */
+#top-luoghi-table .rank-badge {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    text-align: center;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+#top-luoghi-table .rank-1 {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    color: #78350f;
+    box-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
+}
+
+#top-luoghi-table .rank-2 {
+    background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
+    color: #1e293b;
+    box-shadow: 0 2px 8px rgba(148, 163, 184, 0.4);
+}
+
+#top-luoghi-table .rank-3 {
+    background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+    color: #7c2d12;
+    box-shadow: 0 2px 8px rgba(251, 146, 60, 0.4);
+}
+
+#top-luoghi-table .tipo-count {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
 }
