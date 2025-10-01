@@ -698,9 +698,9 @@ function calculateTopLuoghi() {
     // Converti in array e ordina
     topLuoghiData = Object.values(luoghiMap)
         .sort((a, b) => b.total - a.total)
-        .slice(0, 50);
+        .slice(0, 25);
     
-    console.log('Top 50 luoghi calcolati:', topLuoghiData.length);
+    console.log('Top 25 luoghi calcolati:', topLuoghiData.length);
 }
 
 // Update Top Luoghi Modal if open
@@ -713,6 +713,7 @@ function updateTopLuoghiModalIfOpen() {
 }
 
 // Open Top Luoghi Modal
+// Open Top Luoghi Modal
 function openTopLuoghiModal() {
     const modal = document.getElementById('top-luoghi-modal');
     const tbody = document.getElementById('top-luoghi-body');
@@ -724,7 +725,7 @@ function openTopLuoghiModal() {
         countEl.textContent = topLuoghiData.length;
     }
     
-    // Mostra filtri attivi
+    // Prepara i filtri attivi
     const activeFilters = Object.entries(currentFilters)
         .filter(([key, value]) => value && value !== '')
         .map(([key, value]) => {
@@ -732,15 +733,25 @@ function openTopLuoghiModal() {
             return `${label}: ${value}`;
         });
     
-    let filterInfo = '';
+    // Rimuovi eventuali filtri precedenti dalla modal
+    const existingFilters = modal.querySelector('.filters-info-top');
+    if (existingFilters) existingFilters.remove();
+    
+    // Inserisci i filtri UNA SOLA VOLTA sopra la tabella (se ci sono)
     if (activeFilters.length > 0) {
-        filterInfo = `<div style="margin-bottom: 16px; padding: 12px; background: rgba(59, 130, 246, 0.1); border-left: 3px solid #3b82f6; border-radius: 6px;">
-            <strong style="color: #60a5fa;">Filtri applicati:</strong><br>
-            <span style="color: #cbd5e1; font-size: 13px;">${activeFilters.join(' • ')}</span>
-        </div>`;
+        const modalBody = modal.querySelector('.modal-body');
+        if (modalBody) {
+            modalBody.insertAdjacentHTML('afterbegin', `
+                <div class="filters-info-top" style="margin-bottom: 16px; padding: 12px; background: rgba(59, 130, 246, 0.1); border-left: 3px solid #3b82f6; border-radius: 6px;">
+                    <strong style="color: #60a5fa;">Filtri applicati:</strong><br>
+                    <span style="color: #cbd5e1; font-size: 13px;">${activeFilters.join(' • ')}</span>
+                </div>
+            `);
+        }
     }
     
-    let html = filterInfo;
+    // Costruisci le righe della tabella
+    let html = '';
     topLuoghiData.forEach((item, index) => {
         const rank = index + 1;
         let rankClass = '';
@@ -786,14 +797,11 @@ function openTopLuoghiModal() {
         `;
     });
     
-    if (filterInfo) {
-        const modalBody = modal.querySelector('.modal-body');
-        modalBody.insertAdjacentHTML('afterbegin', filterInfo);
-    }
-    
     tbody.innerHTML = html;
     modal.classList.add('show');
 }
+
+
 
 // Close Top Luoghi Modal
 function closeTopLuoghiModal() {
