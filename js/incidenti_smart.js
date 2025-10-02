@@ -656,11 +656,11 @@ function calculateTopLuoghi() {
     const luoghiMap = {};
     
     filteredData.forEach(row => {
-        const luogo = row.Luogo || 'Non specificato';
+        const indirizzo = row.Indirizzo || 'Non specificato';
         
-        if (!luoghiMap[luogo]) {
-            luoghiMap[luogo] = {
-                luogo: luogo,
+        if (!luoghiMap[indirizzo]) {
+            luoghiMap[indirizzo] = {
+                indirizzo: indirizzo,
                 total: 0,
                 M: 0,
                 R: 0,
@@ -670,14 +670,14 @@ function calculateTopLuoghi() {
             };
         }
         
-        luoghiMap[luogo].total++;
+        luoghiMap[indirizzo].total++;
         const tipo = row.Tipologia;
-        if (tipo && luoghiMap[luogo].hasOwnProperty(tipo)) {
-            luoghiMap[luogo][tipo]++;
+        if (tipo && luoghiMap[indirizzo].hasOwnProperty(tipo)) {
+            luoghiMap[indirizzo][tipo]++;
         }
         
-        if (luoghiMap[luogo].coordinates.length === 0 && row.longitude && row.latitude) {
-            luoghiMap[luogo].coordinates = [
+        if (luoghiMap[indirizzo].coordinates.length === 0 && row.longitude && row.latitude) {
+            luoghiMap[indirizzo].coordinates = [
                 parseFloat(row.longitude),
                 parseFloat(row.latitude)
             ];
@@ -746,7 +746,7 @@ function openTopLuoghiModal() {
                 <td style="text-align: center;">
                     <span class="rank-badge ${rankClass}">${rank}</span>
                 </td>
-                <td style="font-weight: 600; color: #f1f5f9;">${item.luogo}</td>
+                <td style="font-weight: 600; color: #f1f5f9;">${item.indirizzo}</td>
                 <td style="text-align: center; font-weight: 700; color: #3b82f6; font-size: 16px;">
                     ${item.total}
                 </td>
@@ -812,11 +812,11 @@ function downloadTopLuoghiCSV() {
         return;
     }
     
-    let csv = 'Posizione,Luogo,Totale Incidenti,Mortali,Riserva,Feriti,Cose\n';
+    let csv = 'Posizione,Indirizzo,Totale Incidenti,Mortali,Riserva,Feriti,Cose\n';
     
     topLuoghiData.forEach((item, index) => {
-        const luogo = item.luogo.replace(/"/g, '""');
-        csv += `${index + 1},"${luogo}",${item.total},${item.M},${item.R},${item.F},${item.C}\n`;
+        const indirizzo = item.indirizzo.replace(/"/g, '""');
+        csv += `${index + 1},"${indirizzo}",${item.total},${item.M},${item.R},${item.F},${item.C}\n`;
     });
     
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
