@@ -1311,7 +1311,7 @@ select option {
 
 .chart-container canvas {
     position: absolute !important;
-    top: 25px;
+    top: 45px;
     left: 0;
     width: 100% !important;
     height: 100% !important;
@@ -1861,7 +1861,7 @@ select option {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(148, 163, 184, 0.2);
     z-index: 10;
-    width: 250px;
+    width: 25vw;
     pointer-events: auto;
     height: 95vh;
     top: 10px;

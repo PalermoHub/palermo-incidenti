@@ -1602,8 +1602,14 @@ function updateMonthlyInjuriesChart() {
                         font: { size: 8 }
                     },
                     grid: {
-                        color: 'rgba(148, 163, 184, 0)'
-                    },
+                        color: 'rgba(148, 163, 184, 0.5)'			
+						},
+						
+						angleLines: {
+    color: 'rgba(148, 163, 184, 0.3)',
+    lineWidth: 1
+},
+						
                     pointLabels: {
                         color: '#fff',
                         font: { 
@@ -1712,7 +1718,7 @@ function updateMonthlyAreaChart() {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    display: true,
+                    display: false,
                     position: 'bottom',
                     labels: {
                         color: '#fff',
@@ -1723,41 +1729,49 @@ function updateMonthlyAreaChart() {
                     }
                 },
                 tooltip: {
-                    enabled: true,
-                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                    padding: 10,
-                    titleFont: { size: 11, weight: 'bold' },
-                    bodyFont: { size: 10 },
-                    callbacks: {
-                        label: function(context) {
-                            const datasetLabel = context.dataset.label;
-                            const value = context.parsed.y;
-                            const mese = MESI_ITALIANI[context.dataIndex];
-                            const totale = monthsDataAll[mese];
-                            
-                            if (datasetLabel === 'Feriti') {
-                                return `Feriti: ${value}`;
-                            } else {
-                                return `Sinistri senza feriti: ${value}`;
-                            }
-                        },
-                        afterLabel: function(context) {
-                            const mese = MESI_ITALIANI[context.dataIndex];
-                            const totale = monthsDataAll[mese];
-                            return `Totale mese: ${totale}`;
-                        },
-                        footer: function(context) {
-                            const mese = MESI_ITALIANI[context[0].dataIndex];
-                            if (selectedMese === mese) {
-                                return '\nClicca per deselezionare';
-                            } else {
-                                return '\nClicca per filtrare';
-                            }
-                        }
-                    }
-                },
+    enabled: true,
+    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+    padding: 10,
+    titleFont: { size: 11, weight: 'bold' },
+    bodyFont: { size: 10 },
+    yAlign: function(context) {
+        // Tooltip in alto per dataset Sinistri (indice 1)
+        // Tooltip in basso per dataset Feriti (indice 0)
+        if (context.tooltip.dataPoints[0].datasetIndex === 1) {
+            return 'bottom';  // Tooltip sopra per Sinistri
+        }
+        return 'top';  // Tooltip sotto per Feriti
+    },
+    callbacks: {
+        label: function(context) {
+            const datasetLabel = context.dataset.label;
+            const value = context.parsed.y;
+            const mese = MESI_ITALIANI[context.dataIndex];
+            const totale = monthsDataAll[mese];
+            
+            if (datasetLabel === 'Feriti') {
+                return `Feriti: ${value}`;
+            } else {
+                return `Sinistri senza feriti: ${value}`;
+            }
+        },
+        afterLabel: function(context) {
+            const mese = MESI_ITALIANI[context.dataIndex];
+            const totale = monthsDataAll[mese];
+            return `Totale mese: ${totale}`;
+        },
+        footer: function(context) {
+            const mese = MESI_ITALIANI[context[0].dataIndex];
+            if (selectedMese === mese) {
+                return '\nClicca per deselezionare';
+            } else {
+                return '\nClicca per filtrare';
+            }
+        }
+    }
+},
                 datalabels: {
-                    display: true,
+                    display: false,
                     align: 'top',
                     anchor: 'end',
                     color: '#1e293b',
@@ -2028,7 +2042,16 @@ function resetFilters() {
         select.disabled = false;
     });
     
+    // Imposta anno 2023 come default
     currentFilters['filter-anno'] = '2023';
+    
+    // AGGIUNGI QUESTE RIGHE:
+    const filterAnno = document.getElementById('filter-anno');
+    if (filterAnno) filterAnno.value = '2023';
+    
+    // Aggiorna anche il calendario custom
+    customCalendarState.selectedYear = 2023;
+    customCalendarState.currentYear = 2023;
     
     resetCustomCalendar();
     
@@ -2038,7 +2061,8 @@ function resetFilters() {
     updateYearStats();
     updateLegendChart();
     updatePeriodSwitches();
-    updateMonthlyInjuriesChart(); updateMonthlyAreaChart();
+    updateMonthlyInjuriesChart();
+    updateMonthlyAreaChart();  // ← aggiungi anche questa se manca
     
     if (showClustering) {
         calculateTopLuoghi();
@@ -3837,12 +3861,14 @@ function selectCalendarDay(day, monthIndex) {
 
 // Reset Calendario
 function resetCustomCalendar() {
-    customCalendarState.selectedYear = null;
+    customCalendarState.selectedYear = 2023;     // ← Cambia da null a 2023
+    customCalendarState.currentYear = 2023;      // ← Mantieni 2023
     customCalendarState.selectedMonth = null;
     customCalendarState.selectedWeekday = null;
     customCalendarState.selectedDay = null;
     
-    delete currentFilters['filter-anno'];
+    // NON cancellare il filtro anno
+    // delete currentFilters['filter-anno'];  ← RIMUOVI questa riga se presente
     delete currentFilters['filter-mese'];
     delete currentFilters['filter-giorno-settimana'];
     delete currentFilters['filter-data-selezionata'];
