@@ -1848,7 +1848,7 @@ select option {
     position: absolute;
     bottom: 40px;
     right: 20px;
-        background: #0f172abd !important;
+    background: #0f172abd !important;
     backdrop-filter: blur(2px);
     border-radius: 8px;
     padding: 8px;
@@ -1857,6 +1857,8 @@ select option {
     z-index: 10;
     width: 250px;
     pointer-events: auto;
+    height: 95vh;
+    top: 10px;
 }
 
 #points-legend h4 {
@@ -2478,7 +2480,7 @@ input:checked + .slider:before {
 #points-legend {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 2px;
 }
 
 /* Specifiche per i singoli grafici */

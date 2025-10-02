@@ -270,7 +270,7 @@
         <canvas id="legend-chart"></canvas>
     </div>
 <!-- Switch Giorno/Notte -->
-<div style="margin-top: -20px; padding: 5px; /*background: rgba(30, 41, 59, 0.6);*/ border-radius: 8px;">
+<div style="margin-top: -50px; padding: 5px; /*background: rgba(30, 41, 59, 0.6);*/ border-radius: 8px;">
   <!--   <h4 style="margin: 0 0 12px 0; font-size: 13px; color: #fff; font-weight: 600; text-align: center;">
         🌞🌙 Periodo del Giorno
     </h4> -->
@@ -288,13 +288,21 @@
     </div>
 </div>
 
-<!-- Grafico Radar Incidenti con Feriti/Morti per Mese -->
+<!-- Grafico Area Incidenti e Feriti per Mese -->
+<div class="chart-container" style="height: 180px; margin-top: 20px;">
+    <h4 style="margin-bottom: 8px; font-size: 13px; color: #fff; font-weight: 600; text-align: left;">
+        📊 Incidenti e Feriti per Mese
+    </h4>
+    <canvas id="monthly-area-chart"></canvas>
+</div>
+
+<!-- Grafico Radar Feriti/Morti per Mese -->
 <div class="chart-container" style="height: 220px; margin-top: 20px; bottom: 20px;">
     <h4 style="margin-bottom: 8px; font-size: 13px; color: #fff; font-weight: 600; text-align: left;">
-     Feriti/Morti per Mese
+     🚑 Feriti/Morti per Mese
     </h4>
     <canvas id="monthly-injuries-chart"></canvas>
-</div> <br>
+</div> <br>	
 <button class="btn-map-control btn-reset-map" id="btn-reset-map" title="Reset Filtri">
  🔄 Reset
  </button>	
