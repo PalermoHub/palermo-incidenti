@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
        <link rel="stylesheet" href="css/incidenti.css">
+	   <link rel="stylesheet" href="css/footer-modal.css">
     
     <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
@@ -596,6 +597,208 @@
         </div>
     </div>
 </div>
+<!-- Footer Button with Pulse -->
+<button class="footer-info-btn" id="footer-info-btn">
+    <span class="pulse-ring"></span>
+    <i class="fas fa-info-circle"></i>
+    Informazioni
+</button>
+
+<!-- Footer Modal Panel -->
+<div class="footer-modal" id="footer-modal">
+    <div class="footer-modal-header">
+        <h3>📊 Informazioni Dataset</h3>
+        <button class="footer-modal-close" id="footer-modal-close">×</button>
+    </div>
+    
+    <div class="footer-modal-tabs">
+        <button class="footer-tab active" data-tab="dataset">Dataset</button>
+        <button class="footer-tab" data-tab="fonte">Fonte Dati</button>
+        <button class="footer-tab" data-tab="licenza">Licenza</button>
+	 <button class="footer-tab" data-tab="tecnologie">Tecnologie</button>
+        <button class="footer-tab" data-tab="crediti">Crediti</button>
+		
+    </div>
+    
+    <div class="footer-modal-content">
+	    <button class="back-to-top-btn" id="back-to-top-btn" title="Torna su">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+        <!-- Tab Dataset -->
+        <div class="footer-tab-content active" id="tab-dataset">
+            <div class="info-card">
+                <h4>📈 Statistiche Dataset</h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Periodo coperto</span>
+                        <span class="info-value">2015 - 2023</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Totale incidenti</span>
+                        <span class="info-value">28.239</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Incidenti mappati</span>
+                        <span class="info-value">23.487 (83,2%)</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Ultimo aggiornamento</span>
+                        <span class="info-value">Dicembre 2023</span>
+                    </div>
+                </div>
+                <div class="info-note">
+                    <strong>⚠️ Note importanti:</strong>
+                    <ul>
+                        <li>1.560 incidenti con coordinate esterne ai confini comunali (esclusi)</li>
+                        <li>3.192 incidenti del 2019 senza coordinate geografiche (conteggiati ma non visualizzati)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab Fonte Dati -->
+        <div class="footer-tab-content" id="tab-fonte">
+            <div class="info-card">
+                <h4>🗂️ Fonte dei Dati</h4>
+                <p><strong>Ente:</strong> Comune di Palermo - Polizia Municipale</p>
+                <p><strong>Portale:</strong> <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" target="_blank" rel="noopener">dati.gov.it</a></p>
+                <p><strong>Dataset:</strong> Incidenti stradali rilevati dalla Polizia Municipale di Palermo</p>
+                <div class="info-note">
+                    <strong>📋 Contenuto del dataset:</strong>
+                    <p>Il dataset contiene informazioni dettagliate su ogni incidente stradale rilevato, inclusi: tipologia, data, ora, condizioni atmosferiche, visibilità, localizzazione geografica e amministrativa.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab Licenza -->
+        <div class="footer-tab-content" id="tab-licenza">
+            <div class="info-card">
+                <h4>⚖️ Licenza d'Uso</h4>
+                <p><strong>Licenza:</strong> Creative Commons - Attribuzione 4.0 Internazionale (CC BY 4.0)</p>
+                <div class="license-box">
+                    <p><strong>Sei libero di:</strong></p>
+                    <ul>
+                        <li>✓ Condividere — riprodurre, distribuire, comunicare al pubblico</li>
+                        <li>✓ Modificare — rielaborare e trasformare i dati</li>
+                        <li>✓ Utilizzare per fini commerciali</li>
+                    </ul>
+                    <p><strong>Alle seguenti condizioni:</strong></p>
+                    <ul>
+                        <li>📝 Attribuzione — devi riconoscere la paternità dei dati e fornire un link alla licenza</li>
+                    </ul>
+                </div>
+                <p style="margin-top: 16px;"><a href="https://creativecommons.org/licenses/by/4.0/deed.it" target="_blank" rel="noopener">Leggi il testo completo della licenza →</a></p>
+            </div>
+        </div>
+		
+        <!-- Tab tecnologie -->
+        <div class="footer-tab-content" id="tab-tecnologie">
+            <div class="info-card">
+                <h4>🗺️ Tecnologie utilizzate</h4>
+<p><strong>In sintesi:</strong></p>
+                    <ul>
+					<li>QGIS - software libero e open source per i Sistemi Informativi Geografici (GIS), che permette di visualizzare, organizzare, analizzare e rappresentare dati spaziali</li>
+                        <li>MapLibre GL JS - Visualizzazione mappa interattiva</li>
+                        <li>Chart.js - Grafici e visualizzazioni dati</li>
+                        <li>PapaParse - Elaborazione file CSV</li>
+                    </ul><br>
+					<hr><br>
+				<p><strong>Versione estesa:</strong></p>
+				<p>Questa web app utilizza uno stack tecnologico <strong>completamente client-side</strong> (nessun backend), basato su tecnologie web moderne:</p>
+
+<h4>Frontend Core</h4>
+<ul>
+  <li><strong>HTML5</strong> - Struttura semantica della pagina</li>
+  <li><strong>CSS3</strong> - Styling avanzato con gradients, flexbox, grid, animazioni</li>
+  <li><strong>JavaScript ES6+</strong> - Logica applicativa (vanilla JS, no framework)</li>
+</ul>
+
+<h4>Librerie JavaScript</h4>
+<ul>
+  <li><strong>MapLibre GL JS</strong> (v4.7.1) - Rendering mappe vettoriali WebGL
+    <ul>
+      <li>Alternative open-source a Mapbox</li>
+      <li>Supporto tile raster e stili personalizzati</li>
+    </ul>
+  </li>
+  <li><strong>PapaParse</strong> (v5.4.1) - Parsing CSV lato client
+    <ul>
+      <li>Gestione file grandi con streaming</li>
+    </ul>
+  </li>
+  <li><strong>Chart.js</strong> (v4.4.0) - Visualizzazioni dati interattive
+    <ul>
+      <li>Plugin: ChartDataLabels per etichette sui grafici</li>
+    </ul>
+  </li>
+</ul>
+
+<h4>Fonti Dati</h4>
+<ul>
+  <li><strong>Tile Maps</strong>: CartoDB, OpenStreetMap, Google Satellite</li>
+  <li><strong>CSV statico</strong>: <code>incidenti_2015_2023.csv</code> (23.487 record geocodificati)</li>
+  <li>Nessun database - tutto caricato in memoria browser</li>
+</ul>
+
+<h4>Pattern Architetturali</h4>
+<ul>
+  <li><strong>Single Page Application (SPA)</strong> - Nessun reload pagina</li>
+  <li><strong>Component-based</strong> - Pannelli modulari (sidebar, analytics, dettagli)</li>
+  <li><strong>Event-driven</strong> - Listener per filtri, click mappa, interazioni UI</li>
+  <li><strong>State management</strong> - Oggetti globali (<code>currentFilters</code>, <code>customCalendarState</code>)</li>
+</ul>
+
+<h4>Caratteristiche Tecniche</h4>
+<ul>
+  <li><strong>Responsive Design</strong> - Media queries per mobile/tablet/desktop</li>
+  <li><strong>Touch-optimized</strong> - Gesture handler per dispositivi touch</li>
+  <li><strong>Client-side filtering</strong> - Nessuna query server, filtraggio array in-memory</li>
+  <li><strong>Real-time updates</strong> - Sincronizzazione immediata tra filtri/mappa/grafici</li>
+</ul>
+
+<h4>Performance</h4>
+<ul>
+  <li><strong>Lazy rendering</strong> - Solo dati visibili renderizzati</li>
+  <li><strong>Clustering geografico</strong> - SuperCluster per aggregazione punti</li>
+  <li><strong>Debouncing</strong> - Eventi touch ottimizzati</li>
+  <li><strong>Canvas rendering</strong> - Chart.js usa canvas per performance</li>
+</ul>
+
+<h4>Deployment</h4>
+<ul>
+  <li><strong>Static hosting</strong> - Può girare su GitHub Pages, Netlify, CDN</li>
+  <li><strong>No build step</strong> - File serviti direttamente (no webpack/vite necessari)</li>
+</ul>
+
+<p>È essenzialmente una <strong>Progressive Web App</strong> che sfrutta le capacità moderne dei browser per elaborare e visualizzare grandi dataset senza server.</p>
+            </div>
+        </div>
+
+        <!-- Tab Crediti -->
+        <div class="footer-tab-content" id="tab-crediti">
+            <div class="info-card">
+                <h4>👥 Crediti e Realizzazione</h4>
+                <div class="credits-section">
+                    <p><strong>🛠️ Sviluppo e Design:</strong></p>
+                    <p>Applicazione web a tecnologia ibrida, sviluppata attraverso una collaborazione human-<a href="https://claude.ai" target="_blank">Claude AI (Anthropic)</a>, che ha supportato lo sviluppo dell'architettura modulare, l'ottimizzazione del codice e l'implementazione di funzionalità avanzate di visualizzazione.<strong>Rielaborazione dati & Autore:</strong> <a href="https://www.linkedin.com/in/gbvitrano/" target="_blank" rel="noopener">Giovan Battista Vitrano</a></p>
+                    
+                    <p><strong>🏛️ Comunità:</strong></p>
+                    <p><a href="http://opendatasicilia.it/" target="_blank" rel="noopener">OpenDataSicilia</a> - Comunità civica che promuove la cultura dei dati aperti in Sicilia</p>
+                    
+                    <p><strong><p> 🧡 Ringraziamenti:</strong></p>
+					<p>Un grazie speciale a <a href="https://www.linkedin.com/in/andreaborruso/" title="Andrea Borruso" target="_blank">Andrea Borruso</a> e <a href="https://www.linkedin.com/in/salvatore-fiandaca-23a1a250/" title="Totò Fiandaca" target="_blank">Totò Fiandaca</a> per il prezioso supporto tecnico, per la loro disponibilità e per aver condiviso con generosità competenze ed esperienza.</p>
+                                      
+                    <p><strong>📧 Contatti:</strong></p>
+                    <p>Per segnalazioni, suggerimenti o collaborazioni: <a href="https://groups.google.com/g/opendatasicilia?pli=1" target="_blank" rel="noopener">contattaci</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="footer-modal-overlay" id="footer-modal-overlay"></div>
+
 <script src="js/incidenti_smart.js"></script>
+<script src="js/footer-modal.js"></script>
 </body>
 </html>
