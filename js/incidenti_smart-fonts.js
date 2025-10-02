@@ -470,7 +470,7 @@ function createClusteringLayers() {
         ],
         layout: {
             'text-field': ['to-string', ['get', 'point_count']],
-            'text-font': ['Titillium Web','Open Sans Bold', 'Arial Unicode MS Bold'],
+            'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
             'text-size': [
                 'step',
                 ['get', 'point_count'],
@@ -2207,12 +2207,12 @@ async function downloadChartAsPNG(chartId, filename) {
         
         // Testi in nero per sfondo bianco
         ctx.fillStyle = '#1e293b';
-        ctx.font = 'bold 11px Titillium Web';
+        ctx.font = 'bold 11px Arial';
         ctx.textAlign = 'left';
         
         ctx.fillText('Fonte Dati: dati.gov.it - Comune di Palermo - Rielaborazione: opendatasicilia.it', 10, tempCanvas.height - 35);
         
-        ctx.font = '10px Titillium Web';
+        ctx.font = '10px Arial';
         ctx.fillStyle = '#3b82f6';
         ctx.fillText('https://opendatasicilia.github.io/incidenti_palermo/', 10, tempCanvas.height - 20);
         
@@ -2228,10 +2228,10 @@ async function downloadChartAsPNG(chartId, filename) {
     
     logo.onerror = function() {
         ctx.fillStyle = '#1e293b';
-        ctx.font = 'bold 11px Titillium Web';
+        ctx.font = 'bold 11px Arial';
         ctx.textAlign = 'left';
         ctx.fillText('Fonte Dati: dati.gov.it - Comune di Palermo - Rielaborazione: opendatasicilia.it', 10, tempCanvas.height - 35);
-        ctx.font = '10px Titillium Web';
+        ctx.font = '10px Arial';
         ctx.fillStyle = '#3b82f6';
         ctx.fillText('https://opendatasicilia.github.io/incidenti_palermo/', 10, tempCanvas.height - 20);
         
@@ -3391,6 +3391,7 @@ function downloadJSON() {
 // CALENDARIO PERSONALIZZATO
 // =======================
 
+// Inizializza Calendario Custom
 // Inizializza Calendario Custom
 function initCustomCalendar() {
     const year = currentFilters['filter-anno'] || '2023';
