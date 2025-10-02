@@ -1521,7 +1521,7 @@ select option {
     }
     
     .chart-container {
-        min-height: 280px;
+        min-height:350px;
     }
     
     .insights-container {
@@ -1649,7 +1649,7 @@ select option {
     }
     
     .chart-container {
-        min-height: 250px;
+        min-height:300px;
         padding: 14px;
     }
     
@@ -1743,7 +1743,7 @@ select option {
     }
     
     .chart-container {
-        min-height: 220px;
+        min-height: 280px;
         padding: 12px;
     }
     
@@ -1795,13 +1795,13 @@ select option {
 }
 
 .chart-container {
-   /* */background: rgba(30, 41, 59, 0);
-    backdrop-filter: blur(10px);
+    background: rgba(30, 41, 59, 0) !important;
+    backdrop-filter: none !important;
     border-radius: 0px;
     padding: 0px;
     border: 0px solid rgba(148, 163, 184, 0.2);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    min-height: 150px;
+    box-shadow: none !important;
+    min-height: 400px;  /* ERA 150px - AUMENTATO */
     display: flex;
     flex-direction: column;
     position: relative;

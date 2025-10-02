@@ -2146,6 +2146,39 @@ async function downloadChartAsPNG(chartId, filename) {
     const canvas = document.getElementById(chartId);
     if (!canvas) return;
     
+    // Ottieni il chart instance
+    const chartInstance = Chart.getChart(canvas);
+    if (!chartInstance) return;
+    
+    // Salva le opzioni originali
+    const originalOptions = JSON.parse(JSON.stringify(chartInstance.options));
+    
+    // Modifica i colori per sfondo bianco
+    if (chartInstance.options.scales) {
+        Object.keys(chartInstance.options.scales).forEach(scaleKey => {
+            const scale = chartInstance.options.scales[scaleKey];
+            if (scale.ticks) {
+                scale.ticks.color = '#1e293b';  // Testo scuro
+            }
+            if (scale.grid) {
+                scale.grid.color = 'rgba(148, 163, 184, 0.3)';  // Griglia visibile
+            }
+            if (scale.pointLabels) {
+                scale.pointLabels.color = '#1e293b';  // Per radar charts
+            }
+        });
+    }
+    
+    if (chartInstance.options.plugins?.legend?.labels) {
+        chartInstance.options.plugins.legend.labels.color = '#1e293b';
+    }
+    
+    // Aggiorna il grafico con i nuovi colori
+    chartInstance.update();
+    
+    // Aspetta che il grafico si aggiorni
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     const tempCanvas = document.createElement('canvas');
     const ctx = tempCanvas.getContext('2d');
     
@@ -2153,9 +2186,11 @@ async function downloadChartAsPNG(chartId, filename) {
     tempCanvas.width = canvas.width;
     tempCanvas.height = canvas.height + padding;
     
+    // Sfondo bianco
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
     
+    // Disegna il grafico aggiornato
     ctx.drawImage(canvas, 0, 0);
     
     const logo = new Image();
@@ -2170,11 +2205,12 @@ async function downloadChartAsPNG(chartId, filename) {
         
         ctx.drawImage(logo, xPos, yPos, logoWidth, logoHeight);
         
+        // Testi in nero per sfondo bianco
         ctx.fillStyle = '#1e293b';
         ctx.font = 'bold 11px Arial';
         ctx.textAlign = 'left';
         
-        ctx.fillText('Fonte: OpenDataSicilia - Incidenti Palermo 2015-2023', 10, tempCanvas.height - 35);
+        ctx.fillText('Fonte Dati: dati.gov.it - Comune di Palermo - Rielaborazione: opendatasicilia.it', 10, tempCanvas.height - 35);
         
         ctx.font = '10px Arial';
         ctx.fillStyle = '#3b82f6';
@@ -2184,13 +2220,17 @@ async function downloadChartAsPNG(chartId, filename) {
         link.download = filename + '.png';
         link.href = tempCanvas.toDataURL('image/png');
         link.click();
+        
+        // Ripristina i colori originali
+        chartInstance.options = originalOptions;
+        chartInstance.update();
     };
     
     logo.onerror = function() {
         ctx.fillStyle = '#1e293b';
         ctx.font = 'bold 11px Arial';
         ctx.textAlign = 'left';
-        ctx.fillText('Fonte: OpenDataSicilia - Incidenti Palermo 2015-2023', 10, tempCanvas.height - 35);
+        ctx.fillText('Fonte Dati: dati.gov.it - Comune di Palermo - Rielaborazione: opendatasicilia.it', 10, tempCanvas.height - 35);
         ctx.font = '10px Arial';
         ctx.fillStyle = '#3b82f6';
         ctx.fillText('https://opendatasicilia.github.io/incidenti_palermo/', 10, tempCanvas.height - 20);
@@ -2199,6 +2239,10 @@ async function downloadChartAsPNG(chartId, filename) {
         link.download = filename + '.png';
         link.href = tempCanvas.toDataURL('image/png');
         link.click();
+        
+        // Ripristina i colori originali
+        chartInstance.options = originalOptions;
+        chartInstance.update();
     };
 }
 
