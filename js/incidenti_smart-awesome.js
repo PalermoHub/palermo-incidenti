@@ -1031,15 +1031,15 @@ function closeDataTable() {
 // Map Initialization
 function initMap() {
     const palermoBounds = [
-        [13.20, 38.00],
-        [13.50, 38.25]
+        [13.05, 38.00],
+        [13.65, 38.25]
     ];
     
     map = new maplibregl.Map({
         container: 'map',
         style: basemapStyles['carto-light'],
-        center: [13.3614, 38.1157],
-        zoom: 11,
+        center: [13.3913, 38.1454],
+        zoom: 11.65,
         minZoom: 9,
         maxZoom: 18,
         maxBounds: palermoBounds,
@@ -1057,8 +1057,8 @@ function initMap() {
             
             this._container.onclick = () => {
                 map.flyTo({
-                    center: [13.3614, 38.1157],
-                    zoom: 10,
+                    center: [13.3913, 38.1454],
+					zoom: 11.65,
                     duration: 1500,
                     essential: true
                 });
@@ -2023,6 +2023,15 @@ function resetFilters() {
     customCalendarState.currentYear = 2023;
     
     resetCustomCalendar();
+	
+	    if (map) {
+        map.flyTo({
+            center: [13.3913, 38.1454],  // Centro Palermo
+            zoom: 11.65,                     // Zoom iniziale
+            duration: 1500,               // Animazione 1.5 secondi
+            essential: true
+        });
+    }        
     
     updateAllFilters();
     updateMapData();
