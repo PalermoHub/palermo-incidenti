@@ -7,6 +7,7 @@ let analyticsCharts = {};
 let monthlyInjuriesChart = null;
 let showClustering = false;
 let topLuoghiData = [];
+let monthlyAreaChart = null;
 
 // Calendario Custom - Variabili Globali
 let customCalendarState = {
@@ -274,7 +275,7 @@ function initMap() {
             updateYearStats();
             updateLegendChart();
             updatePeriodSwitches();
-            updateMonthlyInjuriesChart();
+            updateMonthlyInjuriesChart(); updateMonthlyAreaChart();
             console.log('Inizializzazione completata!');
         } catch (error) {
             console.error('Errore durante inizializzazione:', error);
@@ -920,7 +921,7 @@ function handleFilterChange(filterId, value) {
     updateYearStats();
     updateLegendChart();
     updatePeriodSwitches();
-    updateMonthlyInjuriesChart();
+    updateMonthlyInjuriesChart(); updateMonthlyAreaChart();
     
     if (showClustering) {
         calculateTopLuoghi();
@@ -1225,7 +1226,7 @@ function filterByYear(year) {
     updateYearStats();
     updateLegendChart();
     updatePeriodSwitches();
-    updateMonthlyInjuriesChart();
+    updateMonthlyInjuriesChart(); updateMonthlyAreaChart();
     
     if (showClustering) {
         calculateTopLuoghi();
@@ -1263,7 +1264,7 @@ function filterByTipologia(tipo) {
     updateYearStats();
     updateLegendChart();
     updatePeriodSwitches();
-    updateMonthlyInjuriesChart();
+    updateMonthlyInjuriesChart(); updateMonthlyAreaChart();
     
     const analyticsPanel = document.getElementById('analytics-panel');
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
@@ -1513,7 +1514,7 @@ function updateMonthlyInjuriesChart() {
                         selectedMese === m ? '#2563eb' : '#3b82f6'
                     ),
                     pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
+                    pointBorderWidth: 0.5,
                     pointRadius: MESI_ITALIANI.map(m => 
                         selectedMese === m ? 5 : 3
                     ),
@@ -1529,7 +1530,7 @@ function updateMonthlyInjuriesChart() {
                         selectedMese === m ? '#d97706' : '#f59e0b'
                     ),
                     pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
+                    pointBorderWidth: 0.5,
                     pointRadius: MESI_ITALIANI.map(m => 
                         selectedMese === m ? 5 : 3
                     ),
@@ -1545,7 +1546,7 @@ function updateMonthlyInjuriesChart() {
                         selectedMese === m ? '#dc2626' : '#ef4444'
                     ),
                     pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
+                    pointBorderWidth: 0.5,
                     pointRadius: MESI_ITALIANI.map(m => 
                         selectedMese === m ? 5 : 3
                     ),
@@ -1625,6 +1626,199 @@ function updateMonthlyInjuriesChart() {
     });
 }
 
+// Update Monthly Area Chart (Grafico Area Incidenti/Feriti per Mese)
+function updateMonthlyAreaChart() {
+    const filteredData = getFilteredData();
+    
+    const monthsDataAll = {};
+    const monthsDataFeriti = {};
+    
+    MESI_ITALIANI.forEach(mese => {
+        monthsDataAll[mese] = 0;
+        monthsDataFeriti[mese] = 0;
+    });
+    
+    filteredData.forEach(row => {
+        const mese = row.Mese;
+        const tipo = row.Tipologia;
+        
+        if (mese && monthsDataAll.hasOwnProperty(mese)) {
+            monthsDataAll[mese]++;
+            
+            if (tipo === 'F' || tipo === 'R' || tipo === 'M') {
+                monthsDataFeriti[mese]++;
+            }
+        }
+    });
+    
+    const countsAll = MESI_ITALIANI.map(m => monthsDataAll[m]);
+    const countsFeriti = MESI_ITALIANI.map(m => monthsDataFeriti[m]);
+    const countsSenzaFeriti = countsAll.map((total, idx) => total - countsFeriti[idx]);
+    
+    const selectedMese = currentFilters['filter-mese'];
+    
+    const canvas = document.getElementById('monthly-area-chart');
+    if (!canvas) return;
+    
+    if (monthlyAreaChart) {
+        monthlyAreaChart.destroy();
+    }
+    
+    monthlyAreaChart = new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: MESI_ITALIANI,
+            datasets: [
+                {
+                    label: 'Feriti',
+                    data: countsFeriti,
+                    backgroundColor:'rgba(245, 158, 11, 0.4)',
+                    borderColor: '#f59e0b',
+					pointBorderColor: '#fff', 
+                    borderWidth: 0.5,
+                    fill: true,
+                 //   tension: 0.4,
+                    pointBackgroundColor: MESI_ITALIANI.map(m => 
+                        selectedMese === m ? '#3b82f6' : '#f59e0b'
+                    ),
+                    pointBorderWidth: 0.5,
+                    pointRadius: MESI_ITALIANI.map(m => 
+                        selectedMese === m ? 5 : 3
+                    ),
+                    pointHoverRadius: 6
+                },
+                {
+                    label: 'Sinistri',
+                    data: countsSenzaFeriti,
+                    backgroundColor: 'rgba(59, 130, 246, 0.4)',
+                    borderColor: '#3b82f6',
+					pointBorderColor: '#fff', 
+                    borderWidth: 0.5,
+                    fill: true,
+                   //tension: 0.4,
+                    pointBackgroundColor: MESI_ITALIANI.map(m => 
+                   selectedMese === m ? '#f59e0b' : '#3b82f6',
+                    ),
+                    pointBorderWidth: 0.5,
+                    pointRadius: MESI_ITALIANI.map(m => 
+                        selectedMese === m ? 5 : 3
+                    ),
+                    pointHoverRadius: 6
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        color: '#fff',
+                        font: { size: 9 },
+                        padding: 6,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                },
+                tooltip: {
+                    enabled: true,
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                    padding: 10,
+                    titleFont: { size: 11, weight: 'bold' },
+                    bodyFont: { size: 10 },
+                    callbacks: {
+                        label: function(context) {
+                            const datasetLabel = context.dataset.label;
+                            const value = context.parsed.y;
+                            const mese = MESI_ITALIANI[context.dataIndex];
+                            const totale = monthsDataAll[mese];
+                            
+                            if (datasetLabel === 'Feriti') {
+                                return `Feriti: ${value}`;
+                            } else {
+                                return `Sinistri senza feriti: ${value}`;
+                            }
+                        },
+                        afterLabel: function(context) {
+                            const mese = MESI_ITALIANI[context.dataIndex];
+                            const totale = monthsDataAll[mese];
+                            return `Totale mese: ${totale}`;
+                        },
+                        footer: function(context) {
+                            const mese = MESI_ITALIANI[context[0].dataIndex];
+                            if (selectedMese === mese) {
+                                return '\nClicca per deselezionare';
+                            } else {
+                                return '\nClicca per filtrare';
+                            }
+                        }
+                    }
+                },
+                datalabels: {
+                    display: true,
+                    align: 'top',
+                    anchor: 'end',
+                    color: '#1e293b',
+                    font: {
+                        weight: 'bold',
+                        size: 9
+                    },
+                    backgroundColor: 'rgba(241, 245, 249, 0.95)',
+                    borderRadius: 3,
+                    padding: 2,
+                    formatter: function(value, context) {
+                        // Mostra solo il totale sulla linea superiore
+                        if (context.datasetIndex === 1) {
+                            const mese = MESI_ITALIANI[context.dataIndex];
+                            return monthsDataAll[mese];
+                        }
+                        return null;
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    stacked: true,
+                    ticks: {
+                        color: '#fff',
+                        font: { size: 9 }
+                    },
+                    grid: {
+                        color: 'rgba(148, 163, 184, 0.1)'
+                    }
+                },
+                y: {
+                    stacked: true,
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#fff',
+                        font: { size: 9 }
+                    },
+                    grid: {
+                        color: 'rgba(148, 163, 184, 0.1)'
+                    }
+                }
+            },
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            onHover: (event, activeElements) => {
+                event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
+            },
+            onClick: (e, items) => {
+                if (items.length > 0) {
+                    const mese = MESI_ITALIANI[items[0].index];
+                    filterByMonth(mese);
+                }
+            }
+        }
+    });
+}
+
+
 // Filter By Month
 function filterByMonth(mese) {
     const currentMese = currentFilters['filter-mese'];
@@ -1656,7 +1850,7 @@ function filterByMonth(mese) {
     updateYearStats();
     updateLegendChart();
     updatePeriodSwitches();
-    updateMonthlyInjuriesChart();
+    updateMonthlyInjuriesChart(); updateMonthlyAreaChart();
     
     const analyticsPanel = document.getElementById('analytics-panel');
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
@@ -1684,7 +1878,7 @@ function resetChartsFilters() {
     updateYearStats();
     updateLegendChart();
     updatePeriodSwitches();
-    updateMonthlyInjuriesChart();
+    updateMonthlyInjuriesChart(); updateMonthlyAreaChart();
     
     const analyticsPanel = document.getElementById('analytics-panel');
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
@@ -1713,7 +1907,7 @@ function filterByDayNight(periodo) {
     updateYearStats();
     updateLegendChart();
     updatePeriodSwitches();
-    updateMonthlyInjuriesChart();
+    updateMonthlyInjuriesChart(); updateMonthlyAreaChart();
     
     const analyticsPanel = document.getElementById('analytics-panel');
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
@@ -1844,7 +2038,7 @@ function resetFilters() {
     updateYearStats();
     updateLegendChart();
     updatePeriodSwitches();
-    updateMonthlyInjuriesChart();
+    updateMonthlyInjuriesChart(); updateMonthlyAreaChart();
     
     if (showClustering) {
         calculateTopLuoghi();
@@ -3679,7 +3873,7 @@ function updateCalendarFromState() {
     updateYearStats();
     updateLegendChart();
     updatePeriodSwitches();
-    updateMonthlyInjuriesChart();
+    updateMonthlyInjuriesChart(); updateMonthlyAreaChart();
     
     if (showClustering) {
         calculateTopLuoghi();
