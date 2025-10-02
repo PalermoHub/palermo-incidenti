@@ -96,20 +96,52 @@
             </div>
             <br>
             <div class="filter-section">
-			<!-- NUOVO: Sezione Calendario -->
+<!-- NUOVO: Sezione Calendario Personalizzato -->
 <div class="filter-section">
-    <div class="filter-section-header"  data-section="calendario">
+    <div class="filter-section-header" data-section="calendario">
         <span>📅 Calendario Interattivo</span>
         <span class="toggle-icon collapsed">▼</span>
     </div>
     <div class="filter-section-content collapsed" id="content-calendario">
-        <div class="calendar-info">
-            <small>Clicca su una data per filtrare gli incidenti</small>
+        <div class="custom-calendar" id="custom-calendar">
+            <!-- Controlli Anno -->
+            <div class="calendar-year-control">
+                <button class="calendar-nav-btn" id="cal-prev-year">«</button>
+                <div class="calendar-year-display" id="cal-year-display">2023</div>
+                <button class="calendar-nav-btn" id="cal-next-year">»</button>
+            </div>
+            
+            <!-- Griglia Mesi -->
+            <div class="calendar-months-grid" id="cal-months-grid">
+                <!-- Sarà popolato via JS -->
+            </div>
+            
+            <!-- Griglia Giorni Settimana -->
+            <div class="calendar-weekdays-grid" id="cal-weekdays-grid">
+                <!-- Sarà popolato via JS -->
+            </div>
+            
+            <!-- Griglia Giorni del Mese (quando un mese è selezionato) -->
+            <div class="calendar-days-container" id="cal-days-container" style="display: none;">
+                <div class="calendar-month-header" id="cal-month-header"></div>
+                <div class="calendar-weekday-labels">
+                    <div>L</div><div>M</div><div>M</div><div>G</div><div>V</div><div>S</div><div>D</div>
+                </div>
+                <div class="calendar-days-grid" id="cal-days-grid">
+                    <!-- Sarà popolato via JS -->
+                </div>
+            </div>
+            
+            <!-- Riepilogo Selezione -->
+            <div class="calendar-selection-summary" id="cal-selection-summary">
+                Nessun filtro temporale attivo
+            </div>
+            
+            <!-- Pulsanti Azione -->
+            <div class="calendar-actions">
+                <button class="btn-calendar-reset" id="btn-calendar-reset">🔄 Reset</button>
+            </div>
         </div>
-        <div id="calendar-container"></div>
-        <button class="btn-reset-calendar" style="margin-top: 10px;" id="btn-reset-calendar">
-            🔄 Reset Data
-        </button>
     </div>
 </div>
                 <div class="filter-section-header" data-section="localizzazione">
@@ -557,10 +589,6 @@
         </div>
     </div>
 </div>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/it.js"></script>
 <script src="js/incidenti_smart.js"></script>
 </body>
 </html>

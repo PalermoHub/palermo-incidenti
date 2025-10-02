@@ -7,8 +7,23 @@ let analyticsCharts = {};
 let monthlyInjuriesChart = null;
 let showClustering = false;
 let topLuoghiData = [];
-let calendarInstance = null;
-let incidentsByDate = {};
+
+// Calendario Custom - Variabili Globali
+let customCalendarState = {
+    currentYear: 2023,
+    selectedYear: null,
+    selectedMonth: null,
+    selectedWeekday: null,
+    selectedDay: null
+};
+
+const MESI_ITALIANI = [
+    'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
+    'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
+];
+
+const GIORNI_SETTIMANA = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
+const GIORNI_SETTIMANA_SHORT = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
 
 // Register Chart.js plugins globally
 Chart.register(ChartDataLabels);
@@ -115,7 +130,6 @@ const filterDependencies = {
 };
 
 // Initialization
-// Initialization (MODIFICA)
 async function init() {
     try {
         console.log('Inizio caricamento CSV...');
@@ -127,7 +141,7 @@ async function init() {
         document.getElementById('loading').innerHTML = '<div>Creazione mappa...</div><small>Attendere</small>';
         
         initMap();
-        initCalendar(); // AGGIUNGI QUESTA RIGA
+        initCustomCalendar();
         setupEventListeners();
 
     } catch (error) {
@@ -398,13 +412,11 @@ function createMapLayers() {
 function createClusteringLayers() {
     const geojson = createGeoJSON();
     
-    // Rimuovi i layer esistenti se ci sono
     if (map.getLayer('cluster-count')) map.removeLayer('cluster-count');
     if (map.getLayer('clusters')) map.removeLayer('clusters');
     if (map.getLayer('unclustered-point')) map.removeLayer('unclustered-point');
     if (map.getSource('incidenti-cluster')) map.removeSource('incidenti-cluster');
     
-    // Aggiungi source per clustering
     map.addSource('incidenti-cluster', {
         type: 'geojson',
         data: geojson,
@@ -413,7 +425,6 @@ function createClusteringLayers() {
         clusterRadius: 50
     });
 
-    // Layer per i cluster circles
     map.addLayer({
         id: 'clusters',
         type: 'circle',
@@ -448,7 +459,6 @@ function createClusteringLayers() {
         }
     });
 
-    // Layer per i numeri sui cluster - SOPRA i cerchi
     map.addLayer({
         id: 'cluster-count',
         type: 'symbol',
@@ -482,7 +492,6 @@ function createClusteringLayers() {
         }
     });
 
-    // Layer per i punti non clusterizzati
     map.addLayer({
         id: 'unclustered-point',
         type: 'circle',
@@ -509,9 +518,7 @@ function createClusteringLayers() {
         }
     });
 
-    // Setup event handlers solo la prima volta
     if (!map._clusterHandlersAdded) {
-        // Click handler per espandere i cluster
         map.on('click', 'clusters', (e) => {
             const features = map.queryRenderedFeatures(e.point, {
                 layers: ['clusters']
@@ -536,7 +543,6 @@ function createClusteringLayers() {
             );
         });
 
-        // Tooltip sui cluster
         const popup = new maplibregl.Popup({
             closeButton: false,
             closeOnClick: false,
@@ -562,7 +568,6 @@ function createClusteringLayers() {
             popup.remove();
         });
 
-        // Click handler per i punti non clusterizzati
         map.on('click', 'unclustered-point', (e) => {
             if (!e.features || e.features.length === 0) return;
             const props = e.features[0].properties;
@@ -583,7 +588,6 @@ function createClusteringLayers() {
     console.log('Cluster layers creati con numeri visibili');
 }
 
-
 // Toggle Clustering
 function toggleClustering() {
     showClustering = !showClustering;
@@ -591,58 +595,48 @@ function toggleClustering() {
     const btnTopLuoghi = document.getElementById('btn-top-luoghi-map');
     
     if (showClustering) {
-        // Nascondi heatmap se attiva
         if (showHeatmap) {
             toggleHeatmap();
         }
         
-        // Nascondi layer normali
         ['C', 'F', 'R', 'M'].forEach(tipo => {
             map.setLayoutProperty(`incidenti-${tipo}`, 'visibility', 'none');
         });
         
-        // Crea/aggiorna e mostra cluster CON I FILTRI ATTUALI
         createClusteringLayers();
         map.setLayoutProperty('clusters', 'visibility', 'visible');
         map.setLayoutProperty('cluster-count', 'visibility', 'visible');
         map.setLayoutProperty('unclustered-point', 'visibility', 'visible');
         
-        // Aggiorna pulsante
         if (btn) {
-            btn.textContent = '📍 Mappa di localizzazione';
+            btn.textContent = '🗺️ Mappa di localizzazione';
             btn.classList.add('active');
         }
         
-        // Mostra pulsante Top Luoghi
         if (btnTopLuoghi) {
             btnTopLuoghi.style.display = 'block';
         }
         
-        // Calcola top luoghi CON I FILTRI ATTUALI
         calculateTopLuoghi();
         
         console.log('Clustering attivato - filtri applicati:', Object.keys(currentFilters).filter(k => currentFilters[k]).length);
         
     } else {
-        // Nascondi cluster
         if (map.getLayer('clusters')) {
             map.setLayoutProperty('clusters', 'visibility', 'none');
             map.setLayoutProperty('cluster-count', 'visibility', 'none');
             map.setLayoutProperty('unclustered-point', 'visibility', 'none');
         }
         
-        // Mostra layer normali
         ['C', 'F', 'R', 'M'].forEach(tipo => {
             map.setLayoutProperty(`incidenti-${tipo}`, 'visibility', 'visible');
         });
         
-        // Aggiorna pulsante
         if (btn) {
             btn.textContent = '🔵 Mappa con clustering geografico';
             btn.classList.remove('active');
         }
         
-        // Nascondi pulsante Top Luoghi e chiudi modale se aperta
         if (btnTopLuoghi) {
             btnTopLuoghi.style.display = 'none';
         }
@@ -682,7 +676,6 @@ function calculateTopLuoghi() {
             luoghiMap[luogo][tipo]++;
         }
         
-        // Memorizza le coordinate (prendi la prima occorrenza)
         if (luoghiMap[luogo].coordinates.length === 0 && row.longitude && row.latitude) {
             luoghiMap[luogo].coordinates = [
                 parseFloat(row.longitude),
@@ -691,7 +684,6 @@ function calculateTopLuoghi() {
         }
     });
     
-    // Converti in array e ordina
     topLuoghiData = Object.values(luoghiMap)
         .sort((a, b) => b.total - a.total)
         .slice(0, 25);
@@ -703,12 +695,10 @@ function calculateTopLuoghi() {
 function updateTopLuoghiModalIfOpen() {
     const modal = document.getElementById('top-luoghi-modal');
     if (modal && modal.classList.contains('show')) {
-        // Riapri il modale con i dati aggiornati
         openTopLuoghiModal();
     }
 }
 
-// Open Top Luoghi Modal
 // Open Top Luoghi Modal
 function openTopLuoghiModal() {
     const modal = document.getElementById('top-luoghi-modal');
@@ -721,7 +711,6 @@ function openTopLuoghiModal() {
         countEl.textContent = topLuoghiData.length;
     }
     
-    // Prepara i filtri attivi
     const activeFilters = Object.entries(currentFilters)
         .filter(([key, value]) => value && value !== '')
         .map(([key, value]) => {
@@ -729,11 +718,9 @@ function openTopLuoghiModal() {
             return `${label}: ${value}`;
         });
     
-    // Rimuovi eventuali filtri precedenti dalla modal
     const existingFilters = modal.querySelector('.filters-info-top');
     if (existingFilters) existingFilters.remove();
     
-    // Inserisci i filtri UNA SOLA VOLTA sopra la tabella (se ci sono)
     if (activeFilters.length > 0) {
         const modalBody = modal.querySelector('.modal-body');
         if (modalBody) {
@@ -746,7 +733,6 @@ function openTopLuoghiModal() {
         }
     }
     
-    // Costruisci le righe della tabella
     let html = '';
     topLuoghiData.forEach((item, index) => {
         const rank = index + 1;
@@ -786,7 +772,7 @@ function openTopLuoghiModal() {
                 </td>
                 <td style="text-align: center;">
                     <button class="btn-zoom-location" onclick="zoomToLocation(${item.coordinates[0]}, ${item.coordinates[1]})">
-                        📍 Visualizza
+                        🔍 Visualizza
                     </button>
                 </td>
             </tr>
@@ -796,8 +782,6 @@ function openTopLuoghiModal() {
     tbody.innerHTML = html;
     modal.classList.add('show');
 }
-
-
 
 // Close Top Luoghi Modal
 function closeTopLuoghiModal() {
@@ -816,7 +800,6 @@ function zoomToLocation(lng, lat) {
         essential: true
     });
     
-    // Chiudi sidebar su mobile
     if (window.innerWidth <= 768) {
         closeSidebar();
     }
@@ -850,7 +833,6 @@ function downloadTopLuoghiCSV() {
     document.body.removeChild(link);
 }
 
-
 // Setup Layer Interactions
 function setupLayerInteractions(layerId) {
     map.on('click', layerId, (e) => {
@@ -869,17 +851,15 @@ function setupLayerInteractions(layerId) {
     });
 }
 
-// Get Filtered Data (MODIFICATA)
+// Get Filtered Data
 function getFilteredData() {
     return allIncidenti.filter(row => {
-        // Filtro data calendario
         if (currentFilters['filter-data-selezionata']) {
             if (row.Data !== currentFilters['filter-data-selezionata']) {
                 return false;
             }
         }
         
-        // Altri filtri esistenti
         for (const [filterId, property] of Object.entries(filterConfig)) {
             const value = currentFilters[filterId];
             if (!value) continue;
@@ -916,16 +896,9 @@ function populateFilters() {
 function handleFilterChange(filterId, value) {
     currentFilters[filterId] = value;
     
-    // Se si cambia anno, mese o altri filtri temporali, rimuovi il filtro data specifico
-    if (filterId === 'filter-anno' || filterId === 'filter-mese') {
+    if (filterId === 'filter-anno' || filterId === 'filter-mese' || filterId === 'filter-giorno-settimana') {
         delete currentFilters['filter-data-selezionata'];
-        if (calendarInstance) {
-            calendarInstance.clear();
-            // Se si cambia anno, sposta il calendario a quell'anno
-            if (filterId === 'filter-anno' && value) {
-                calendarInstance.jumpToDate(`${value}-01-01`);
-            }
-        }
+        customCalendarState.selectedDay = null;
     }
 
     if (filterDependencies[filterId]) {
@@ -1012,20 +985,17 @@ function updateMapData() {
     const geojson = createGeoJSON();
     console.log(`Aggiornamento mappa con ${geojson.features.length} features`);
     
-    // Aggiorna source normale
     const source = map.getSource('incidenti');
     if (source) {
         source.setData(geojson);
     }
     
-    // Aggiorna source cluster se esiste
     const clusterSource = map.getSource('incidenti-cluster');
     if (clusterSource) {
         clusterSource.setData(geojson);
         console.log('Cluster aggiornati con i nuovi filtri');
     }
     
-    // Ricalcola top luoghi se il clustering è attivo
     if (showClustering) {
         calculateTopLuoghi();
     }
@@ -1055,14 +1025,24 @@ function updateStats() {
     if (statCose) statCose.textContent = stats.C.toLocaleString('it-IT');
     if (statTotal) statTotal.textContent = (stats.M + stats.R + stats.F + stats.C).toLocaleString('it-IT');
     
-    const annoFiltrato = currentFilters['filter-anno'];
     const labelTotale = document.querySelector('.stat-total .stat-label');
     if (labelTotale) {
-        if (annoFiltrato) {
-            labelTotale.textContent = `Totale Incidenti (${annoFiltrato})`;
-        } else {
-            labelTotale.textContent = 'Totale Incidenti';
+        let labelText = 'Totale Incidenti';
+        
+        if (currentFilters['filter-data-selezionata']) {
+            labelText = `Totale Incidenti (${currentFilters['filter-data-selezionata']})`;
         }
+        else if (currentFilters['filter-mese'] && currentFilters['filter-anno']) {
+            labelText = `Totale Incidenti (${currentFilters['filter-mese']} ${currentFilters['filter-anno']})`;
+        }
+        else if (currentFilters['filter-mese']) {
+            labelText = `Totale Incidenti (${currentFilters['filter-mese']})`;
+        }
+        else if (currentFilters['filter-anno']) {
+            labelText = `Totale Incidenti (${currentFilters['filter-anno']})`;
+        }
+        
+        labelTotale.textContent = labelText;
     }
 
     console.log('Statistiche:', stats, `su ${filteredData.length} incidenti filtrati`);
@@ -1221,25 +1201,23 @@ function filterByYear(year) {
     
     if (currentYear === String(year)) {
         currentFilters['filter-anno'] = '';
-        // Reset calendario quando si deseleziona l'anno
-        if (calendarInstance) {
-            calendarInstance.clear();
-        }
+        customCalendarState.selectedYear = null;
     } else {
         currentFilters['filter-anno'] = String(year);
-        // Sincronizza calendario con il nuovo anno
-        if (calendarInstance && year) {
-            calendarInstance.jumpToDate(`${year}-01-01`);
-        }
+        customCalendarState.selectedYear = parseInt(year);
+        customCalendarState.currentYear = parseInt(year);
     }
     
-    // Rimuovi filtro data specifica quando si cambia anno manualmente
     delete currentFilters['filter-data-selezionata'];
+    customCalendarState.selectedDay = null;
     
     const filterAnno = document.getElementById('filter-anno');
     if (filterAnno) {
         filterAnno.value = currentFilters['filter-anno'];
     }
+    
+    renderCalendarYear();
+    renderCalendarMonths();
     
     updateAllFilters();
     updateMapData();
@@ -1263,8 +1241,6 @@ function filterByYear(year) {
         updateAnalytics();
     }
 }
-
-
 
 // Filter By Tipologia
 function filterByTipologia(tipo) {
@@ -1457,7 +1433,6 @@ function updatePeriodSwitches() {
     
     const selectedPeriodo = currentFilters['filter-giorno-notte'];
     
-    // Aggiorna contatori con controlli null
     const countGiornoEl = document.getElementById('count-giorno');
     const countNotteEl = document.getElementById('count-notte');
     
@@ -1468,7 +1443,6 @@ function updatePeriodSwitches() {
         countNotteEl.textContent = stats['Notte'].toLocaleString('it-IT');
     }
     
-    // Aggiorna stato attivo con controlli null
     const switchGiorno = document.getElementById('switch-giorno');
     const switchNotte = document.getElementById('switch-notte');
     
@@ -1484,15 +1458,11 @@ function updatePeriodSwitches() {
 function updateMonthlyInjuriesChart() {
     const filteredData = getFilteredData();
     
-    // Conta per mese per ogni tipologia
-    const monthsDataAll = {};  // Tutti gli incidenti
-    const monthsDataFeriti = {};  // Solo Feriti (F + R)
-    const monthsDataMorti = {};  // Solo Morti (M)
+    const monthsDataAll = {};
+    const monthsDataFeriti = {};
+    const monthsDataMorti = {};
     
-    const mesi = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 
-                  'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
-    
-    mesi.forEach(mese => {
+    MESI_ITALIANI.forEach(mese => {
         monthsDataAll[mese] = 0;
         monthsDataFeriti[mese] = 0;
         monthsDataMorti[mese] = 0;
@@ -1503,24 +1473,21 @@ function updateMonthlyInjuriesChart() {
         const tipo = row.Tipologia;
         
         if (mese && monthsDataAll.hasOwnProperty(mese)) {
-            // Tutti gli incidenti
             monthsDataAll[mese]++;
             
-            // Feriti (F + R)
             if (tipo === 'F' || tipo === 'R') {
                 monthsDataFeriti[mese]++;
             }
             
-            // Morti (M)
             if (tipo === 'M') {
                 monthsDataMorti[mese]++;
             }
         }
     });
     
-    const countsAll = mesi.map(m => monthsDataAll[m]);
-    const countsFeriti = mesi.map(m => monthsDataFeriti[m]);
-    const countsMorti = mesi.map(m => monthsDataMorti[m]);
+    const countsAll = MESI_ITALIANI.map(m => monthsDataAll[m]);
+    const countsFeriti = MESI_ITALIANI.map(m => monthsDataFeriti[m]);
+    const countsMorti = MESI_ITALIANI.map(m => monthsDataMorti[m]);
     
     const selectedMese = currentFilters['filter-mese'];
     
@@ -1534,7 +1501,7 @@ function updateMonthlyInjuriesChart() {
     monthlyInjuriesChart = new Chart(canvas, {
         type: 'radar',
         data: {
-            labels: mesi,
+            labels: MESI_ITALIANI,
             datasets: [
                 {
                     label: 'Incidenti',
@@ -1542,12 +1509,12 @@ function updateMonthlyInjuriesChart() {
                     backgroundColor: 'rgba(59, 130, 246, 0.1)',
                     borderColor: '#3b82f6',
                     borderWidth: 2,
-                    pointBackgroundColor: mesi.map(m => 
+                    pointBackgroundColor: MESI_ITALIANI.map(m => 
                         selectedMese === m ? '#2563eb' : '#3b82f6'
                     ),
                     pointBorderColor: '#fff',
                     pointBorderWidth: 2,
-                    pointRadius: mesi.map(m => 
+                    pointRadius: MESI_ITALIANI.map(m => 
                         selectedMese === m ? 5 : 3
                     ),
                     pointHoverRadius: 6
@@ -1558,12 +1525,12 @@ function updateMonthlyInjuriesChart() {
                     backgroundColor: 'rgba(245, 158, 11, 0.1)',
                     borderColor: '#f59e0b',
                     borderWidth: 2,
-                    pointBackgroundColor: mesi.map(m => 
+                    pointBackgroundColor: MESI_ITALIANI.map(m => 
                         selectedMese === m ? '#d97706' : '#f59e0b'
                     ),
                     pointBorderColor: '#fff',
                     pointBorderWidth: 2,
-                    pointRadius: mesi.map(m => 
+                    pointRadius: MESI_ITALIANI.map(m => 
                         selectedMese === m ? 5 : 3
                     ),
                     pointHoverRadius: 6
@@ -1574,12 +1541,12 @@ function updateMonthlyInjuriesChart() {
                     backgroundColor: 'rgba(239, 68, 68, 0.1)',
                     borderColor: '#ef4444',
                     borderWidth: 2,
-                    pointBackgroundColor: mesi.map(m => 
+                    pointBackgroundColor: MESI_ITALIANI.map(m => 
                         selectedMese === m ? '#dc2626' : '#ef4444'
                     ),
                     pointBorderColor: '#fff',
                     pointBorderWidth: 2,
-                    pointRadius: mesi.map(m => 
+                    pointRadius: MESI_ITALIANI.map(m => 
                         selectedMese === m ? 5 : 3
                     ),
                     pointHoverRadius: 6
@@ -1614,11 +1581,10 @@ function updateMonthlyInjuriesChart() {
                             return `${label}: ${value}`;
                         },
                         afterBody: function(context) {
-                            const mese = mesi[context[0].dataIndex];
+                            const mese = MESI_ITALIANI[context[0].dataIndex];
                             if (selectedMese === mese) {
                                 return '\nClicca per deselezionare';
                             }
-                            //return '\nClicca per filtrare';
                         }
                     }
                 },
@@ -1651,13 +1617,12 @@ function updateMonthlyInjuriesChart() {
             },
             onClick: (e, items) => {
                 if (items.length > 0) {
-                    const mese = mesi[items[0].index];
+                    const mese = MESI_ITALIANI[items[0].index];
                     filterByMonth(mese);
                 }
             }
         }
     });
-	
 }
 
 // Filter By Month
@@ -1666,14 +1631,24 @@ function filterByMonth(mese) {
     
     if (currentMese === mese) {
         currentFilters['filter-mese'] = '';
+        customCalendarState.selectedMonth = null;
+        document.getElementById('cal-days-container').style.display = 'none';
     } else {
         currentFilters['filter-mese'] = mese;
+        customCalendarState.selectedMonth = mese;
+        const monthIndex = MESI_ITALIANI.indexOf(mese);
+        if (monthIndex >= 0) {
+            renderCalendarDays(monthIndex);
+        }
     }
     
     const filterMese = document.getElementById('filter-mese');
     if (filterMese) {
         filterMese.value = currentFilters['filter-mese'];
     }
+    
+    renderCalendarMonths();
+    updateCalendarSummary();
     
     updateAllFilters();
     updateMapData();
@@ -1689,25 +1664,20 @@ function filterByMonth(mese) {
     }
 }
 
-
 // Reset Charts Filters
 function resetChartsFilters() {
-    // Reset filtro tipologia
     currentFilters['filter-tipologia'] = '';
     const filterTipologia = document.getElementById('filter-tipologia');
     if (filterTipologia) filterTipologia.value = '';
     
-    // Reset filtro giorno/notte
     currentFilters['filter-giorno-notte'] = '';
     const filterGiornoNotte = document.getElementById('filter-giorno-notte');
     if (filterGiornoNotte) filterGiornoNotte.value = '';
     
-    // Reset filtro mese
     currentFilters['filter-mese'] = '';
     const filterMese = document.getElementById('filter-mese');
     if (filterMese) filterMese.value = '';
     
-    // Aggiorna tutto
     updateAllFilters();
     updateMapData();
     updateStats();
@@ -1866,12 +1836,7 @@ function resetFilters() {
     
     currentFilters['filter-anno'] = '2023';
     
-    // Reset anche il calendario
-    if (calendarInstance) {
-        calendarInstance.clear();
-        calendarInstance.jumpToDate('2023-01-01');
-    }
-    delete currentFilters['filter-data-selezionata'];
+    resetCustomCalendar();
     
     updateAllFilters();
     updateMapData();
@@ -1893,10 +1858,8 @@ function resetFilters() {
 }
 
 function updateLegendActiveState() {
-    // Questa funzione può essere chiamata per evidenziare la legenda in base ai filtri attivi
     const selectedTipo = currentFilters['filter-tipologia'];
     
-    // Aggiorna visivamente la legenda se necessario
     document.querySelectorAll('.legend-item').forEach(item => {
         const tipo = item.dataset.tipo;
         if (selectedTipo === tipo) {
@@ -2067,6 +2030,7 @@ function closeDetailPanel() {
     const panel = document.getElementById('detail-panel');
     if (panel) panel.classList.remove('open');
 }
+
 // Analytics Functions
 function openAnalytics() {
     const panel = document.getElementById('analytics-panel');
@@ -2082,14 +2046,12 @@ function closeAnalytics() {
     if (panel) panel.classList.remove('open');
 }
 
-
 function updateActiveFiltersDisplay() {
     const filteredData = getFilteredData();
     const totalData = allIncidenti.length;
     
     let filterText = [];
     
-    // AGGIUNGI visualizzazione data calendario
     if (currentFilters['filter-data-selezionata']) {
         filterText.push(`Data: ${currentFilters['filter-data-selezionata']}`);
     }
@@ -2098,7 +2060,17 @@ function updateActiveFiltersDisplay() {
         filterText.push(`Anno: ${currentFilters['filter-anno']}`);
     }
     
-    // ... resto del codice esistente ...
+    if (currentFilters['filter-mese']) {
+        filterText.push(`Mese: ${currentFilters['filter-mese']}`);
+    }
+    
+    if (currentFilters['filter-giorno-settimana']) {
+        filterText.push(`Giorno: ${currentFilters['filter-giorno-settimana']}`);
+    }
+    
+    if (currentFilters['filter-tipologia']) {
+        filterText.push(`Tipologia: ${currentFilters['filter-tipologia']}`);
+    }
     
     let displayHTML = '';
     
@@ -2419,10 +2391,11 @@ function updatePanoramicaCharts(data) {
         }
     });
     
-    const tipologiaCanvas = document.getElementById('chart-tipologia');
-    if (tipologiaCanvas) {
-        if (analyticsCharts.tipologia) analyticsCharts.tipologia.destroy();
-        analyticsCharts.tipologia = new Chart(tipologiaCanvas, {
+ const tipologiaCanvas = document.getElementById('chart-tipologia');
+if (tipologiaCanvas) {
+    if (analyticsCharts.tipologia) analyticsCharts.tipologia.destroy();
+    analytics  // <-- QUESTA RIGA È ROTTA!
+	Charts.tipologia = new Chart(tipologiaCanvas, {
             type: 'doughnut',
             data: {
                 labels: ['Mortale', 'Riserva', 'Feriti', 'Cose'],
@@ -3371,6 +3344,350 @@ function downloadJSON() {
     document.body.removeChild(link);
 }
 
+// =======================
+// CALENDARIO PERSONALIZZATO
+// =======================
+
+// Inizializza Calendario Custom
+// Inizializza Calendario Custom
+function initCustomCalendar() {
+    const year = currentFilters['filter-anno'] || '2023';
+    customCalendarState.currentYear = parseInt(year);
+    
+    renderCalendarYear();
+    renderCalendarMonths();
+    renderCalendarWeekdays();
+    updateCalendarSummary();
+    
+    const prevYearBtn = document.getElementById('cal-prev-year');
+    const nextYearBtn = document.getElementById('cal-next-year');
+    const yearDisplay = document.getElementById('cal-year-display');
+    const resetBtn = document.getElementById('btn-calendar-reset');
+    
+    if (prevYearBtn) {
+        prevYearBtn.addEventListener('click', () => {
+            if (customCalendarState.currentYear > 2015) {
+                customCalendarState.currentYear--;
+                // APPLICA AUTOMATICAMENTE IL FILTRO
+                selectCalendarYear(customCalendarState.currentYear);
+            }
+        });
+    }
+    
+    if (nextYearBtn) {
+        nextYearBtn.addEventListener('click', () => {
+            if (customCalendarState.currentYear < 2023) {
+                customCalendarState.currentYear++;
+                // APPLICA AUTOMATICAMENTE IL FILTRO
+                selectCalendarYear(customCalendarState.currentYear);
+            }
+        });
+    }
+    
+    if (yearDisplay) {
+        yearDisplay.addEventListener('click', () => {
+            // TOGGLE: se già selezionato lo deseleziona, altrimenti lo seleziona
+            if (customCalendarState.selectedYear === customCalendarState.currentYear) {
+                resetCustomCalendar();
+            } else {
+                selectCalendarYear(customCalendarState.currentYear);
+            }
+        });
+    }
+    
+    if (resetBtn) {
+        resetBtn.addEventListener('click', resetCustomCalendar);
+    }
+}
+
+
+// Render Anno
+function renderCalendarYear() {
+    const yearDisplay = document.getElementById('cal-year-display');
+    if (yearDisplay) {
+        yearDisplay.textContent = customCalendarState.currentYear;
+        yearDisplay.classList.toggle('active', customCalendarState.selectedYear === customCalendarState.currentYear);
+    }
+}
+
+// Render Mesi
+function renderCalendarMonths() {
+    const grid = document.getElementById('cal-months-grid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    
+    MESI_ITALIANI.forEach((mese, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'calendar-month-btn';
+        btn.textContent = mese;
+        btn.dataset.month = mese;
+        btn.dataset.monthIndex = index;
+        
+        const hasData = checkMonthHasData(customCalendarState.currentYear, index + 1);
+        if (hasData) {
+            btn.classList.add('has-data');
+        }
+        
+        if (customCalendarState.selectedMonth === mese && 
+            customCalendarState.selectedYear === customCalendarState.currentYear) {
+            btn.classList.add('active');
+        }
+        
+        btn.addEventListener('click', () => selectCalendarMonth(mese, index));
+        grid.appendChild(btn);
+    });
+}
+
+// Render Giorni Settimana
+function renderCalendarWeekdays() {
+    const grid = document.getElementById('cal-weekdays-grid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    
+    GIORNI_SETTIMANA_SHORT.forEach((giorno, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'calendar-weekday-btn';
+        btn.textContent = giorno;
+        btn.dataset.weekday = GIORNI_SETTIMANA[index];
+        
+        if (customCalendarState.selectedWeekday === GIORNI_SETTIMANA[index]) {
+            btn.classList.add('active');
+        }
+        
+        btn.addEventListener('click', () => selectCalendarWeekday(GIORNI_SETTIMANA[index]));
+        grid.appendChild(btn);
+    });
+}
+
+// Render Giorni del Mese
+function renderCalendarDays(monthIndex) {
+    const container = document.getElementById('cal-days-container');
+    const header = document.getElementById('cal-month-header');
+    const grid = document.getElementById('cal-days-grid');
+    
+    if (!container || !header || !grid) return;
+    
+    container.style.display = 'block';
+    header.textContent = `${MESI_ITALIANI[monthIndex]} ${customCalendarState.currentYear}`;
+    grid.innerHTML = '';
+    
+    const year = customCalendarState.currentYear;
+    const month = monthIndex;
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    
+    let startDay = firstDay.getDay() - 1;
+    if (startDay < 0) startDay = 6;
+    
+    for (let i = 0; i < startDay; i++) {
+        const emptyBtn = document.createElement('div');
+        emptyBtn.className = 'calendar-day-btn empty';
+        grid.appendChild(emptyBtn);
+    }
+    
+    for (let day = 1; day <= daysInMonth; day++) {
+        const btn = document.createElement('button');
+        btn.className = 'calendar-day-btn';
+        btn.textContent = day;
+        btn.dataset.day = day;
+        
+        const dateStr = `${String(day).padStart(2, '0')}/${String(month + 1).padStart(2, '0')}/${year}`;
+        const incidents = checkDayHasIncidents(dateStr);
+        
+        if (incidents > 0) {
+            btn.classList.add('has-incidents');
+            if (incidents >= 5) {
+                btn.classList.add('high-incidents');
+            }
+            btn.title = `${incidents} incident${incidents > 1 ? 'i' : 'e'}`;
+        }
+        
+        if (customCalendarState.selectedDay === day &&
+            customCalendarState.selectedMonth === MESI_ITALIANI[monthIndex] &&
+            customCalendarState.selectedYear === year) {
+            btn.classList.add('active');
+        }
+        
+        btn.addEventListener('click', () => selectCalendarDay(day, monthIndex));
+        grid.appendChild(btn);
+    }
+}
+
+// Seleziona Anno
+function selectCalendarYear(year) {
+    // Sempre seleziona l'anno passato come parametro
+    customCalendarState.selectedYear = year;
+    customCalendarState.currentYear = year; // Sincronizza anche la visualizzazione
+    currentFilters['filter-anno'] = String(year);
+    
+    // Reset mese e giorno quando si cambia anno
+    customCalendarState.selectedMonth = null;
+    customCalendarState.selectedDay = null;
+    delete currentFilters['filter-mese'];
+    delete currentFilters['filter-data-selezionata'];
+    
+    const daysContainer = document.getElementById('cal-days-container');
+    if (daysContainer) {
+        daysContainer.style.display = 'none';
+    }
+    
+    renderCalendarYear();
+    renderCalendarMonths();
+    updateCalendarFromState();
+}
+
+// Seleziona Mese
+function selectCalendarMonth(mese, monthIndex) {
+    if (customCalendarState.selectedMonth === mese && 
+        customCalendarState.selectedYear === customCalendarState.currentYear) {
+        customCalendarState.selectedMonth = null;
+        delete currentFilters['filter-mese'];
+        document.getElementById('cal-days-container').style.display = 'none';
+    } else {
+        customCalendarState.selectedYear = customCalendarState.currentYear;
+        customCalendarState.selectedMonth = mese;
+        currentFilters['filter-anno'] = String(customCalendarState.currentYear);
+        currentFilters['filter-mese'] = mese;
+        renderCalendarDays(monthIndex);
+    }
+    
+    customCalendarState.selectedDay = null;
+    delete currentFilters['filter-data-selezionata'];
+    
+    renderCalendarYear();
+    renderCalendarMonths();
+    updateCalendarFromState();
+}
+
+// Seleziona Giorno Settimana
+function selectCalendarWeekday(weekday) {
+    if (customCalendarState.selectedWeekday === weekday) {
+        customCalendarState.selectedWeekday = null;
+        delete currentFilters['filter-giorno-settimana'];
+    } else {
+        customCalendarState.selectedWeekday = weekday;
+        currentFilters['filter-giorno-settimana'] = weekday;
+    }
+    
+    renderCalendarWeekdays();
+    updateCalendarFromState();
+}
+
+// Seleziona Giorno Specifico
+function selectCalendarDay(day, monthIndex) {
+    const year = customCalendarState.currentYear;
+    const month = monthIndex + 1;
+    const dateStr = `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
+    
+    if (customCalendarState.selectedDay === day) {
+        customCalendarState.selectedDay = null;
+        delete currentFilters['filter-data-selezionata'];
+    } else {
+        customCalendarState.selectedDay = day;
+        customCalendarState.selectedYear = year;
+        customCalendarState.selectedMonth = MESI_ITALIANI[monthIndex];
+        
+        currentFilters['filter-anno'] = String(year);
+        currentFilters['filter-mese'] = MESI_ITALIANI[monthIndex];
+        currentFilters['filter-data-selezionata'] = dateStr;
+    }
+    
+    renderCalendarDays(monthIndex);
+    updateCalendarFromState();
+}
+
+// Reset Calendario
+function resetCustomCalendar() {
+    customCalendarState.selectedYear = null;
+    customCalendarState.selectedMonth = null;
+    customCalendarState.selectedWeekday = null;
+    customCalendarState.selectedDay = null;
+    
+    delete currentFilters['filter-anno'];
+    delete currentFilters['filter-mese'];
+    delete currentFilters['filter-giorno-settimana'];
+    delete currentFilters['filter-data-selezionata'];
+    
+    document.getElementById('cal-days-container').style.display = 'none';
+    
+    renderCalendarYear();
+    renderCalendarMonths();
+    renderCalendarWeekdays();
+    updateCalendarFromState();
+}
+
+// Aggiorna Filtri e UI
+function updateCalendarFromState() {
+    const selectAnno = document.getElementById('filter-anno');
+    const selectMese = document.getElementById('filter-mese');
+    const selectGiornoSettimana = document.getElementById('filter-giorno-settimana');
+    
+    if (selectAnno) selectAnno.value = currentFilters['filter-anno'] || '';
+    if (selectMese) selectMese.value = currentFilters['filter-mese'] || '';
+    if (selectGiornoSettimana) selectGiornoSettimana.value = currentFilters['filter-giorno-settimana'] || '';
+    
+    updateCalendarSummary();
+    
+    updateAllFilters();
+    updateMapData();
+    updateStats();
+    updateYearStats();
+    updateLegendChart();
+    updatePeriodSwitches();
+    updateMonthlyInjuriesChart();
+    
+    if (showClustering) {
+        calculateTopLuoghi();
+        updateTopLuoghiModalIfOpen();
+    }
+    
+    const analyticsPanel = document.getElementById('analytics-panel');
+    if (analyticsPanel && analyticsPanel.classList.contains('open')) {
+        updateActiveFiltersDisplay();
+        updateAnalytics();
+    }
+}
+
+// Update Summary
+function updateCalendarSummary() {
+    const summary = document.getElementById('cal-selection-summary');
+    if (!summary) return;
+    
+    const parts = [];
+    
+    if (customCalendarState.selectedDay) {
+        parts.push(`<strong>Giorno:</strong> ${customCalendarState.selectedDay} ${customCalendarState.selectedMonth} ${customCalendarState.selectedYear}`);
+    } else {
+        if (customCalendarState.selectedYear) {
+            parts.push(`<strong>Anno:</strong> ${customCalendarState.selectedYear}`);
+        }
+        if (customCalendarState.selectedMonth) {
+            parts.push(`<strong>Mese:</strong> ${customCalendarState.selectedMonth}`);
+        }
+    }
+    
+    if (customCalendarState.selectedWeekday) {
+        parts.push(`<strong>Giorno settimana:</strong> ${customCalendarState.selectedWeekday}`);
+    }
+    
+    summary.innerHTML = parts.length > 0 ? parts.join(' • ') : 'Nessun filtro temporale attivo';
+}
+
+// Verifica dati mese
+function checkMonthHasData(year, month) {
+    return allIncidenti.some(row => {
+        return row.Anno === year && row.Mese === MESI_ITALIANI[month - 1];
+    });
+}
+
+// Verifica incidenti giorno
+function checkDayHasIncidents(dateStr) {
+    return allIncidenti.filter(row => row.Data === dateStr).length;
+}
+
 // Setup Event Listeners
 function setupEventListeners() {
     function addTouchClickListener(element, handler) {
@@ -3545,190 +3862,19 @@ function setupEventListeners() {
             e.preventDefault();
         }
     }, { passive: false });
-	
-	// Clustering e Top Luoghi
-const btnClustering = document.getElementById('btn-clustering-map');
-if (btnClustering) addTouchClickListener(btnClustering, toggleClustering);
+    
+    const btnClustering = document.getElementById('btn-clustering-map');
+    if (btnClustering) addTouchClickListener(btnClustering, toggleClustering);
 
-const btnTopLuoghi = document.getElementById('btn-top-luoghi-map');
-if (btnTopLuoghi) addTouchClickListener(btnTopLuoghi, openTopLuoghiModal);
+    const btnTopLuoghi = document.getElementById('btn-top-luoghi-map');
+    if (btnTopLuoghi) addTouchClickListener(btnTopLuoghi, openTopLuoghiModal);
 
-const btnTopLuoghiClose = document.getElementById('top-luoghi-close');
-if (btnTopLuoghiClose) addTouchClickListener(btnTopLuoghiClose, closeTopLuoghiModal);
+    const btnTopLuoghiClose = document.getElementById('top-luoghi-close');
+    if (btnTopLuoghiClose) addTouchClickListener(btnTopLuoghiClose, closeTopLuoghiModal);
 
-const btnDownloadLuoghi = document.getElementById('btn-download-luoghi-csv');
-if (btnDownloadLuoghi) addTouchClickListener(btnDownloadLuoghi, downloadTopLuoghiCSV);
-
-    // Calendar reset button
-    const btnResetCalendar = document.getElementById('btn-reset-calendar');
-    if (btnResetCalendar) {
-        btnResetCalendar.addEventListener('click', resetCalendar);
-    }
-
+    const btnDownloadLuoghi = document.getElementById('btn-download-luoghi-csv');
+    if (btnDownloadLuoghi) addTouchClickListener(btnDownloadLuoghi, downloadTopLuoghiCSV);
 }
-
-
-// Initialize Calendar
-function initCalendar() {
-    // Pre-calcola incidenti per data per performance
-    calculateIncidentsByDate();
-    
-    calendarInstance = flatpickr("#calendar-container", {
-        inline: true,
-        locale: "it",
-        minDate: "2015-01-01",
-        maxDate: "2023-12-31",
-        defaultDate: currentFilters['filter-anno'] ? `${currentFilters['filter-anno']}-01-01` : "2023-01-01",
-        onChange: function(selectedDates, dateStr, instance) {
-            if (selectedDates.length > 0) {
-                handleCalendarSelection(selectedDates[0]);
-            }
-        },
-        onMonthChange: function(selectedDates, dateStr, instance) {
-            updateCalendarIndicators(instance);
-        },
-        onYearChange: function(selectedDates, dateStr, instance) {
-            updateCalendarIndicators(instance);
-        },
-        onReady: function(selectedDates, dateStr, instance) {
-            updateCalendarIndicators(instance);
-        }
-    });
-}
-
-// Calcola incidenti per data
-function calculateIncidentsByDate() {
-    incidentsByDate = {};
-    
-    allIncidenti.forEach(row => {
-        if (row.Data) {
-            const date = row.Data; // Formato: DD/MM/YYYY
-            const [day, month, year] = date.split('/');
-            const isoDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-            
-            if (!incidentsByDate[isoDate]) {
-                incidentsByDate[isoDate] = 0;
-            }
-            incidentsByDate[isoDate]++;
-        }
-    });
-}
-
-// Aggiorna indicatori visivi sul calendario
-function updateCalendarIndicators(instance) {
-    setTimeout(() => {
-        const days = instance.calendarContainer.querySelectorAll('.flatpickr-day');
-        
-        days.forEach(day => {
-            if (day.classList.contains('disabled') || day.classList.contains('nextMonthDay') || day.classList.contains('prevMonthDay')) {
-                return;
-            }
-            
-            const dateStr = day.dateObj ? 
-                `${day.dateObj.getFullYear()}-${String(day.dateObj.getMonth() + 1).padStart(2, '0')}-${String(day.dateObj.getDate()).padStart(2, '0')}` 
-                : null;
-            
-            if (dateStr && incidentsByDate[dateStr]) {
-                const count = incidentsByDate[dateStr];
-                day.classList.add('has-incidents');
-                
-                // Classifica densità
-                if (count > 15) {
-                    day.classList.add('high-density');
-                } else if (count > 5) {
-                    day.classList.add('medium-density');
-                }
-                
-                // Tooltip
-                day.title = `${count} incidenti`;
-            }
-        });
-    }, 10);
-}
-
-// Gestisci selezione data dal calendario
-
-function handleCalendarSelection(date) {
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    
-    const mesiItaliani = [
-        'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
-        'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
-    ];
-    
-    const dataFiltro = `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
-    
-    currentFilters['filter-data-selezionata'] = dataFiltro;
-    currentFilters['filter-anno'] = String(year);
-    
-    const selectAnno = document.getElementById('filter-anno');
-    if (selectAnno) {
-        selectAnno.value = String(year);
-    }
-    
-    const selectMese = document.getElementById('filter-mese');
-    if (selectMese) {
-        selectMese.value = mesiItaliani[month - 1];
-    }
-    
-    console.log(`Filtro data: ${dataFiltro}`);
-    
-    // AGGIUNGI QUESTE CHIAMATE MANCANTI:
-    updateAllFilters();
-    updateMapData();
-    updateStats();
-    updateYearStats();
-    updateLegendChart();           // ← AGGIUNTO
-    updatePeriodSwitches();        // ← AGGIUNTO
-    updateMonthlyInjuriesChart();  // ← AGGIUNTO
-    
-    // Ricalcola top luoghi se clustering attivo
-    if (showClustering) {
-        calculateTopLuoghi();
-        updateTopLuoghiModalIfOpen();
-    }
-    
-    if (window.innerWidth <= 768) {
-        closeSidebar();
-    }
-    
-    const analyticsPanel = document.getElementById('analytics-panel');
-    if (analyticsPanel && analyticsPanel.classList.contains('open')) {
-        updateActiveFiltersDisplay();
-        updateAnalytics();
-    }
-}
-
-// Reset calendario
-function resetCalendar() {
-    if (calendarInstance) {
-        calendarInstance.clear();
-    }
-    delete currentFilters['filter-data-selezionata'];
-    
-    updateAllFilters();
-    updateMapData();
-    updateStats();
-    updateYearStats();
-    updateLegendChart();           // ← AGGIUNTO
-    updatePeriodSwitches();        // ← AGGIUNTO
-    updateMonthlyInjuriesChart();  // ← AGGIUNTO
-    
-    if (showClustering) {
-        calculateTopLuoghi();
-        updateTopLuoghiModalIfOpen();
-    }
-    
-    const analyticsPanel = document.getElementById('analytics-panel');
-    if (analyticsPanel && analyticsPanel.classList.contains('open')) {
-        updateActiveFiltersDisplay();
-        updateAnalytics();
-    }
-}
-
 
 // Initialize App
 init();
-

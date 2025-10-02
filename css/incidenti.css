@@ -2185,75 +2185,203 @@ input:checked + .slider:before {
     font-weight: 600;
 }
 
-/* Calendar Section */
-.calendar-info {
-    font-size: 11px;
-    color: #94a3b8;
+/* Custom Calendar Styles */
+.custom-calendar {
+    background: rgba(15, 23, 42, 0.8);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+/* Anno Control */
+.calendar-year-control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    gap: 12px;
+}
+
+.calendar-nav-btn {
+    background: rgba(59, 130, 246, 0.2);
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    color: #60a5fa;
     padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.calendar-nav-btn:hover {
+    background: rgba(59, 130, 246, 0.4);
+    transform: scale(1.05);
+}
+
+.calendar-year-display {
+    flex: 1;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+    color: #f1f5f9;
+    padding: 8px;
     background: rgba(59, 130, 246, 0.1);
     border-radius: 6px;
-    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.calendar-year-display:hover {
+    background: rgba(59, 130, 246, 0.2);
+}
+
+/* Mesi Grid */
+.calendar-months-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.calendar-month-btn {
+    padding: 10px 8px;
+    background: rgba(51, 65, 85, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 6px;
+    color: #cbd5e1;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.calendar-month-btn:hover {
+    background: rgba(59, 130, 246, 0.3);
+    border-color: #3b82f6;
+    transform: translateY(-2px);
+}
+
+.calendar-month-btn.active {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border-color: #3b82f6;
+    color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.calendar-month-btn.has-data::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 6px;
+    height: 6px;
+    background: #10b981;
+    border-radius: 50%;
+}
+
+/* Giorni Settimana Grid */
+.calendar-weekdays-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.calendar-weekday-btn {
+    padding: 8px 4px;
+    background: rgba(51, 65, 85, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 6px;
+    color: #cbd5e1;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
     text-align: center;
-    border-left: 3px solid #3b82f6;
 }
 
-#calendar-container {
-    margin-bottom: 12px;
+.calendar-weekday-btn:hover {
+    background: rgba(168, 85, 247, 0.3);
+    border-color: #a855f7;
 }
 
-/* Flatpickr Custom Styling */
-.flatpickr-calendar {
-    background: rgba(30, 41, 59, 0.95) !important;
-    border: 1px solid rgba(148, 163, 184, 0.3) !important;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
-    border-radius: 8px !important;
+.calendar-weekday-btn.active {
+    background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
+    border-color: #a855f7;
+    color: white;
+    box-shadow: 0 2px 8px rgba(168, 85, 247, 0.4);
 }
 
-.flatpickr-months {
-    background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%) !important;
-    border-radius: 8px 8px 0 0 !important;
+/* Giorni del Mese Container */
+.calendar-days-container {
+    margin-bottom: 16px;
+    padding: 12px;
+    background: rgba(30, 41, 59, 0.6);
+    border-radius: 8px;
 }
 
-.flatpickr-current-month {
-    color: #f1f5f9 !important;
-}
-
-.flatpickr-weekdays {
-    background: rgba(51, 65, 85, 0.8) !important;
-}
-
-.flatpickr-weekday {
-    color: #cbd5e1 !important;
-    font-weight: 700 !important;
-}
-
-.flatpickr-day {
-    color: #f1f5f9 !important;
-    border: 1px solid rgba(148, 163, 184, 0.1) !important;
-}
-
-.flatpickr-day:hover {
-    background: rgba(59, 130, 246, 0.3) !important;
-    border-color: #3b82f6 !important;
-}
-
-.flatpickr-day.selected {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
-    border-color: #3b82f6 !important;
-    color: white !important;
-}
-
-.flatpickr-day.today {
-    border-color: #10b981 !important;
+.calendar-month-header {
+    text-align: center;
     font-weight: 700;
+    color: #60a5fa;
+    margin-bottom: 12px;
+    font-size: 14px;
 }
 
-.flatpickr-day.disabled {
-    color: #475569 !important;
+.calendar-weekday-labels {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 8px;
+    text-align: center;
+    font-size: 10px;
+    color: #94a3b8;
+    font-weight: 600;
 }
 
-/* Indicator dots per giorni con incidenti */
-.flatpickr-day.has-incidents::after {
+.calendar-days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.calendar-day-btn {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(51, 65, 85, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.1);
+    border-radius: 6px;
+    color: #cbd5e1;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.calendar-day-btn.empty {
+    background: transparent;
+    border: none;
+    cursor: default;
+}
+
+.calendar-day-btn:not(.empty):hover {
+    background: rgba(16, 185, 129, 0.3);
+    border-color: #10b981;
+    transform: scale(1.1);
+}
+
+.calendar-day-btn.active {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-color: #10b981;
+    color: white;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+}
+
+.calendar-day-btn.has-incidents::before {
     content: '';
     position: absolute;
     bottom: 2px;
@@ -2261,69 +2389,53 @@ input:checked + .slider:before {
     transform: translateX(-50%);
     width: 4px;
     height: 4px;
+    background: #ef4444;
     border-radius: 50%;
-    background: #10b981;
 }
 
-.flatpickr-day.has-incidents.high-density::after {
-    background: #ef4444;
+.calendar-day-btn.high-incidents::before {
     width: 6px;
     height: 6px;
+    background: #ef4444;
+    box-shadow: 0 0 4px rgba(239, 68, 68, 0.6);
 }
 
-.flatpickr-day.has-incidents.medium-density::after {
-    background: #f59e0b;
-    width: 5px;
-    height: 5px;
+/* Selection Summary */
+.calendar-selection-summary {
+    background: rgba(59, 130, 246, 0.1);
+    border-left: 3px solid #3b82f6;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    color: #cbd5e1;
+    margin-bottom: 12px;
+    line-height: 1.5;
 }
 
-.btn-reset-calendar {
-    width: 100%;
+.calendar-selection-summary strong {
+    color: #60a5fa;
+}
+
+/* Calendar Actions */
+.calendar-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-calendar-reset {
+    flex: 1;
     padding: 10px;
     background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     font-size: 12px;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
 }
 
-.btn-reset-calendar:hover {
+.btn-calendar-reset:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
 }
-
-/* Mobile adjustments */
-@media (max-width: 768px) {
-    .flatpickr-calendar {
-        width: 100% !important;
-    }
-    
-    .flatpickr-day {
-        height: 32px !important;
-        line-height: 32px !important;
-    }
-}
-
-/*Dimensione calendario*/
-}
-.flatpickr-innerContainer .flatpickr-days  {  width: 280px!important;
-		}
-
-.dayContainer {    width: 275px!important;
-    min-width: 275px!important;
-    max-width: 275px!important;
-		}
-	
-	.flatpickr-weekdays { width: 275px!important;
-    min-width: 275px!important;
-    max-width: 275px!important;
-	}
-	
-	.flatpickr-months .flatpickr-month {width: 275px!important;
-    min-width:275px!important;
-    max-width: 275px!important;
-	}
