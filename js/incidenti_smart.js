@@ -2394,8 +2394,7 @@ function updatePanoramicaCharts(data) {
  const tipologiaCanvas = document.getElementById('chart-tipologia');
 if (tipologiaCanvas) {
     if (analyticsCharts.tipologia) analyticsCharts.tipologia.destroy();
-    analytics  // <-- QUESTA RIGA È ROTTA!
-	Charts.tipologia = new Chart(tipologiaCanvas, {
+    analyticsCharts.tipologia = new Chart(tipologiaCanvas, {
             type: 'doughnut',
             data: {
                 labels: ['Mortale', 'Riserva', 'Feriti', 'Cose'],
