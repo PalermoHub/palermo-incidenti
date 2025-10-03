@@ -2241,15 +2241,31 @@ function updateLegendChart() {
                 },
                 datalabels: {
                     display: true,
-                    anchor: 'end',
-                    align: 'end',
-                    color: '#f1f5f9',
+                    anchor: function(context) {
+                        const value = context.dataset.data[context.dataIndex];
+                        const maxValue = Math.max(...context.dataset.data);
+                        return value > maxValue * 0.2 ? 'end' : 'end';
+                    },
+                    align: function(context) {
+                        const value = context.dataset.data[context.dataIndex];
+                        const maxValue = Math.max(...context.dataset.data);
+                        return value > maxValue * 0.2 ? 'start' : 'end';
+                    },
+                    color: function(context) {
+                        const value = context.dataset.data[context.dataIndex];
+                        const maxValue = Math.max(...context.dataset.data);
+                        return value > maxValue * 0.2 ? '#ffffff' : '#f1f5f9';
+                    },
                     font: {
                         size: 10,
                         weight: 'bold'
                     },
                     formatter: (value) => value > 0 ? value.toLocaleString('it-IT') : '',
-                    offset: 4
+                    offset: function(context) {
+                        const value = context.dataset.data[context.dataIndex];
+                        const maxValue = Math.max(...context.dataset.data);
+                        return value > maxValue * 0.2 ? 2: 4;
+                    }
                 }
             },
             scales: {
@@ -2285,6 +2301,8 @@ function updateLegendChart() {
         }
     });
 }
+
+
 
 // Update Monthly Injuries Chart (Grafico Radar)
 function updateMonthlyInjuriesChart() {
@@ -2510,7 +2528,7 @@ function updateMonthlyAreaChart() {
                     backgroundColor:'rgba(245, 158, 11, 0.4)',
                     borderColor: '#f59e0b',
                     pointBorderColor: '#fff', 
-                    borderWidth: 0.5,
+                    borderWidth: 2,
                     fill: true,
                     pointBackgroundColor: MESI_ITALIANI.map(m => 
                         selectedMese === m ? '#3b82f6' : '#f59e0b'
@@ -2527,7 +2545,7 @@ function updateMonthlyAreaChart() {
                     backgroundColor: 'rgba(59, 130, 246, 0.4)',
                     borderColor: '#3b82f6',
                     pointBorderColor: '#fff', 
-                    borderWidth: 0.5,
+                    borderWidth: 2,
                     fill: true,
                     pointBackgroundColor: MESI_ITALIANI.map(m => 
                         selectedMese === m ? '#f59e0b' : '#3b82f6',
