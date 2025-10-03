@@ -245,7 +245,7 @@ function toggleHeatmap() {
             btnMap.innerHTML = '<i class="fas fa-map"></i> Mappa di localizzazione';
             btnMap.classList.add('active');
         }
-        const analyticsPanel = document.getElementById('analytics-side-panel');
+        const pointsLegend = document.getElementById('points-legend');
         const heatmapLegend = document.getElementById('heatmap-legend');
         if (pointsLegend) pointsLegend.classList.add('hidden');
         if (heatmapLegend) heatmapLegend.classList.remove('hidden');
@@ -262,7 +262,7 @@ function toggleHeatmap() {
             btnMap.innerHTML = '<i class="fas fa-fire"></i> Heatmap';
             btnMap.classList.remove('active');
         }
-        const analyticsPanel = document.getElementById('analytics-side-panel');
+        const pointsLegend = document.getElementById('points-legend');
         const heatmapLegend = document.getElementById('heatmap-legend');
         if (pointsLegend) pointsLegend.classList.remove('hidden');
         if (heatmapLegend) heatmapLegend.classList.add('hidden');

@@ -1847,114 +1847,104 @@ select option {
 }
 
 /* ==========================================
-   ANALYTICS SIDE PANEL - DESIGN MIGLIORATO
+   ANALYTICS SIDE PANEL - Nuovo Design 6 Sezioni
    ========================================== */
 
 #analytics-side-panel {
     position: fixed;
-    top: 5px;
-    right: 5px;
-    height: calc(97.8vh - 20px);
-    width: 340px;
-    background: #0f172abd !important;
-    backdrop-filter: blur(2px);
-    border-radius: 8px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(59, 130, 246, 0.2);
+    top: 10px;
+    right: 20px;
+    height: calc(95vh - 40px);
+    width: 320px;
+    background: rgba(15, 23, 42, 0.98);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.2);
     z-index: 1000;
     display: flex;
     flex-direction: column;
-    gap: 1px;
-    padding:2px 0 0px 2px;
+    gap: 10px;
+    padding: 12px;
     overflow-y: auto;
     overflow-x: hidden;
 }
 
 #analytics-side-panel::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
 }
 
 #analytics-side-panel::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.6);
-    border-radius: 4px;
+    background: rgba(15, 23, 42, 0.5);
+    border-radius: 3px;
 }
 
 #analytics-side-panel::-webkit-scrollbar-thumb {
-    background: rgba(59, 130, 246, 0.4);
-    border-radius: 4px;
+    background: rgba(148, 163, 184, 0.4);
+    border-radius: 3px;
 }
 
 #analytics-side-panel::-webkit-scrollbar-thumb:hover {
-    background: rgba(59, 130, 246, 0.6);
+    background: rgba(148, 163, 184, 0.6);
 }
 
-/*
 .panel-section {
-    background: linear-gradient(135deg, rgba(51, 65, 85, 0.8) 0%, rgba(30, 41, 59, 0.9) 100%);
-    border-radius: 12px;
-    border: 1px solid rgba(59, 130, 246, 0.25);
+    background: rgba(30, 41, 59, 0.7);
+    border-radius: 8px;
+    border: 1px solid rgba(148, 163, 184, 0.15);
     overflow: hidden;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-}*/
+}
 
 .panel-section:hover {
-    border-color: rgba(59, 130, 246, 0.4);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    border-color: rgba(59, 130, 246, 0.3);
 }
 
 .section-header {
     display: flex;
     align-items: center;
-    gap: 2px;
-    padding: 2px 2px;
-    /*background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(99, 102, 241, 0.25) 100%);
-    border-bottom: 2px solid rgba(59, 130, 246, 0.3);*/
+    gap: 8px;
+    padding: 10px 12px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.1);
     font-size: 12px;
-    font-weight: 600;
-    color: #93c5fd;
-    /**/text-transform: uppercase;
-    letter-spacing: 0.8px;
+    font-weight: 700;
+    color: #60a5fa;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .section-header i {
-    font-size: 15px;
-    color: #60a5fa;
+    font-size: 13px;
 }
 
 .section-content {
-    padding: 0px 2px 0 1px;
-  /*  background: rgba(15, 23, 42, 0.5);*/
+    padding: 12px;
 }
 
 .section-map-controls .section-content {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 8px;
 }
 
 .panel-select {
     width: 100%;
-    padding: 10px 12px;
-    background: rgba(30, 41, 59, 0.9);
-    border: 2px solid rgba(59, 130, 246, 0.3);
-    border-radius: 8px;
+    padding: 8px 10px;
+    background: rgba(51, 65, 85, 0.8);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 6px;
     color: #f1f5f9;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
-.panel-select:hover {
-    border-color: rgba(59, 130, 246, 0.5);
-    background: rgba(30, 41, 59, 1);
-}
-
 .panel-select:focus {
     outline: none;
     border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
 .panel-btn {
@@ -1962,24 +1952,23 @@ select option {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 10px 14px;
+    padding: 8px 12px;
     border: none;
-    border-radius: 8px;
-    font-size: 12px;
+    border-radius: 6px;
+    font-size: 11px;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
     color: white;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .panel-btn i {
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .panel-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .panel-btn:active {
@@ -1991,7 +1980,7 @@ select option {
 }
 
 .btn-primary:hover {
-    box-shadow: 0 6px 18px rgba(59, 130, 246, 0.5);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
 
 .btn-warning {
@@ -1999,7 +1988,7 @@ select option {
 }
 
 .btn-warning:hover {
-    box-shadow: 0 6px 18px rgba(245, 158, 11, 0.5);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
 }
 
 .btn-success {
@@ -2007,7 +1996,7 @@ select option {
 }
 
 .btn-success:hover {
-    box-shadow: 0 6px 18px rgba(16, 185, 129, 0.5);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
 }
 
 .btn-info {
@@ -2015,7 +2004,7 @@ select option {
 }
 
 .btn-info:hover {
-    box-shadow: 0 6px 18px rgba(6, 182, 212, 0.5);
+    box-shadow: 0 4px 12px rgba(6, 182, 212, 0.4);
 }
 
 .btn-purple {
@@ -2023,7 +2012,7 @@ select option {
 }
 
 .btn-purple:hover {
-    box-shadow: 0 6px 18px rgba(139, 92, 246, 0.5);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
 }
 
 .btn-danger {
@@ -2031,7 +2020,7 @@ select option {
 }
 
 .btn-danger:hover {
-    box-shadow: 0 6px 18px rgba(239, 68, 68, 0.5);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
 }
 
 .btn-danger-outline {
@@ -2042,16 +2031,13 @@ select option {
 
 .btn-danger-outline:hover {
     background: rgba(239, 68, 68, 0.1);
-    box-shadow: 0 6px 18px rgba(239, 68, 68, 0.4);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 .chart-wrapper-panel {
     position: relative;
-    height: 180px;
+    height: 150px;
     width: 100%;
-    /*background: rgba(15, 23, 42, 0.6);
-    border-radius: 8px;*/
-    padding: 2px;
 }
 
 .chart-wrapper-panel canvas {
@@ -2061,30 +2047,28 @@ select option {
 
 .period-switches {
     display: flex;
-    gap: 10px;
+    gap: 8px;
 }
 
 .period-switch {
     flex: 1;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
-    gap: 8px;
-    padding: 2px 2px;
-    background: linear-gradient(135deg, rgba(51, 65, 85, 0.9) 0%, rgba(30, 41, 59, 0.9) 100%);
-    border: 2px solid rgba(148, 163, 184, 0.3);
+    gap: 6px;
+    padding: 12px 8px;
+    background: rgba(51, 65, 85, 0.8);
+    border: 2px solid rgba(148, 163, 184, 0.2);
     border-radius: 8px;
     color: #cbd5e1;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
 }
 
 .period-switch i {
-    font-size: 20px;
-    color: #94a3b8;
-    transition: all 0.3s ease;
+    font-size: 18px;
 }
 
 .period-switch span {
@@ -2092,38 +2076,28 @@ select option {
 }
 
 .period-count {
-    font-size: 15px !important;
+    font-size: 16px !important;
     color: #f1f5f9;
     font-weight: 800;
 }
 
 .period-switch:hover {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.4) 0%, rgba(99, 102, 241, 0.4) 100%);
+    background: rgba(59, 130, 246, 0.3);
     border-color: #3b82f6;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
-}
-
-.period-switch:hover i {
-    color: #60a5fa;
-    transform: scale(1.1);
 }
 
 .period-switch.active {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.5) 0%, rgba(99, 102, 241, 0.5) 100%);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.4) 0%, rgba(139, 92, 246, 0.4) 100%);
     border-color: #3b82f6;
     color: #f1f5f9;
-    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
-}
-
-.period-switch.active i {
-    color: #93c5fd;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
 }
 
 .section-actions .section-content {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 }
 
 /* ==========================================
@@ -2279,23 +2253,21 @@ select option {
     }
     
     #analytics-side-panel {
-        width: 300px;
-        padding: 14px;
-        gap: 10px;
+        width: 280px;
     }
     
     .chart-wrapper-panel {
-        height: 150px;
+        height: 130px;
     }
 }
 
 @media (min-width: 768px) and (max-width: 1024px) {
     #analytics-side-panel {
-        width: 300px;
+        width: 280px;
     }
     
     .chart-wrapper-panel {
-        height: 150px;
+        height: 130px;
     }
 }
 
@@ -2303,40 +2275,40 @@ select option {
     #analytics-side-panel {
         top: 10px;
         right: 10px;
-        width: 280px;
-        padding: 12px;
+        width: 250px;
+        padding: 10px;
         gap: 8px;
     }
     
     .section-header {
-        padding: 10px 12px;
-        font-size: 12px;
-    }
-    
-    .section-content {
-        padding: 12px;
-    }
-    
-    .panel-btn {
         padding: 8px 10px;
         font-size: 11px;
     }
     
+    .section-content {
+        padding: 10px;
+    }
+    
+    .panel-btn {
+        padding: 7px 10px;
+        font-size: 10px;
+    }
+    
     .chart-wrapper-panel {
-        height: 140px;
+        height: 120px;
     }
     
     .period-switch {
-        padding: 12px 8px;
-        font-size: 11px;
+        padding: 10px 6px;
+        font-size: 10px;
     }
     
     .period-switch i {
-        font-size: 18px;
+        font-size: 16px;
     }
     
     .period-count {
-        font-size: 16px !important;
+        font-size: 14px !important;
     }
 }
 
@@ -2445,38 +2417,38 @@ select option {
     #analytics-side-panel {
         top: 10px;
         right: 5px;
-        width: 240px;
-        padding: 10px;
-        gap: 2px;
-    }
-    
-    .section-header {
-        padding: 8px 10px;
-        font-size: 11px;
+        width: 200px;
+        padding: 8px;
         gap: 6px;
     }
     
-    .section-header i {
-        font-size: 12px;
-    }
-    
-    .section-content {
-        padding: 10px;
-    }
-    
-    .panel-select {
-        padding: 8px 10px;
-        font-size: 11px;
-    }
-    
-    .panel-btn {
-        padding: 8px 10px;
+    .section-header {
+        padding: 6px 8px;
         font-size: 10px;
         gap: 6px;
     }
     
-    .panel-btn i {
+    .section-header i {
         font-size: 11px;
+    }
+    
+    .section-content {
+        padding: 8px;
+    }
+    
+    .panel-select {
+        padding: 6px 8px;
+        font-size: 10px;
+    }
+    
+    .panel-btn {
+        padding: 6px 8px;
+        font-size: 9px;
+        gap: 6px;
+    }
+    
+    .panel-btn i {
+        font-size: 10px;
     }
     
     .panel-btn span {
@@ -2484,37 +2456,36 @@ select option {
     }
     
     .chart-wrapper-panel {
-        height: 120px;
+        height: 100px;
     }
     
     .period-switches {
         flex-direction: column;
-        gap: 8px;
     }
     
     .period-switch {
-        padding: 10px 8px;
-        font-size: 10px;
+        padding: 8px 6px;
+        font-size: 9px;
         flex-direction: row;
         justify-content: space-between;
     }
     
     .period-switch i {
-        font-size: 16px;
+        font-size: 14px;
     }
     
     .period-count {
-        font-size: 14px !important;
+        font-size: 13px !important;
     }
 }
 
 @media (min-width: 1400px) and (max-width: 1920px) {
     #analytics-side-panel {
-        width: 300px;
+        width: 360px;
     }
     
     .chart-wrapper-panel {
-        height: 200px;
+        height: 180px;
     }
 }
 
@@ -2525,70 +2496,38 @@ select option {
     }
     
     .section-header {
-        padding: 16px 18px;
-        font-size: 14px;
-    }
-    
-    .section-content {
-        padding: 16px;
-    }
-    
-    .panel-select {
         padding: 12px 14px;
         font-size: 13px;
     }
     
+    .section-content {
+        padding: 14px;
+    }
+    
+    .panel-select {
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+    
     .panel-btn {
-        padding: 12px 16px;
-        font-size: 13px;
+        padding: 10px 14px;
+        font-size: 12px;
     }
     
     .chart-wrapper-panel {
-        height: 220px;
+        height: 200px;
     }
     
     .period-switch {
-        padding: 16px 12px;
-        font-size: 13px;
+        padding: 14px 10px;
+        font-size: 12px;
     }
     
     .period-switch i {
-        font-size: 22px;
+        font-size: 20px;
     }
     
     .period-count {
-        font-size: 20px !important;
-    }
-}
-
-/*  Pulsanti affiancati */
-/* Modifica la sezione controlli mappa per supportare pulsanti affiancati */
-.section-map-controls .section-content {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-/* Nuovo contenitore per pulsanti affiancati */
-.panel-btn-row {
-    display: flex;
-    gap: 6px;
-}
-
-.panel-btn-row .panel-btn {
-    flex: 1;
-    font-size: 10px;
-    padding: 8px 6px;
-}
-
-
-@media (min-width: 240px) and (max-width: 480px) {
-    .panel-btn-row .panel-btn span {
-        display: inline; /* Mantieni il testo visibile */
-    }
-    
-    .panel-btn-row .panel-btn {
-        font-size: 9px;
-        padding: 6px 4px;
+        font-size: 18px !important;
     }
 }

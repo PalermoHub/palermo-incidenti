@@ -280,141 +280,79 @@
     <!-- Map Controls Container -->
     <div class="map-controls-container">
    </div>
+    
+    <!-- Legend -->
+<div id="points-legend">
+            <select style="margin-bottom: 10px;" id="basemap-select" title="Seleziona Mappa di Base">
+                <option value="carto-dark" >Carto Dark</option>
+                <option value="osm">OpenStreetMap</option>
+                <option value="satellite">Satellite</option>
+                <option value="carto-light" selected>Carto Light</option>
+            </select>	
+			<button class="btn-map-control btn-clustering-map" id="btn-clustering-map" title="Visualizza raggruppamento incidenti per zona e le strade con maggior numero di incidenti"> <i class="fas fa-circle"></i> Mappa con clustering geografico
+</button>
+<button class="btn-map-control btn-top-luoghi-map" id="btn-top-luoghi-map" style="display: none;" title="Visualizza/Scarica l'elcono con le 25 vie con più incidenti">
+    <i class="fas fa-trophy"></i> Vie con maggior numero di incidenti
+</button>			
+			<button class="btn-map-control btn-heatmap-map" id="btn-heatmap-map" title="Attiva/Disattiva Mappa di Calore">
+                <i class="fas fa-fire"></i> Heatmap
+            </button>
 
-<!-- Analytics Side Panel -->
-<div id="analytics-side-panel">
-    <!-- Sezione 1: Controlli Mappa -->
-   <div class="panel-section section-map-controls">
-    <div class="section-header">
-        <i class="fas fa-map"></i>
-        <span>Controlli Mappa</span>
+            <button class="btn-map-control btn-data-table-map" id="btn-data-table-map" title="Visualizza/scarica la Tabella dati selezionati">
+                <i class="fas fa-table"></i> Tabella dati
+            </button>
+            <button class="btn-map-control btn-analytics-map" id="btn-analytics-map" title="Visualizza la Dashboard di Analisi Avanzata">
+                <i class="fas fa-chart-line"></i> Cockpit Analisi
+            </button>
+   <!--         <button class="btn-map-control btn-reset-map" id="btn-reset-map" title="Reset Filtri">
+                <i class="fas fa-sync-alt"></i> Reset
+            </button>	-->
+			<hr>
+    <h4>Tipologie Incidenti</h4>
+    <div style="height: 170px; top: -10px; position: relative;">
+        <canvas id="legend-chart"></canvas>
     </div>
-    <div class="section-content">
-        <select id="basemap-select" class="panel-select" title="Seleziona Mappa di Base">
-            <option value="carto-light" selected>Carto Light</option>
-            <option value="carto-dark">Carto Dark</option>
-            <option value="osm">OpenStreetMap</option>
-            <option value="satellite">Satellite</option>
-        </select>
-                <!-- Pulsanti affiancati -->
-        <div class="panel-btn-row">
-        <button class="panel-btn btn-primary" id="btn-clustering-map" title="Visualizza clustering geografico">
-            <i class="fas fa-circle"></i>
-            <span>Clustering</span>
+<!-- Switch Giorno/Notte -->
+<div style="margin-top: -50px; padding: 5px; /*background: rgba(30, 41, 59, 0.6);*/ border-radius: 8px;">
+  <!--   <h4 style="margin: 0 0 12px 0; font-size: 13px; color: #fff; font-weight: 600; text-align: center;">
+        <i class="fas fa-sun"></i><i class="fas fa-moon"></i> Periodo del Giorno
+    </h4> -->
+    <div style="display: flex; gap: 8px;">
+        <button id="switch-giorno" class="period-switch" data-period="Giorno" title="Filtra incidenti diurni">
+            <span style="font-size: 10px;"><i class="fas fa-sun"></i></span>
+            <span style="font-size: 11px; font-weight: 600;">Giorno</span>
+            <span id="count-giorno" style="font-size: 10px; font-weight: 600;">0</span>
         </button>
-        
-        <button class="panel-btn btn-warning" id="btn-top-luoghi-map" style="display: none;" title="Top 25 vie">
-            <i class="fas fa-trophy"></i>
-            <span>Top Luoghi</span>
+        <button id="switch-notte" class="period-switch" data-period="Notte" title="Filtra incidenti notturni">
+            <span style="font-size: 10px;"><i class="fas fa-moon"></i></span>
+            <span style="font-size: 11px; font-weight: 600;">Notte</span>
+            <span id="count-notte" style="font-size: 10px; font-weight: 700;">0</span>
         </button>
-        
-        <button class="panel-btn btn-success" id="btn-heatmap-map" title="Mappa di calore">
-            <i class="fas fa-fire"></i>
-            <span>Heatmap</span>
-        </button>
-        </div>
-        <!-- Pulsanti affiancati -->
-        <div class="panel-btn-row">
-            <button class="panel-btn btn-info" id="btn-data-table-map" title="Tabella dati">
-                <i class="fas fa-table"></i>
-                <span>Tabella</span>
-            </button>
-            
-            <button class="panel-btn btn-purple" id="btn-analytics-map" title="Dashboard analisi">
-                <i class="fas fa-chart-line"></i>
-                <span>Analisi</span>
-            </button>
-        </div>
-					            <button class="panel-btn btn-danger" id="btn-reset-map" title="Reset Filtri">
-                <i class="fas fa-sync-alt"></i>
-                <span>Reset Filtri</span>
-            </button>
     </div>
 </div>
 
-    <!-- Sezione 2: Tipologie Incidenti -->
-    <div class="panel-section section-types">
-        <div class="section-header">
-            <i class="fas fa-exclamation-triangle"></i>
-            <span>Tipologie Incidenti</span>
-        </div>
-        <div class="section-content">
-            <div class="chart-wrapper-panel">
-                <canvas id="legend-chart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <!-- Sezione 3: Periodo Giorno/Notte -->
-    <div class="panel-section section-period">
-        <div class="section-header">
-            <i class="fas fa-sun"></i>
-            <i class="fas fa-moon"></i>
-            <span>Periodo</span>
-        </div>
-        <div class="section-content">
-            <div class="period-switches">
-                <button id="switch-giorno" class="period-switch" data-period="Giorno" title="Filtra incidenti diurni">
-                    <i class="fas fa-sun"></i>
-                    <span>Giorno</span>
-                    <span id="count-giorno" class="period-count">0</span>
-                </button>
-                <button id="switch-notte" class="period-switch" data-period="Notte" title="Filtra incidenti notturni">
-                    <i class="fas fa-moon"></i>
-                    <span>Notte</span>
-                    <span id="count-notte" class="period-count">0</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Sezione 4: Analisi Mensile -->
-    <div class="panel-section section-monthly">
-        <div class="section-header">
-            <i class="fas fa-chart-bar"></i>
-            <span>Incidenti per Mese</span>
-        </div>
-        <div class="section-content">
-            <div class="chart-wrapper-panel">
-                <canvas id="monthly-area-chart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <!-- Sezione 5: Analisi Feriti/Morti -->
-    <div class="panel-section section-injuries">
-        <div class="section-header">
-            <i class="fas fa-ambulance"></i>
-            <span>Feriti/Morti per Mese</span>
-        </div>
-        <div class="section-content">
-            <div class="chart-wrapper-panel">
-                <canvas id="monthly-injuries-chart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <!-- Sezione 6: Azioni 
-    <div class="panel-section section-actions">
-        <div class="section-content">
-            <button class="panel-btn btn-danger" id="btn-reset-map" title="Reset Filtri">
-                <i class="fas fa-sync-alt"></i>
-                <span>Reset Filtri</span>
-            </button>
-         </div>-->
-    </div>
+<!-- Grafico Area Incidenti e Feriti per Mese -->
+<div class="chart-container" style="margin-top: -5px;">
+    <h4 style="margin-bottom: 8px; font-size: 13px; color: #fff; font-weight: 600; text-align: left;">
+        <i class="fas fa-chart-bar"></i> Incidenti e Feriti per Mese
+    </h4>
+    <canvas id="monthly-area-chart"></canvas>
 </div>
 
-<!-- Heatmap Legend (separato, si mostra solo con heatmap attiva) -->
-<div class="heatmap-legend hidden" id="heatmap-legend">
-    <h3>Densità Incidenti</h3>
-    <div class="heatmap-gradient"></div>
-    <div class="heatmap-labels">
-        <span>Bassa</span>
-        <span>Alta</span>
-    </div>
+<!-- Grafico Radar Feriti/Morti per Mese -->
+<div class="chart-container" style="margin-top: 50px; bottom: 20px;">
+    <h4 style="margin-bottom: 8px; font-size: 13px; color: #fff; font-weight: 600; text-align: left;">
+     <i class="fas fa-ambulance"></i> Feriti/Morti per Mese
+    </h4>
+    <canvas id="monthly-injuries-chart"></canvas>
+</div> <br>	
+<button class="btn-map-control btn-reset-map" id="btn-reset-map" title="Reset Filtri">
+ <i class="fas fa-sync-alt"></i> Reset
+ </button>	
+<button id="btn-reset-charts" class="btn-reset-charts" title="Resetta tutti i filtri grafici">
+    <span style="font-size: 12px;"><i class="fas fa-sync-alt"></i></span> Reset Filtri Grafici
+</button>
 </div>
-
 
    <!-- Heatmap Legend -->
     <div class="heatmap-legend hidden" id="heatmap-legend">
