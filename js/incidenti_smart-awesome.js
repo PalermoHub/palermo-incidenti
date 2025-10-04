@@ -2152,6 +2152,44 @@ function updateLegendChart() {
         }
     });
     
+    // AGGIUNGI QUESTO BLOCCO QUI ↓
+    // Costruisci il titolo con i filtri attivi
+    const activeFilters = [];
+    
+    if (currentFilters['filter-data-selezionata']) {
+        activeFilters.push(currentFilters['filter-data-selezionata']);
+    } else {
+        if (currentFilters['filter-anno']) {
+            activeFilters.push(currentFilters['filter-anno']);
+        }
+        if (currentFilters['filter-mese']) {
+            activeFilters.push(currentFilters['filter-mese']);
+        }
+        if (currentFilters['filter-giorno-settimana']) {
+            activeFilters.push(currentFilters['filter-giorno-settimana']);
+        }
+    }
+    
+    if (currentFilters['filter-circoscrizione']) {
+        activeFilters.push(currentFilters['filter-circoscrizione']);
+    }
+    if (currentFilters['filter-quartiere']) {
+        activeFilters.push(currentFilters['filter-quartiere']);
+    }
+    if (currentFilters['filter-giorno-notte']) {
+        activeFilters.push(currentFilters['filter-giorno-notte']);
+    }
+    
+    // Aggiorna il titolo del grafico
+    const chartTitle = document.getElementById('legend-chart-title');
+    if (chartTitle) {
+        if (activeFilters.length > 0) {
+            chartTitle.innerHTML = `Tipologia Incidenti<br><small style="font-size: 11px; font-weight: 600; color: #94a3b8;">${activeFilters.join(' • ')}</small>`;
+        } else {
+            chartTitle.textContent = 'Tipologia Incidenti';
+        }
+    }
+    
     const selectedTipo = currentFilters['filter-tipologia'];
     
     const items = [

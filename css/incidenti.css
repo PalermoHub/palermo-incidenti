@@ -1845,6 +1845,10 @@ select option {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
 }
+/**/
+.maplibregl-ctrl-attrib.maplibregl-compact {
+ top: 8px;
+}
 
 /* ==========================================
    ANALYTICS SIDE PANEL - DESIGN MIGLIORATO
@@ -1854,7 +1858,7 @@ select option {
     position: fixed;
     top: 5px;
     right: 5px;
-    height: calc(97.8vh - 20px);
+    height: calc(98.8vh - 20px);
     width: 340px;
     background: #0f172abd !important;
     backdrop-filter: blur(2px);
