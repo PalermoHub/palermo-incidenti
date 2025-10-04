@@ -70,7 +70,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-   /* background: rgba(0, 0, 0, 0.6);*/
+    background: rgba(0, 0, 0, 0.6);
     z-index: 2400;
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -87,7 +87,7 @@
     bottom: -100%;
     left: 0;
     width: 100%;
-    max-height: 100vh;
+    max-height: 70vh;
     background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
@@ -450,95 +450,6 @@
     }
 }
 
-  /* Additional styles for article content */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Titillium Web', sans-serif;
-            line-height: 1.8;
-            color: #cbd5e1;
-            background: #f8f9fa;
-        }
-        
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 40px 20px 120px;
-            background: white;
-            box-shadow: 0 0 30px rgba(0,0,0,0.1);
-        }
-        
-        h1 {
-            font-family: 'Titillium Web', sans-serif;
-            font-size: 2.2em;
-            color: #c0392b;
-            margin-bottom: 20px;
-            line-height: 1.3;
-            border-bottom: 4px solid #c0392b;
-            padding-bottom: 15px;
-            font-weight: 700;
-        }
-        
-        .subtitle {
-            font-size: 1.1em;
-            color: #7f8c8d;
-            font-weight: 600;
-            margin-bottom: 40px;
-            font-style: italic;
-        }
-        
-        h2 {
-            font-family: 'Titillium Web', sans-serif;
-            font-size: 1.8em;
-            color: #cbd5e1;
-            margin-top: 50px;
-            margin-bottom: 20px;
-            border-left: 5px solid #3498db;
-            padding-left: 15px;
-            font-weight: 700;
-        }
-        
-        h3 {
-            font-family: 'Titillium Web', sans-serif;
-            font-size: 1.3em;
-            color: #cbd5e1;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-        
-        p {
-            margin-bottom: 20px;
-            text-align: justify;
-        }
-        
-        ul, ol {
-            margin: 20px 0 20px 40px;
-        }
-        
-        li {
-            margin-bottom: 10px;
-        }
-        
-        strong {
-            color: #c0392b;
-            font-weight: 700;
-        }
-        
-        a {
-            color: #3498db;
-            text-decoration: none;
-            border-bottom: 1px dotted #3498db;
-        }
-        
-        a:hover {
-            color: #2980b9;
-            border-bottom: 1px solid #2980b9;
-        }
 /* Responsive */
 @media (max-width: 768px) {
     .back-to-top-btn {
