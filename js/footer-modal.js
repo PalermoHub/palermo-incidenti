@@ -15,6 +15,8 @@
         const footerModal = document.getElementById('footer-modal');
         const footerOverlay = document.getElementById('footer-modal-overlay');
         const closeBtn = document.getElementById('footer-modal-close');
+        const backToTopBtn = document.getElementById('back-to-top-btn');
+        const modalContent = document.querySelector('.footer-modal-content');
         
         if (footerBtn) {
             footerBtn.addEventListener('click', toggleModal);
@@ -26,6 +28,26 @@
         
         if (footerOverlay) {
             footerOverlay.addEventListener('click', closeModal);
+        }
+        
+        // Back to top functionality
+        if (backToTopBtn && modalContent) {
+            // Show/hide button on scroll
+            modalContent.addEventListener('scroll', () => {
+                if (modalContent.scrollTop > 200) {
+                    backToTopBtn.classList.add('show');
+                } else {
+                    backToTopBtn.classList.remove('show');
+                }
+            });
+            
+            // Scroll to top on click
+            backToTopBtn.addEventListener('click', () => {
+                modalContent.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
         }
         
         // Tab switching
@@ -68,35 +90,33 @@
     }
     
     // Close Modal
-// Close Modal
-function closeModal() {
-    const modal = document.getElementById('footer-modal');
-    const overlay = document.getElementById('footer-modal-overlay');
-    const btn = document.getElementById('footer-info-btn');
-    const backToTopBtn = document.getElementById('back-to-top-btn');  // ← AGGIUNGI
-    
-    if (modal && overlay && btn) {
-        modal.classList.remove('open');
-        overlay.classList.remove('show');
+    function closeModal() {
+        const modal = document.getElementById('footer-modal');
+        const overlay = document.getElementById('footer-modal-overlay');
+        const btn = document.getElementById('footer-info-btn');
+        const backToTopBtn = document.getElementById('back-to-top-btn');
         
-        // Hide back to top button  // ← AGGIUNGI
-        if (backToTopBtn) {
-            backToTopBtn.classList.remove('show');
+        if (modal && overlay && btn) {
+            modal.classList.remove('open');
+            overlay.classList.remove('show');
+            
+            // Hide back to top button
+            if (backToTopBtn) {
+                backToTopBtn.classList.remove('show');
+            }
+            
+            // Wait for animation to complete
+            setTimeout(() => {
+                btn.style.display = 'flex';
+            }, 400);
+            
+            isModalOpen = false;
+            
+            // Re-enable body scroll
+            document.body.style.overflow = '';
         }
-        
-        // Wait for animation to complete
-        setTimeout(() => {
-            btn.style.display = 'flex';
-        }, 400);
-        
-        isModalOpen = false;
-        
-        // Re-enable body scroll
-        document.body.style.overflow = '';
     }
-}
-
-
+    
     // Switch Tab
     function switchTab(tabName) {
         // Remove active class from all tabs and contents
@@ -114,62 +134,17 @@ function closeModal() {
         
         if (selectedTab) selectedTab.classList.add('active');
         if (selectedContent) selectedContent.classList.add('active');
-    }
-    
-	// Setup Event Listeners
-function setupEventListeners() {
-    const footerBtn = document.getElementById('footer-info-btn');
-    const footerModal = document.getElementById('footer-modal');
-    const footerOverlay = document.getElementById('footer-modal-overlay');
-    const closeBtn = document.getElementById('footer-modal-close');
-    const backToTopBtn = document.getElementById('back-to-top-btn');  // ← AGGIUNGI
-    const modalContent = document.querySelector('.footer-modal-content');  // ← AGGIUNGI
-    
-    if (footerBtn) {
-        footerBtn.addEventListener('click', toggleModal);
-    }
-    
-    if (closeBtn) {
-        closeBtn.addEventListener('click', closeModal);
-    }
-    
-    if (footerOverlay) {
-        footerOverlay.addEventListener('click', closeModal);
-    }
-    
-    // AGGIUNGI: Back to top functionality
-    if (backToTopBtn && modalContent) {
-        // Show/hide button on scroll
-        modalContent.addEventListener('scroll', () => {
-            if (modalContent.scrollTop > 200) {
-                backToTopBtn.classList.add('show');
-            } else {
-                backToTopBtn.classList.remove('show');
-            }
-        });
         
-        // Scroll to top on click
-        backToTopBtn.addEventListener('click', () => {
+        // ✅ SCROLL TO TOP WHEN CHANGING TAB
+        const modalContent = document.querySelector('.footer-modal-content');
+        if (modalContent) {
             modalContent.scrollTo({
                 top: 0,
                 behavior: 'smooth'
             });
-        });
+        }
     }
     
-    // Tab switching
-    document.querySelectorAll('.footer-tab').forEach(tab => {
-        tab.addEventListener('click', () => switchTab(tab.dataset.tab));
-    });
-    
-    // ESC key to close
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && isModalOpen) {
-            closeModal();
-        }
-    });
-}
-	
     // Initialize on DOM ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);

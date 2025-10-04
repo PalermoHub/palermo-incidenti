@@ -87,7 +87,7 @@
     bottom: -100%;
     left: 0;
     width: 100%;
-    max-height: 100vh;
+    height: 100vh;  /* ✅ CAMBIA QUESTO */
     background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;

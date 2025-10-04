@@ -24,45 +24,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
-    
-    <style>
-        .demo-badge {
-            position: absolute;
-    top: 50px;
-    right: -25px;
-            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            transform: rotate(-30deg);
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
-            animation: pulse-demo 2s ease-in-out infinite;
-            z-index: 10;
-        }
-        
-        .demo-badge i {
-            margin-right: 4px;
-            font-size: 12px;
-        }
-        
-        @keyframes pulse-demo {
-            0%, 100% {
-                transform: rotate(-30deg) scale(1);
-                box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
-            }
-            50% {
-                transform: rotate(-30deg) scale(1.05);
-                box-shadow: 0 6px 16px rgba(239, 68, 68, 0.6);
-            }
-        }
-        
-        .header-content {
-            position: relative;
-        }
-    </style>
 </head>
 <body>
     <!-- Mobile Toggle -->
@@ -81,9 +42,6 @@
             <div class="header-content">
                 <h1>Incidenti Stradali</h1>
                 <p>Palermo 2015-2023 • Dashboard Interattiva</p>
-                <span class="demo-badge">
-                    <i class="fas fa-flask"></i> Demo Version
-                </span>
             </div>
         </div>
         
@@ -111,20 +69,20 @@
                 <div class="stat-label">Totale Incidenti</div>
                 <div class="stat-value" id="stat-total">0</div>
                 <div class="stat-info" id="total-info">
-                    <span><i class="fas fa-check"></i> Dati caricati</span>
+                    <span>✓ Dati caricati</span>
                     <span class="info-icon" id="info-icon-btn" title="Informazioni sui dati">i</span>
                 </div>
             </div>
             
             <div class="year-stats">
-                <div class="year-stats-title"><i class="fas fa-chart-bar"></i> Distribuzione per Anno (clicca per filtrare)</div>
+                <div class="year-stats-title">📊 Distribuzione per Anno (clicca per filtrare)</div>
                 <div class="year-stats-grid" id="year-stats-grid"></div>
             </div>
         </div>
 
         <div class="filters">
             <button class="btn-heatmap" id="btn-toggle-heatmap">
-                <i class="fas fa-fire"></i> Mappa di Calore
+                🔥 Mappa di Calore
             </button>
             <br>
             <div class="filter-group hidden">
@@ -141,16 +99,16 @@
 <!-- NUOVO: Sezione Calendario Personalizzato -->
 <div class="filter-section" >
     <div class="filter-section-header" data-section="calendario">
-        <span><i class="fas fa-calendar-alt"></i> Calendario Interattivo</span>
-        <span class="toggle-icon collapsed"><i class="fas fa-chevron-down"></i></span>
+        <span>📅 Calendario Interattivo</span>
+        <span class="toggle-icon collapsed">▼</span>
     </div>
     <div class="filter-section-content collapsed" id="content-calendario">
         <div class="custom-calendar" id="custom-calendar">
             <!-- Controlli Anno -->
             <div class="calendar-year-control">
-                <button class="calendar-nav-btn" id="cal-prev-year"><i class="fas fa-chevron-left"></i></button>
+                <button class="calendar-nav-btn" id="cal-prev-year">«</button>
                 <div class="calendar-year-display" id="cal-year-display">2023</div>
-                <button class="calendar-nav-btn" id="cal-next-year"><i class="fas fa-chevron-right"></i></button>
+                <button class="calendar-nav-btn" id="cal-next-year">»</button>
             </div>
             
             <!-- Griglia Mesi -->
@@ -181,25 +139,25 @@
             
             <!-- Pulsanti Azione -->
             <div class="calendar-actions">
-                <button class="btn-calendar-reset" id="btn-calendar-reset"><i class="fas fa-sync-alt"></i> Reset</button>
+                <button class="btn-calendar-reset" id="btn-calendar-reset">🔄 Reset</button>
             </div>
         </div>
     </div>
 </div>
                 <div class="filter-section-header" data-section="localizzazione">
-                    <span><i class="fas fa-map-marker-alt"></i> Localizzazione</span>
-                    <span class="toggle-icon collapsed"><i class="fas fa-chevron-down"></i></span>
+                    <span>📍 Localizzazione</span>
+                    <span class="toggle-icon collapsed">▼</span>
                 </div>
                 <div class="filter-section-content collapsed" id="content-localizzazione">
                     <div class="filter-group">
                         <label class="filter-label">Circoscrizioni</label>
                         <select id="filter-circoscrizione"></select>
-                        <div class="filter-cascade-info">Filtra Quartiere e UPL <i class="fas fa-arrow-down"></i></div>
+                        <div class="filter-cascade-info">Filtra Quartiere e UPL ↓</div>
                     </div>
                     <div class="filter-group">
                         <label class="filter-label">Quartieri</label>
                         <select id="filter-quartiere"></select>
-                        <div class="filter-cascade-info">Filtra UPL <i class="fas fa-arrow-down"></i></div>
+                        <div class="filter-cascade-info">Filtra UPL ↓</div>
                     </div>
                     <div class="filter-group">
                         <label class="filter-label">Unità di primo livello</label>
@@ -210,8 +168,8 @@
 
             <div class="filter-section">
                 <div class="filter-section-header" data-section="temporale">
-                    <span><i class="fa-solid fa-calendar"></i> Analisi Temporale</span>
-                    <span class="toggle-icon collapsed"><i class="fas fa-chevron-down"></i></span>
+                    <span>📅 Analisi Temporale</span>
+                    <span class="toggle-icon collapsed">▼</span>
                 </div>
                 <div class="filter-section-content collapsed" id="content-temporale">
                     <div class="filter-group hidden">
@@ -239,8 +197,8 @@
 
             <div class="filter-section">
                 <div class="filter-section-header" data-section="condizioni">
-                    <span><i class="fas fa-cloud-sun"></i> Condizioni e Orari</span>
-                    <span class="toggle-icon collapsed"><i class="fas fa-chevron-down"></i></span>
+                    <span>🌤️ Condizioni e Orari</span>
+                    <span class="toggle-icon collapsed">▼</span>
                 </div>
                 <div class="filter-section-content collapsed" id="content-condizioni">
                     <div class="filter-group">
@@ -266,10 +224,10 @@
                 </div>
             </div>
 
-            <button class="btn-reset" id="btn-reset" title="Reset Filtri"><i class="fas fa-sync-alt"></i> Reset Filtri</button>
-            <button class="btn-data-table" id="btn-data-table" title="Visualizza e scarica i dati selezionati"><i class="fas fa-table"></i> Tabella Dati</button>
+            <button class="btn-reset" id="btn-reset" title="Reset Filtri">🔄 Reset Filtri</button>
+            <button class="btn-data-table" id="btn-data-table" title="Visualizza e scarica i dati selezionati">📊 Tabella Dati</button>
             <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" title="Agenzia per l'Italia Digitale" target="_blank" rel="noopener noreferrer" class="btn-fonte">
-                <i class="fa fa-database"></i> Fonte Dati: dati.gov.it
+                📄 Fonte Dati: dati.gov.it
             </a>
         </div>
     </div>
@@ -280,141 +238,79 @@
     <!-- Map Controls Container -->
     <div class="map-controls-container">
    </div>
+    
+    <!-- Legend -->
+<div id="points-legend">
+            <select style="margin-bottom: 10px;" id="basemap-select" title="Seleziona Mappa di Base">
+                <option value="carto-dark" >Carto Dark</option>
+                <option value="osm">OpenStreetMap</option>
+                <option value="satellite">Satellite</option>
+                <option value="carto-light" selected>Carto Light</option>
+            </select>	
+			<button class="btn-map-control btn-clustering-map" id="btn-clustering-map" title="Visualizza raggruppamento incidenti per zona e le strade con maggior numero di incidenti"> 🔵 Mappa con clustering geografico
+</button>
+<button class="btn-map-control btn-top-luoghi-map" id="btn-top-luoghi-map" style="display: none;" title="Visualizza/Scarica l'elcono con le 25 vie con più incidenti">
+    🏆 Vie con maggior numero di incidenti
+</button>			
+			<button class="btn-map-control btn-heatmap-map" id="btn-heatmap-map" title="Attiva/Disattiva Mappa di Calore">
+                🔥 Heatmap
+            </button>
 
-<!-- Analytics Side Panel -->
-<div id="analytics-side-panel">
-    <!-- Sezione 1: Controlli Mappa -->
-   <div class="panel-section section-map-controls">
-    <div class="section-header">
-        <i class="fas fa-map"></i>
-        <span>Controlli Mappa</span>
+            <button class="btn-map-control btn-data-table-map" id="btn-data-table-map" title="Visualizza/scarica la Tabella dati selezionati">
+                📊 Tabella dati
+            </button>
+            <button class="btn-map-control btn-analytics-map" id="btn-analytics-map" title="Visualizza la Dashboard di Analisi Avanzata">
+                📈 Cockpit Analisi
+            </button>
+   <!--         <button class="btn-map-control btn-reset-map" id="btn-reset-map" title="Reset Filtri">
+                🔄 Reset
+            </button>	-->
+			<hr>
+    <h4>Tipologie Incidenti</h4>
+    <div style="height: 170px; top: -10px; position: relative;">
+        <canvas id="legend-chart"></canvas>
     </div>
-    <div class="section-content">
-        <select id="basemap-select" class="panel-select" title="Seleziona Mappa di Base">
-            <option value="carto-light" selected>Carto Light</option>
-            <option value="carto-dark">Carto Dark</option>
-            <option value="osm">OpenStreetMap</option>
-            <option value="satellite">Satellite</option>
-        </select>
-                <!-- Pulsanti affiancati -->
-        <div class="panel-btn-row">
-        <button class="panel-btn btn-primary" id="btn-clustering-map" title="Visualizza clustering geografico">
-            <i class="fas fa-circle"></i>
-            <span>Clustering</span>
+<!-- Switch Giorno/Notte -->
+<div style="margin-top: -50px; padding: 5px; /*background: rgba(30, 41, 59, 0.6);*/ border-radius: 8px;">
+  <!--   <h4 style="margin: 0 0 12px 0; font-size: 13px; color: #fff; font-weight: 600; text-align: center;">
+        🌞🌙 Periodo del Giorno
+    </h4> -->
+    <div style="display: flex; gap: 8px;">
+        <button id="switch-giorno" class="period-switch" data-period="Giorno" title="Filtra incidenti diurni">
+            <span style="font-size: 10px;">☀️</span>
+            <span style="font-size: 11px; font-weight: 600;">Giorno</span>
+            <span id="count-giorno" style="font-size: 10px; font-weight: 600;">0</span>
         </button>
-        
-        <button class="panel-btn btn-warning" id="btn-top-luoghi-map" style="display: none;" title="Top 25 vie">
-            <i class="fas fa-trophy"></i>
-            <span>Top Luoghi</span>
+        <button id="switch-notte" class="period-switch" data-period="Notte" title="Filtra incidenti notturni">
+            <span style="font-size: 10px;">🌙</span>
+            <span style="font-size: 11px; font-weight: 600;">Notte</span>
+            <span id="count-notte" style="font-size: 10px; font-weight: 700;">0</span>
         </button>
-        
-        <button class="panel-btn btn-success" id="btn-heatmap-map" title="Mappa di calore">
-            <i class="fas fa-fire"></i>
-            <span>Heatmap</span>
-        </button>
-        </div>
-        <!-- Pulsanti affiancati -->
-        <div class="panel-btn-row">
-            <button class="panel-btn btn-info" id="btn-data-table-map" title="Tabella dati">
-                <i class="fas fa-table"></i>
-                <span>Tabella</span>
-            </button>
-            
-            <button class="panel-btn btn-purple" id="btn-analytics-map" title="Dashboard analisi">
-                <i class="fas fa-chart-line"></i>
-                <span>Analisi</span>
-            </button>
-        </div>
-					            <button class="panel-btn btn-danger" id="btn-reset-map" title="Reset Filtri">
-                <i class="fas fa-sync-alt"></i>
-                <span>Reset Filtri</span>
-            </button>
     </div>
 </div>
 
-    <!-- Sezione 2: Tipologie Incidenti -->
-    <div class="panel-section section-types">
-        <div class="section-header">
-            <i class="fas fa-exclamation-triangle"></i>
-            <span id="legend-chart-title">Tipologie Incidenti</span>
-        </div>
-        <div class="section-content">
-            <div class="chart-wrapper-panel">
-                <canvas id="legend-chart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <!-- Sezione 3: Periodo Giorno/Notte -->
-    <div class="panel-section section-period">
-        <div class="section-header">
-            <i class="fas fa-sun"></i>
-            <i class="fas fa-moon"></i>
-            <span>Periodo</span>
-        </div>
-        <div class="section-content">
-            <div class="period-switches">
-                <button id="switch-giorno" class="period-switch" data-period="Giorno" title="Filtra incidenti diurni">
-                    <i class="fas fa-sun"></i>
-                    <span>Giorno</span>
-                    <span id="count-giorno" class="period-count">0</span>
-                </button>
-                <button id="switch-notte" class="period-switch" data-period="Notte" title="Filtra incidenti notturni">
-                    <i class="fas fa-moon"></i>
-                    <span>Notte</span>
-                    <span id="count-notte" class="period-count">0</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Sezione 4: Analisi Mensile -->
-    <div class="panel-section section-monthly">
-        <div class="section-header">
-            <i class="fas fa-chart-bar"></i>
-            <span>Incidenti per Mese</span>
-        </div>
-        <div class="section-content">
-            <div class="chart-wrapper-panel">
-                <canvas id="monthly-area-chart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <!-- Sezione 5: Analisi Feriti/Morti -->
-    <div class="panel-section section-injuries">
-        <div class="section-header">
-            <i class="fas fa-ambulance"></i>
-            <span>Feriti/Morti per Mese</span>
-        </div>
-        <div class="section-content">
-            <div class="chart-wrapper-panel">
-                <canvas id="monthly-injuries-chart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <!-- Sezione 6: Azioni 
-    <div class="panel-section section-actions">
-        <div class="section-content">
-            <button class="panel-btn btn-danger" id="btn-reset-map" title="Reset Filtri">
-                <i class="fas fa-sync-alt"></i>
-                <span>Reset Filtri</span>
-            </button>
-         </div>-->
-    </div>
+<!-- Grafico Area Incidenti e Feriti per Mese -->
+<div class="chart-container" style="margin-top: -5px;">
+    <h4 style="margin-bottom: 8px; font-size: 13px; color: #fff; font-weight: 600; text-align: left;">
+        📊 Incidenti e Feriti per Mese
+    </h4>
+    <canvas id="monthly-area-chart"></canvas>
 </div>
 
-<!-- Heatmap Legend (separato, si mostra solo con heatmap attiva) -->
-<div class="heatmap-legend hidden" id="heatmap-legend">
-    <h3>Densità Incidenti</h3>
-    <div class="heatmap-gradient"></div>
-    <div class="heatmap-labels">
-        <span>Bassa</span>
-        <span>Alta</span>
-    </div>
+<!-- Grafico Radar Feriti/Morti per Mese -->
+<div class="chart-container" style="margin-top: 50px; bottom: 20px;">
+    <h4 style="margin-bottom: 8px; font-size: 13px; color: #fff; font-weight: 600; text-align: left;">
+     🚑 Feriti/Morti per Mese
+    </h4>
+    <canvas id="monthly-injuries-chart"></canvas>
+</div> <br>	
+<button class="btn-map-control btn-reset-map" id="btn-reset-map" title="Reset Filtri">
+ 🔄 Reset
+ </button>	
+<button id="btn-reset-charts" class="btn-reset-charts" title="Resetta tutti i filtri grafici">
+    <span style="font-size: 12px;">↻</span> Reset Filtri Grafici
+</button>
 </div>
-
 
    <!-- Heatmap Legend -->
     <div class="heatmap-legend hidden" id="heatmap-legend">
@@ -437,7 +333,7 @@
         <div class="detail-header">
             <button class="detail-close" id="detail-close">×</button>
             <h2 id="detail-tipo-header">
-                <span id="detail-tipo-icon"><i class="fas fa-car"></i></span>
+                <span id="detail-tipo-icon">🚗</span>
                 Dettagli Incidente
             </h2>
             <p id="detail-subtitle">Informazioni complete</p>
@@ -449,7 +345,7 @@
     <div class="modal" id="info-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3><i class="fas fa-info-circle"></i> Informazioni sui Dati</h3>
+                <h3>ℹ️ Informazioni sui Dati</h3>
                 <button class="modal-close" id="info-modal-close">×</button>
             </div>
             <div class="modal-body">
@@ -468,13 +364,13 @@
     <div class="modal" id="data-table-modal">
         <div class="modal-content" style="max-width: 90vw;">
             <div class="modal-header">
-                <h3><i class="fas fa-table"></i> Tabella Dati Incidenti Filtrati</h3>
+                <h3>📊 Tabella Dati Incidenti Filtrati</h3>
                 <button class="modal-close" id="data-table-close">×</button>
             </div>
             <div class="modal-body">
                 <div class="table-actions">
-                    <button class="btn-download" id="btn-download-csv"><i class="fas fa-download"></i> Scarica CSV</button>
-                    <button class="btn-download" id="btn-download-json"><i class="fas fa-download"></i> Scarica JSON</button>
+                    <button class="btn-download" id="btn-download-csv">⬇️ Scarica CSV</button>
+                    <button class="btn-download" id="btn-download-json">⬇️ Scarica JSON</button>
                 </div>
                 <div style="color: #94a3b8; font-size: 12px; margin-bottom: 12px;">
                     <strong id="table-count">0</strong> incidenti visualizzati
@@ -493,7 +389,7 @@
     <div class="analytics-panel" id="analytics-panel">
         <div class="analytics-header">
             <div class="analytics-header-top">
-                <h2><i class="fas fa-chart-line"></i> Analisi Avanzata Incidenti</h2>
+                <h2>📈 Analisi Avanzata Incidenti</h2>
                 <button class="analytics-close" id="analytics-close">×</button>
             </div>
             <div class="analytics-filters-info" id="analytics-filters-info">
@@ -503,11 +399,11 @@
         </div>
         
         <div class="analytics-tabs">
-            <button class="analytics-tab active" data-tab="panoramica"><i class="fas fa-chart-bar"></i> Panoramica</button>
-            <button class="analytics-tab" data-tab="temporale"><i class="fas fa-calendar-alt"></i> Temporale</button>
-            <button class="analytics-tab" data-tab="oraria"><i class="fas fa-clock"></i> Oraria</button>
-            <button class="analytics-tab" data-tab="condizioni"><i class="fas fa-cloud-sun"></i> Condizioni</button>
-            <button class="analytics-tab" data-tab="insights"><i class="fas fa-lightbulb"></i> Insights</button>
+            <button class="analytics-tab active" data-tab="panoramica">📊 Panoramica</button>
+            <button class="analytics-tab" data-tab="temporale">📅 Temporale</button>
+            <button class="analytics-tab" data-tab="oraria">⏰ Oraria</button>
+            <button class="analytics-tab" data-tab="condizioni">🌤️ Condizioni</button>
+            <button class="analytics-tab" data-tab="insights">💡 Insights</button>
         </div>
 
         <div class="analytics-content">
@@ -611,7 +507,7 @@
             <div class="analytics-tab-content" id="tab-insights">
                 <div class="insights-container">
                     <div class="stats-realtime">
-                        <h3><i class="fas fa-chart-bar"></i> Statistiche in Tempo Reale</h3>
+                        <h3>📊 Statistiche in Tempo Reale</h3>
                         <div class="stats-realtime-grid">
                             <div class="stat-realtime-item">
                                 <div class="stat-realtime-label">Totale Incidenti</div>
@@ -633,30 +529,30 @@
                     </div>
 
                     <div class="insights-auto">
-                        <h3><i class="fas fa-lightbulb"></i> Insights Automatici</h3>
+                        <h3>💡 Insights Automatici</h3>
                         <div class="insight-item">
-                            <div class="insight-icon"><i class="fas fa-calendar-day"></i></div>
+                            <div class="insight-icon">📅</div>
                             <div class="insight-content">
                                 <div class="insight-label">Giorno più pericoloso</div>
                                 <div class="insight-value" id="insight-giorno">-</div>
                             </div>
                         </div>
                         <div class="insight-item">
-                            <div class="insight-icon"><i class="fas fa-clock"></i></div>
+                            <div class="insight-icon">⏰</div>
                             <div class="insight-content">
                                 <div class="insight-label">Fascia oraria critica</div>
                                 <div class="insight-value" id="insight-fascia">-</div>
                             </div>
                         </div>
                         <div class="insight-item">
-                            <div class="insight-icon"><i class="fas fa-leaf"></i></div>
+                            <div class="insight-icon">🍂</div>
                             <div class="insight-content">
                                 <div class="insight-label">Stagione più rischiosa</div>
                                 <div class="insight-value" id="insight-stagione">-</div>
                             </div>
                         </div>
                         <div class="insight-item">
-                            <div class="insight-icon"><i class="fas fa-moon"></i></div>
+                            <div class="insight-icon">🌙</div>
                             <div class="insight-content">
                                 <div class="insight-label">Condizione più pericolosa</div>
                                 <div class="insight-value" id="insight-condizione">-</div>
@@ -671,7 +567,7 @@
 <div class="modal" id="top-luoghi-modal">
     <div class="modal-content" style="max-width: 1000px;">
         <div class="modal-header">
-            <h3><i class="fas fa-trophy"></i> Top 25 vie con più incidenti</h3>
+            <h3>🏆 Top 25 vie con più incidenti</h3>
             <button class="modal-close" id="top-luoghi-close">×</button>
         </div>
         <div class="modal-body">
@@ -711,12 +607,12 @@
 <!-- Footer Modal Panel -->
 <div class="footer-modal" id="footer-modal">
     <div class="footer-modal-header">
-        <h3><i class="fas fa-chart-bar"></i> Informazioni Dataset</h3>
+        <h3>📊 Informazioni Dataset</h3>
         <button class="footer-modal-close" id="footer-modal-close">×</button>
     </div>
     
     <div class="footer-modal-tabs">
-        <button class="footer-tab active" data-tab="dataset">Dataset e Analisi</button>
+        <button class="footer-tab active" data-tab="dataset">Dataset</button>
         <button class="footer-tab" data-tab="fonte">Fonte Dati</button>
         <button class="footer-tab" data-tab="licenza">Licenza</button>
 	 <button class="footer-tab" data-tab="tecnologie">Tecnologie</button>
@@ -731,10 +627,7 @@
         <!-- Tab Dataset -->
         <div class="footer-tab-content active" id="tab-dataset">
             <div class="info-card">
-                <h4><i class="fas fa-chart-line"></i> Statistiche Dataset</h4>
-		   <p class="subtitle">Un'analisi approfondita dei dati 2015-2023 rivela 28.239 incidenti: il 2023 segna l'anno più recente di una serie storica che evidenzia zone rosse e orari critici</p>
-            <div class="info-card">
-                <h4><i class="fas fa-chart-line"></i> Statistiche Dataset</h4>
+                <h4>📈 Statistiche Dataset</h4>
                 <div class="info-grid">
                     <div class="info-item">
                         <span class="info-label">Periodo coperto</span>
@@ -753,239 +646,25 @@
                         <span class="info-value">Dicembre 2023</span>
                     </div>
                 </div>
-      <p>Tra il 2015 e il 2023, le strade di Palermo hanno registrato <strong>28.239 incidenti stradali</strong>. Un numero che, tradotto in media, significa <strong>oltre 8,6 incidenti al giorno</strong> per nove anni consecutivi. Di questi:</p>
-        
-        <ul>
-            <li><strong>23.487 incidenti (83,2%)</strong> hanno coordinate geografiche precise e sono mappabili</li>
-            <li><strong>3.192 incidenti del 2019 (11,3%)</strong> sono privi di geolocalizzazione, una lacuna significativa che rende quell'anno problematico per analisi territoriali</li>
-            <li><strong>1.560 incidenti (5,5%)</strong> presentano coordinate esterne ai confini comunali</li>
-        </ul>
-        
-        <p>Il 2023, ultimo anno disponibile nel dataset, viene impostato come anno di default nella dashboard - un segnale dell'importanza di analizzare i dati più recenti per orientare le politiche di sicurezza.</p>
-        
-        <h2>Focus 2023</h2>
-        
-        <p>Pur non avendo accesso ai numeri disaggregati anno per anno dal dataset fornito, la dashboard interattiva permette di filtrare il 2023 come anno predefinito, suggerendo che rappresenti un benchmark importante per valutare l'attuale stato della sicurezza stradale palermitana.</p>
-        
-        <p>Il 2023 si colloca in un contesto post-pandemico dove la circolazione è tornata ai livelli pre-Covid, rendendo il confronto con gli anni 2020-2021 poco significativo, ma molto rilevante il raffronto con il 2019 e gli anni precedenti.</p>
-        
-        <h2>Le quattro categorie di incidenti</h2>
-        
-        <p>Gli incidenti sono classificati in quattro tipologie di gravità:</p>
-        
-        <div class="category-list">
-            <ul>
-                <li><strong>M - Mortali</strong>: incidenti con esito fatale</li>
-                <li><strong>R - Riserva</strong>: incidenti con prognosi riservata, situazioni critiche</li>
-                <li><strong>F - Feriti</strong>: incidenti con feriti di varia gravità</li>
-                <li><strong>C - Cose</strong>: incidenti con soli danni materiali</li>
-            </ul>
-        </div>
-		<p>La dashboard utilizza un sistema di colori per evidenziare questa classificazione: rosso per i mortali, viola per le riserve, arancione per i feriti, verde per i danni alle cose. Una scala cromatica che rende immediatamente visibile la gravità della situazione.</p>
-        
-        <h2>L'anomalia 2019 e l'effetto pandemia: i numeri che raccontano</h2>
-        
-        <p>Il <strong>2019 presenta 3.192 incidenti "fantasma"</strong> - sinistri documentati ma senza coordinate geografiche. Questo significa che per quell'anno, qualsiasi analisi territoriale è parziale: non sappiamo in quali quartieri o strade siano avvenuti questi incidenti, né possiamo identificare pattern geografici completi.</p>
-        
-        <p>Gli anni della pandemia mostrano inevitabilmente numeri diversi:</p>
-        <ul>
-            <li><strong>2020</strong>: primo anno di lockdown e restrizioni severe</li>
-            <li><strong>2021</strong>: proseguimento delle limitazioni alla mobilità</li>
-        </ul>
-        
-        <p>Questi due anni registrano probabilmente un calo negli incidenti assoluti, ma il dato va contestualizzato: con meno veicoli circolanti, era inevitabile. Ciò che conta è il <strong>tasso di incidenti rispetto al traffico effettivo</strong> - un dato che richiederebbe l'incrocio con statistiche sul volume di circolazione.</p>
-        
-        <h2>La geografia del rischio: dove avvengono gli incidenti</h2>
-        
-        <p>La dashboard implementa una funzionalità "Top 25 luoghi" che identifica le vie con il maggior numero di incidenti quando attivata la modalità clustering. Questa funzione diventa operativa solo filtrando i dati e permette di visualizzare:</p>
-        
-        <ul>
-            <li><strong>Indirizzo esatto</strong> dell'area critica</li>
-            <li><strong>Totale incidenti</strong> in quella localizzazione</li>
-            <li><strong>Distribuzione per gravità</strong>: mortali, riserva, feriti, cose</li>
-            <li><strong>Coordinate geografiche</strong> per la localizzazione sulla mappa</li>
-        </ul>
-        
-        <p>Il sistema di clustering geografico evidenzia come gli incidenti tendano a concentrarsi in specifici punti critici: grandi incroci, rotonde complesse, arterie di scorrimento veloce. Ogni "cluster" sulla mappa rappresenta un'area dove multipli incidenti si sono verificati in prossimità.</p>
-        
-        <h2>L'analisi territoriale: circoscrizioni e quartieri</h2>
-        
-        <p>Il dataset include una stratificazione territoriale articolata:</p>
-        <ul>
-            <li><strong>Circoscrizioni</strong>: la prima suddivisione amministrativa</li>
-            <li><strong>Quartieri</strong>: livello intermedio di dettaglio</li>
-            <li><strong>UPL (Unità di Primo Livello)</strong>: la granularità più fine</li>
-        </ul>
-        
-        <p>Questa struttura permette analisi a cascata: filtrando una circoscrizione, si vedono solo i quartieri inclusi; filtrando un quartiere, solo le relative UPL. Un sistema che permette di "zoomare" progressivamente sulle zone più critiche.</p>
-        
-        <h2>Il fattore tempo: quando Palermo diventa pericolosa</h2>
-        
-        <h3>Stagionalità</h3>
-        <p>Il dataset classifica gli incidenti per <strong>stagione</strong>, permettendo di identificare se estate o inverno, primavera o autunno presentino rischi differenti - legati a condizioni meteo, flussi turistici, abitudini di mobilità.</p>
-        
-        <h3>Distribuzione settimanale</h3>
-        <p>La suddivisione per <strong>giorno della settimana</strong> rivela pattern comportamentali: i weekend potrebbero mostrare dinamiche diverse (velocità più elevate, guida in stato di ebbrezza) rispetto ai giorni feriali (traffico pendolare, ore di punta).</p>
-        
-        <p>Il filtro <strong>Feriale/Weekend</strong> sintetizza questa distinzione, evidenziando come il rischio cambi tra giorni lavorativi e di riposo.</p>
-        
-        <h3>Le fasce orarie critiche</h3>
-        <p>La dashboard offre due livelli di granularità temporale:</p>
-        
-        <p><strong>Fascia oraria (4 fasce)</strong>: una divisione grossolana della giornata</p>
-        
-        <p><strong>Fascia oraria dettagliata (6 fasce)</strong>:</p>
-        <ul>
-            <li>Alba</li>
-            <li>Mattina</li>
-            <li>Pranzo</li>
-            <li>Pomeriggio</li>
-            <li>Sera</li>
-            <li>Notte</li>
-        </ul>
-        
-        <p>A questo si aggiunge il filtro <strong>"Ora di punta (Picchi di traffico)"</strong> che identifica specificamente i momenti di maggiore congestione - tipicamente le ore 7-9 del mattino e 17-20 del pomeriggio, quando il traffico pendolare raggiunge l'apice.</p>
-        
-        <h3>Giorno vs Notte: il fattore visibilità</h3>
-        
-        <p>La dashboard include un'analisi comparativa <strong>Giorno/Notte</strong> con contatori in tempo reale che mostrano:</p>
-        <ul>
-            <li>Numero di incidenti diurni</li>
-            <li>Numero di incidenti notturni</li>
-            <li>Possibilità di filtrare l'uno o l'altro per analisi mirate</li>
-        </ul>
-        
-        <p>Un elemento grafico particolare: il pannello laterale mostra icone di sole e luna, rendendo immediatamente visibile questa distinzione fondamentale.</p>
-        
-        <h2>Condizioni di luce: oltre il giorno e la notte</h2>
-        
-        <p>Il parametro <strong>"Condizioni luce (Visibilità)"</strong> va oltre la semplice dicotomia temporale e considera:</p>
-        <ul>
-            <li>Luce naturale piena</li>
-            <li>Crepuscolo</li>
-            <li>Buio con illuminazione artificiale funzionante</li>
-            <li>Buio con illuminazione artificiale insufficiente/assente</li>
-            <li>Condizioni meteo che riducono la visibilità</li>
-        </ul>
-        
-        <p>Questa classificazione è cruciale per valutare l'adeguatezza dell'illuminazione pubblica e per programmare interventi di potenziamento nelle zone critiche.</p>
-        
-        <h2>Strumenti di visualizzazione: dalla mappa ai grafici</h2>
-        
-        <p>La dashboard offre multiple modalità di analisi:</p>
-        
-        <h3>Modalità mappa</h3>
-        <ul>
-            <li><strong>Visualizzazione a punti</strong>: ogni incidente come punto colorato per gravità</li>
-            <li><strong>Clustering geografico</strong>: aggregazione automatica delle zone ad alta densità</li>
-            <li><strong>Heatmap (mappa di calore)</strong>: visualizzazione della densità spaziale degli incidenti</li>
-        </ul>
-        
-        <h3>Grafici analitici</h3>
-        <ul>
-            <li><strong>Trend annuale</strong>: evoluzione degli incidenti 2015-2023</li>
-            <li><strong>Distribuzione mensile</strong>: grafico radar che mostra i mesi più rischiosi</li>
-            <li><strong>Analisi oraria</strong>: grafici polari per le fasce della giornata</li>
-            <li><strong>Confronti stagionali</strong>: bar chart per le quattro stagioni</li>
-        </ul>
-        
-        <h3>Calendario interattivo</h3>
-        <p>Una funzionalità innovativa permette di:</p>
-        <ul>
-            <li>Selezionare un anno specifico</li>
-            <li>Navigare per mesi</li>
-            <li>Visualizzare giorni specifici con evidenza di quelli con incidenti</li>
-            <li>Filtrare per giorno della settimana</li>
-        </ul>
-        
-        <h2>I numeri nel 2023: cosa ci dicono</h2>
-        
-        <p>Pur mancando i dati disaggregati completi nel documento fornito, la struttura della dashboard indica che il 2023 è l'anno di riferimento principale. Questo suggerisce che:</p>
-        
-        <ol>
-            <li><strong>È l'anno più recente</strong> e quindi il più rilevante per politiche attuali</li>
-            <li><strong>Ha dati completi e geolocalizzati</strong> a differenza dell'anomalo 2019</li>
-            <li><strong>Rappresenta la "nuova normalità" post-Covid</strong> senza le distorsioni pandemiche del 2020-2021</li>
-        </ol>
-        
-        <h2>Il contesto demografico e urbanistico</h2>
-        
-        <p>Palermo conta circa 650.000 abitanti nell'area comunale. Con quasi 30.000 incidenti in 9 anni su questa popolazione, significa che statisticamente:</p>
-        <ul>
-            <li><strong>Ogni 23 palermitani, uno è stato coinvolto in un incidente</strong> nel periodo considerato</li>
-            <li>Considerando che non tutti i palermitani guidano (escludendo minori, anziani non automuniti, etc.), la proporzione reale tra conducenti/passeggeri coinvolti è ancora più alta</li>
-        </ul>
-        
-        <h2>Limiti e criticità dei dati</h2>
-        
-        <p>È importante evidenziare alcune criticità:</p>
-        
-        <ol>
-            <li><strong>Il buco nero del 2019</strong>: 3.192 incidenti senza coordinate rendono parziale qualsiasi analisi di quell'anno</li>
-            <li><strong>Sottoregistrazione possibile</strong>: alcuni incidenti minori potrebbero non essere rilevati</li>
-            <li><strong>Mancanza di dati su vittime</strong>: il dataset classifica per gravità ma non specifica il numero esatto di morti e feriti per incidente</li>
-            <li><strong>Assenza di informazioni su cause</strong>: non sappiamo se gli incidenti siano dovuti a velocità, alcol, distrazione, condizioni stradali</li>
-        </ol>
-        
-        <h2>Dal dato all'azione: cosa fare</h2>
-        
-        <p>La disponibilità di questi dati georeferenziati permette interventi mirati:</p>
-        
-        <h3>Immediati</h3>
-        <ul>
-            <li><strong>Potenziamento controlli</strong> nelle top 25 vie più pericolose</li>
-            <li><strong>Miglioramento illuminazione</strong> dove gli incidenti notturni sono concentrati</li>
-            <li><strong>Revisione segnaletica</strong> negli incroci critici</li>
-        </ul>
-        
-        <h3>Medio termine</h3>
-        <ul>
-            <li><strong>Ridisegno viabilità</strong> nelle zone ad alta concentrazione</li>
-            <li><strong>Installazione autovelox</strong> nelle arterie dove la velocità è fattore critico</li>
-            <li><strong>Potenziamento trasporto pubblico</strong> per ridurre traffico veicolare privato</li>
-        </ul>
-        
-        <h3>Strategici</h3>
-        <ul>
-            <li><strong>Piano urbano mobilità sostenibile</strong> evidence-based</li>
-            <li><strong>Educazione stradale</strong> mirata su comportamenti più rischiosi</li>
-            <li><strong>Monitoraggio continuo</strong> con aggiornamento dati in tempo reale</li>
-        </ul>
-        
-        <h2>Trasparenza come prima forma di prevenzione</h2>
-        
-        <p>L'iniziativa di rendere questi dati pubblici e visualizzabili rappresenta un atto di trasparenza fondamentale. La pubblicazione su <strong>dati.gov.it</strong> con licenza <strong>Creative Commons CC BY 4.0</strong> significa che:</p>
-        
-        <ul>
-            <li>Chiunque può accedere ai dati gratuitamente</li>
-            <li>I dati possono essere riutilizzati anche commercialmente</li>
-            <li>L'unico vincolo è citare la fonte</li>
-        </ul>
-        
-        <p>OpenDataSicilia ha trasformato un dataset tecnico in una <strong>dashboard interattiva</strong> accessibile anche a non esperti, democratizzando l'accesso all'informazione sulla sicurezza stradale.</p>
-        
-        <h2>Conclusioni: i numeri chiedono risposte</h2>
-        
-        <div class="highlight-box">
-            <p><strong>28.239 incidenti non sono una statistica astratta</strong>: sono persone, famiglie, vite cambiate. Ogni punto sulla mappa rappresenta un dramma personale, un costo sociale, un fallimento nella progettazione urbana o nel controllo del territorio.</p>
-        </div>
-        
-        <p>Il 2023, come anno più recente, ci dice che il problema è attuale, non storico. I dati esistono, gli strumenti per analizzarli pure. Quello che manca è la <strong>volontà politica</strong> di trasformare le evidenze in azioni concrete.</p>
-        
-        <p>Palermo, come molte città italiane, deve scegliere: continuare a contare incidenti o iniziare a prevenirli. I dati sono lì, georeferenziati, analizzabili, pronti a guidare politiche basate su evidenze. Ignorarli sarebbe non solo un errore tecnico, ma una responsabilità morale verso chi ogni giorno affronta il rischio delle strade urbane.</p>
-  </div>
-  </div>
+                <div class="info-note">
+                    <strong>⚠️ Note importanti:</strong>
+                    <ul>
+                        <li>1.560 incidenti con coordinate esterne ai confini comunali (esclusi)</li>
+                        <li>3.192 incidenti del 2019 senza coordinate geografiche (conteggiati ma non visualizzati)</li>
+                    </ul>
+                </div>
+            </div>
         </div>
         
         <!-- Tab Fonte Dati -->
         <div class="footer-tab-content" id="tab-fonte">
             <div class="info-card">
-                <h4><i class="fa fa-database"></i> Fonte dei Dati</h4>
+                <h4>🗂️ Fonte dei Dati</h4>
                 <p><strong>Ente:</strong> Comune di Palermo - Polizia Municipale</p>
                 <p><strong>Portale:</strong> <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" target="_blank" rel="noopener">dati.gov.it</a></p>
                 <p><strong>Dataset:</strong> Incidenti stradali rilevati dalla Polizia Municipale di Palermo</p>
                 <div class="info-note">
-                    <strong><i class="fas fa-clipboard-list"></i> Contenuto del dataset:</strong>
+                    <strong>📋 Contenuto del dataset:</strong>
                     <p>Il dataset contiene informazioni dettagliate su ogni incidente stradale rilevato, inclusi: tipologia, data, ora, condizioni atmosferiche, visibilità, localizzazione geografica e amministrativa.</p>
                 </div>
             </div>
@@ -994,28 +673,28 @@
         <!-- Tab Licenza -->
         <div class="footer-tab-content" id="tab-licenza">
             <div class="info-card">
-                <h4><i class="fas fa-balance-scale"></i> Licenza d'Uso</h4>
+                <h4>⚖️ Licenza d'Uso</h4>
                 <p><strong>Licenza:</strong> Creative Commons - Attribuzione 4.0 Internazionale (CC BY 4.0)</p>
                 <div class="license-box">
                     <p><strong>Sei libero di:</strong></p>
                     <ul>
-                        <li><i class="fas fa-check"></i> Condividere – riprodurre, distribuire, comunicare al pubblico</li>
-                        <li><i class="fas fa-check"></i> Modificare – rielaborare e trasformare i dati</li>
-                        <li><i class="fas fa-check"></i> Utilizzare per fini commerciali</li>
+                        <li>✓ Condividere — riprodurre, distribuire, comunicare al pubblico</li>
+                        <li>✓ Modificare — rielaborare e trasformare i dati</li>
+                        <li>✓ Utilizzare per fini commerciali</li>
                     </ul>
                     <p><strong>Alle seguenti condizioni:</strong></p>
                     <ul>
-                        <li><i class="fas fa-pencil-alt"></i> Attribuzione – devi riconoscere la paternità dei dati e fornire un link alla licenza</li>
+                        <li>📝 Attribuzione — devi riconoscere la paternità dei dati e fornire un link alla licenza</li>
                     </ul>
                 </div>
-                <p style="margin-top: 16px;"><a href="https://creativecommons.org/licenses/by/4.0/deed.it" target="_blank" rel="noopener">Leggi il testo completo della licenza <i class="fas fa-external-link-alt"></i></a></p>
+                <p style="margin-top: 16px;"><a href="https://creativecommons.org/licenses/by/4.0/deed.it" target="_blank" rel="noopener">Leggi il testo completo della licenza →</a></p>
             </div>
         </div>
 		
         <!-- Tab tecnologie -->
         <div class="footer-tab-content" id="tab-tecnologie">
             <div class="info-card">
-                <h4><i class="fas fa-map"></i> Tecnologie utilizzate</h4>
+                <h4>🗺️ Tecnologie utilizzate</h4>
 <p><strong>In sintesi:</strong></p>
                     <ul>
 					<li>QGIS - software libero e open source per i Sistemi Informativi Geografici (GIS), che permette di visualizzare, organizzare, analizzare e rappresentare dati spaziali</li>
@@ -1098,18 +777,18 @@
         <!-- Tab Crediti -->
         <div class="footer-tab-content" id="tab-crediti">
             <div class="info-card">
-                <h4><i class="fas fa-users"></i> Crediti e Realizzazione</h4>
+                <h4>👥 Crediti e Realizzazione</h4>
                 <div class="credits-section">
-                    <p><strong><i class="fas fa-tools"></i> Sviluppo e Design:</strong></p>
+                    <p><strong>🛠️ Sviluppo e Design:</strong></p>
                     <p>Applicazione web a tecnologia ibrida, sviluppata attraverso una collaborazione human-<a href="https://claude.ai" target="_blank">Claude AI (Anthropic)</a>, che ha supportato lo sviluppo dell'architettura modulare, l'ottimizzazione del codice e l'implementazione di funzionalità avanzate di visualizzazione.<strong>Rielaborazione dati & Autore:</strong> <a href="https://www.linkedin.com/in/gbvitrano/" target="_blank" rel="noopener">Giovan Battista Vitrano</a></p>
                     
-                    <p><strong><i class="fas fa-landmark"></i> Comunità:</strong></p>
+                    <p><strong>🏛️ Comunità:</strong></p>
                     <p><a href="http://opendatasicilia.it/" target="_blank" rel="noopener">OpenDataSicilia</a> - Comunità civica che promuove la cultura dei dati aperti in Sicilia</p>
                     
-                    <p><strong><p> <i class="fas fa-heart"></i> Ringraziamenti:</strong></p>
+                    <p><strong><p> 🧡 Ringraziamenti:</strong></p>
 					<p>Un grazie speciale a <a href="https://www.linkedin.com/in/andreaborruso/" title="Andrea Borruso" target="_blank">Andrea Borruso</a> e <a href="https://www.linkedin.com/in/salvatore-fiandaca-23a1a250/" title="Totò Fiandaca" target="_blank">Totò Fiandaca</a> per il prezioso supporto tecnico, per la loro disponibilità e per aver condiviso con generosità competenze ed esperienza.</p>
                                       
-                    <p><strong><i class="fas fa-envelope"></i> Contatti:</strong></p>
+                    <p><strong>📧 Contatti:</strong></p>
                     <p>Per segnalazioni, suggerimenti o collaborazioni: <a href="https://groups.google.com/g/opendatasicilia?pli=1" target="_blank" rel="noopener">contattaci</a></p>
                 </div>
             </div>
@@ -1118,8 +797,8 @@
 </div>
 
 <div class="footer-modal-overlay" id="footer-modal-overlay"></div>
-<script src="js/incidenti_smart-awesome.js"></script>
-<script src="js/incidenti_final.js"></script>
+
+<script src="js/incidenti_smart.js"></script>
 <script src="js/footer-modal.js"></script>
 </body>
 </html>
