@@ -13,9 +13,8 @@
 body {
     font-family: 'Titillium Web';
     height: 100vh;
-    display: flex;
     overflow: hidden;
-    background: #ffffffa;
+    /*background: #0f172a;*/
 }
 
 /* Touch Optimization */
@@ -96,37 +95,47 @@ button, .legend-item, .year-stat-item, .year-stat-item-all {
 
 /* Sidebar */
 #sidebar {
+    position: fixed;
+    top: 5px;
+    left: 5px;
+    height: calc(98.8vh - 10px);
     width: 320px;
-    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-    box-shadow: 4px 0 20px rgba(0,0,0,0.5);
-    overflow-y: auto;
+    background: #0f172abd !important;
+    backdrop-filter: blur(2px);
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(59, 130, 246, 0.2);
     z-index: 1000;
-    border-right: 1px solid rgba(148, 163, 184, 0.1);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 2px;
 }
 
+/* Scroll della sidebar */
 #sidebar::-webkit-scrollbar {
     width: 8px;
 }
 
 #sidebar::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.5);
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 4px;
 }
 
 #sidebar::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.3);
+    background: rgba(59, 130, 246, 0.4);
     border-radius: 4px;
 }
 
 #sidebar::-webkit-scrollbar-thumb:hover {
-    background: rgba(148, 163, 184, 0.5);
+    background: rgba(59, 130, 246, 0.6);
 }
 
-/* Map */
+/* Map - occupa tutto lo spazio */
 #map {
-    flex: 1;
+    width: 100%;
     height: 100vh;
+    position: relative;
 }
-
 /* Header */
 .header {
     background-image: url('../img/sfondo_02.jpg');
@@ -169,7 +178,7 @@ button, .legend-item, .year-stat-item, .year-stat-item-all {
 /* Stats */
 .stats {
     padding: 8px  8px  0px 8px;
-    backdrop-filter: blur(10px);
+    /*backdrop-filter: blur(10px);*/
 }
 
 .stat-label-main {
@@ -500,7 +509,7 @@ select option {
 /* Filter Sections */
 .filter-section {
     margin-bottom: 16px;
-    border: 0px solid rgba(148, 163, 184, 0.2);
+    border: 1px solid rgba(148, 163, 184, 0.2);
     border-radius: 8px;
     overflow: hidden;
     background: rgba(30, 41, 59, 0.4);
@@ -642,7 +651,34 @@ select option {
     box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
 }
 
-/* Legend */
+/* Map Controls Container - posiziona 20px dopo la sidebar */
+.map-controls-container {
+    position: absolute;
+    top: 20px;
+    left: 345px; /* 320px (sidebar) + 5px (margine) + 20px (spazio) */
+    z-index: 999;
+    width: 160px;
+}
+
+/* Su mobile tornano alla posizione normale */
+@media (max-width: 768px) {
+    .map-controls-container {
+        top: 10px;
+        left: auto;
+        right: 10px;
+    }
+    
+    .legend {
+        left: 10px;
+        bottom: 10px;
+    }
+    
+    .maplibregl-ctrl-bottom-left {
+        left: 10px !important;
+    }
+}
+
+/* Legend - anche questa 20px dopo la sidebar */
 .legend {
     background: rgba(15, 23, 42, 0.95);
     backdrop-filter: blur(10px);
@@ -652,8 +688,8 @@ select option {
     box-shadow: 0 8px 32px rgba(0,0,0,0.4);
     position: absolute;
     bottom: 20px;
-    right: 20px;
-    z-index: 1000;
+    left: 345px; /* stesso calcolo */
+    z-index: 999;
     border: 1px solid rgba(148, 163, 184, 0.2);
     max-width: 200px;
 }
@@ -2645,5 +2681,29 @@ select option {
     .panel-btn-row .panel-btn {
         font-size: 9px;
         padding: 6px 4px;
+    }
+}
+
+@media (max-width: 768px) {
+    #sidebar {
+        position: fixed;
+        left: -380px; /* nascosta di default su mobile */
+        top: 0;
+        width: 360px;
+        height: 100vh;
+        z-index: 2000;
+        transition: left 0.3s ease;
+        border-radius: 0; /* rimuovi border-radius su mobile */
+    }
+    
+    #sidebar.open {
+        left: 0;
+    }
+    
+    .mobile-toggle {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 2001;
     }
 }
