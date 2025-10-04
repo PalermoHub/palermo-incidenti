@@ -78,6 +78,7 @@ const tipologiaNames = {
 const basemapStyles = {
     'carto-dark': {
         version: 8,
+        glyphs: 'https://api.mapbox.com/fonts/v1/mapbox/{fontstack}/{range}.pbf?access_token=eyJ1IjoiZ2J2aXRyYW5vIiwiYSI6ImNtNWpwMDloejBtN3ozM3F3NzJvZGh2ZG4ifQ.AXXkYYL7XY6RBVXpJ2IrBA',  // AGGIUNTO
         sources: {
             'carto': {
                 type: 'raster',
@@ -94,6 +95,7 @@ const basemapStyles = {
     },
     'osm': {
         version: 8,
+        glyphs: 'https://api.mapbox.com/fonts/v1/mapbox/{fontstack}/{range}.pbf?access_token=eyJ1IjoiZ2J2aXRyYW5vIiwiYSI6ImNtNWpwMDloejBtN3ozM3F3NzJvZGh2ZG4ifQ.AXXkYYL7XY6RBVXpJ2IrBA',  // AGGIUNTO
         sources: {
             'osm': {
                 type: 'raster',
@@ -110,6 +112,7 @@ const basemapStyles = {
     },
     'satellite': {
         version: 8,
+        glyphs: 'https://api.mapbox.com/fonts/v1/mapbox/{fontstack}/{range}.pbf?access_token=eyJ1IjoiZ2J2aXRyYW5vIiwiYSI6ImNtNWpwMDloejBtN3ozM3F3NzJvZGh2ZG4ifQ.AXXkYYL7XY6RBVXpJ2IrBA',  // AGGIUNTO
         sources: {
             'satellite': {
                 type: 'raster',
@@ -126,6 +129,7 @@ const basemapStyles = {
     },
     'carto-light': {
         version: 8,
+        glyphs: 'https://api.mapbox.com/fonts/v1/mapbox/{fontstack}/{range}.pbf?access_token=eyJ1IjoiZ2J2aXRyYW5vIiwiYSI6ImNtNWpwMDloejBtN3ozM3F3NzJvZGh2ZG4ifQ.AXXkYYL7XY6RBVXpJ2IrBA',  // AGGIUNTO
         sources: {
             'carto': {
                 type: 'raster',
@@ -281,16 +285,15 @@ function toggleClustering() {
         }
         
         ['C', 'F', 'R', 'M'].forEach(tipo => {
-            map.setLayoutProperty(`incidenti-${tipo}`, 'visibility', 'none');
+            if (map.getLayer(`incidenti-${tipo}`)) {
+                map.setLayoutProperty(`incidenti-${tipo}`, 'visibility', 'none');
+            }
         });
         
         createClusteringLayers();
-        map.setLayoutProperty('clusters', 'visibility', 'visible');
-        map.setLayoutProperty('cluster-count', 'visibility', 'visible');
-        map.setLayoutProperty('unclustered-point', 'visibility', 'visible');
         
         if (btn) {
-            btn.innerHTML = '<i class="fas fa-map"></i> Mappa di localizzazione';
+            btn.innerHTML = '<i class="fas fa-map"></i> <span>Localizzazione</span>';
             btn.classList.add('active');
         }
         
@@ -300,21 +303,23 @@ function toggleClustering() {
         
         calculateTopLuoghi();
         
-        console.log('Clustering attivato - filtri applicati:', Object.keys(currentFilters).filter(k => currentFilters[k]).length);
-        
     } else {
-        if (map.getLayer('clusters')) {
-            map.setLayoutProperty('clusters', 'visibility', 'none');
-            map.setLayoutProperty('cluster-count', 'visibility', 'none');
-            map.setLayoutProperty('unclustered-point', 'visibility', 'none');
-        }
+        // RIMUOVI I LAYER IN ORDINE SICURO
+        const layersToRemove = ['cluster-count', 'clusters', 'unclustered-point'];
+        layersToRemove.forEach(layerId => {
+            if (map.getLayer(layerId)) {
+                map.setLayoutProperty(layerId, 'visibility', 'none');
+            }
+        });
         
         ['C', 'F', 'R', 'M'].forEach(tipo => {
-            map.setLayoutProperty(`incidenti-${tipo}`, 'visibility', 'visible');
+            if (map.getLayer(`incidenti-${tipo}`)) {
+                map.setLayoutProperty(`incidenti-${tipo}`, 'visibility', 'visible');
+            }
         });
         
         if (btn) {
-            btn.innerHTML = '<i class="fas fa-circle"></i> Mappa con clustering geografico';
+            btn.innerHTML = '<i class="fas fa-circle"></i> <span>Clustering</span>';
             btn.classList.remove('active');
         }
         
@@ -326,8 +331,6 @@ function toggleClustering() {
         if (modal && modal.classList.contains('show')) {
             closeTopLuoghiModal();
         }
-        
-        console.log('Clustering disattivato');
     }
 }
 
@@ -1254,90 +1257,96 @@ function createMapLayers() {
     console.log('Layers creati con successo');
 }
 
-// Create Clustering Layers
+// Create Clustering Layers - VERSIONE CORRETTA SENZA ERRORI
 function createClusteringLayers() {
     const geojson = createGeoJSON();
     
-    if (map.getLayer('cluster-count')) map.removeLayer('cluster-count');
-    if (map.getLayer('clusters')) map.removeLayer('clusters');
-    if (map.getLayer('unclustered-point')) map.removeLayer('unclustered-point');
-    if (map.getSource('incidenti-cluster')) map.removeSource('incidenti-cluster');
-    
-    map.addSource('incidenti-cluster', {
-        type: 'geojson',
-        data: geojson,
-        cluster: true,
-        clusterMaxZoom: 14,
-        clusterRadius: 50
+    // Rimuovi TUTTI i layer e source nell'ordine corretto
+    const layersToRemove = ['cluster-count', 'clusters', 'unclustered-point'];
+    layersToRemove.forEach(layerId => {
+        if (map.getLayer(layerId)) {
+            map.removeLayer(layerId);
+        }
     });
+    
+    if (map.getSource('incidenti-cluster')) {
+        map.removeSource('incidenti-cluster');
+    }
+    
+    console.log('Creazione clustering con', geojson.features.length, 'incidenti');
+    
+    // CREA SOURCE
+map.addSource('incidenti-cluster', {
+    type: 'geojson',
+    data: geojson,
+    cluster: true,
+    clusterMaxZoom: 15,        // zoom più alto
+    clusterRadius: 40,         // raggio ridotto
+    clusterMinPoints: 2        // minimo 2 punti per cluster
+});
 
+    // LAYER 1: CERCHI CLUSTER
     map.addLayer({
         id: 'clusters',
         type: 'circle',
         source: 'incidenti-cluster',
         filter: ['has', 'point_count'],
-        paint: {
-            'circle-color': [
-                'step',
-                ['get', 'point_count'],
-                '#3b82f6',
-                10,
-                '#f59e0b',
-                25,
-                '#f97316',
-                50,
-                '#ef4444'
-            ],
-            'circle-radius': [
-                'step',
-                ['get', 'point_count'],
-                20,
-                10,
-                25,
-                25,
-                30,
-                50,
-                35
-            ],
-            'circle-opacity': 0.85,
-            'circle-stroke-width': 3,
-            'circle-stroke-color': '#ffffff'
-        }
+paint: {
+    'circle-color': [
+        'step',
+        ['get', 'point_count'],
+        '#3b82f6',
+        10, '#f59e0b',
+        25, '#f97316',
+        50, '#ef4444'
+    ],
+    'circle-radius': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],                    // ← basato sullo zoom
+        10, ['interpolate', ['linear'], ['get', 'point_count'], 2, 6, 100, 25],
+        16, ['interpolate', ['linear'], ['get', 'point_count'], 2, 12, 100, 40]
+    ],
+    'circle-opacity': 0.85,
+    'circle-stroke-width': 1,
+    'circle-stroke-color': '#ffffff'
+}
     });
 
+    // LAYER 2: NUMERI (SUBITO DOPO I CERCHI)
     map.addLayer({
         id: 'cluster-count',
         type: 'symbol',
         source: 'incidenti-cluster',
-        filter: [
-            'all',
-            ['has', 'point_count'],
-            ['>=', ['get', 'point_count'], 2]
-        ],
+        filter: ['has', 'point_count'],
         layout: {
-            'text-field': ['to-string', ['get', 'point_count']],
-            'text-font': ['Titillium Web','Open Sans Bold', 'Arial Unicode MS Bold'],
+            'text-field': ['get', 'point_count'],
+            'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
             'text-size': [
-                'step',
+                'interpolate',
+                ['linear'],
                 ['get', 'point_count'],
-                13,
-                10,
-                15,
-                25,
-                17,
-                50,
-                19
+                2, 10,
+                10, 10,
+                25, 12,
+                50, 16,
+                100, 15
             ],
             'text-allow-overlap': true,
-            'text-ignore-placement': true
+            'text-ignore-placement': true,
+            'text-anchor': 'center',
+            'text-offset': [0, 0],
+            'visibility': 'visible'  // AGGIUNGI ESPLICITAMENTE
         },
         paint: {
             'text-color': '#ffffff',
-            'text-halo-color': 'rgba(0, 0, 0, 0.9)',
-            'text-halo-width': 2
+'text-halo-color': 'rgba(0, 0, 0, 0.3)',
+    'text-halo-width': 1.5,
+    'text-halo-blur': 1
         }
     });
 
+    // LAYER 3: PUNTI SINGOLI
     map.addLayer({
         id: 'unclustered-point',
         type: 'circle',
@@ -1359,11 +1368,14 @@ function createClusteringLayers() {
                 16, 8
             ],
             'circle-opacity': 0.8,
-            'circle-stroke-width': 2,
+            'circle-stroke-width': 1,
             'circle-stroke-color': '#fff'
         }
     });
 
+    console.log('✓ Tutti i layer cluster creati');
+
+    // Event handlers
     if (!map._clusterHandlersAdded) {
         map.on('click', 'clusters', (e) => {
             const features = map.queryRenderedFeatures(e.point, {
@@ -1373,8 +1385,6 @@ function createClusteringLayers() {
             
             const clusterId = features[0].properties.cluster_id;
             const pointCount = features[0].properties.point_count;
-            
-            console.log(`Cluster cliccato: ${pointCount} incidenti`);
             
             map.getSource('incidenti-cluster').getClusterExpansionZoom(
                 clusterId,
@@ -1397,7 +1407,6 @@ function createClusteringLayers() {
 
         map.on('mouseenter', 'clusters', (e) => {
             map.getCanvas().style.cursor = 'pointer';
-            
             const coordinates = e.features[0].geometry.coordinates.slice();
             const pointCount = e.features[0].properties.point_count;
             
@@ -1430,8 +1439,6 @@ function createClusteringLayers() {
 
         map._clusterHandlersAdded = true;
     }
-    
-    console.log('Cluster layers creati con numeri visibili');
 }
 
 // Setup Layer Interactions
