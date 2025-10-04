@@ -914,7 +914,7 @@ async function downloadChartAsPNG(chartId, filename) {
     
     const logo = new Image();
     logo.crossOrigin = 'anonymous';
-    logo.src = 'https://palermohub.opendatasicilia.it/lib/images/opendatasicilia.png';
+    logo.src = 'img/pa_hub_new.png';
     
     logo.onload = function() {
         const logoHeight = 35;
@@ -1083,14 +1083,14 @@ function initMap() {
             this._container.className = 'maplibregl-ctrl maplibregl-ctrl-ods';
             
             const link = document.createElement('a');
-            link.href = 'https://opendatasicilia.it/';
+            link.href = 'https://palermohub.opendatasicilia.it/';
             link.target = '_blank';
             link.rel = 'noopener noreferrer';
-            link.title = 'OpenDataSicilia';
+            link.title = 'palermohub.opendatasicilia.it';
             
             const img = document.createElement('img');
-            img.src = 'https://palermohub.opendatasicilia.it/lib/images/opendatasicilia.png';
-            img.alt = 'OpenDataSicilia';
+            img.src = 'img/pa_hub_new.png';
+            img.alt = 'palermohub.opendatasicilia.it';
             
             link.appendChild(img);
             this._container.appendChild(link);
