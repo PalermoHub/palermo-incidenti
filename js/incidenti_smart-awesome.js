@@ -246,7 +246,7 @@ function toggleHeatmap() {
             btn.classList.add('active');
         }
         if (btnMap) {
-            btnMap.innerHTML = '<i class="fas fa-map"></i> Mappa di localizzazione';
+            btnMap.innerHTML = '<i class="fa-solid fa-power-off"></i> Heatmap - Off';
             btnMap.classList.add('active');
         }
         const analyticsPanel = document.getElementById('analytics-side-panel');
@@ -273,7 +273,6 @@ function toggleHeatmap() {
     }
 }
 
-// Toggle Clustering (AGGIORNATO CON FONT AWESOME)
 function toggleClustering() {
     showClustering = !showClustering;
     const btn = document.getElementById('btn-clustering-map');
@@ -293,18 +292,16 @@ function toggleClustering() {
         createClusteringLayers();
         
         if (btn) {
-            btn.innerHTML = '<i class="fas fa-map"></i> <span>Localizzazione</span>';
+            btn.innerHTML = '<i class="fa-solid fa-power-off"></i> <span>Clustering - Off</span>';
             btn.classList.add('active');
         }
         
-        if (btnTopLuoghi) {
-            btnTopLuoghi.style.display = 'block';
-        }
+        // RIMOSSO: Non gestiamo più display: block/none
+        // Il pulsante Top Luoghi è sempre visibile
         
         calculateTopLuoghi();
         
     } else {
-        // RIMUOVI I LAYER IN ORDINE SICURO
         const layersToRemove = ['cluster-count', 'clusters', 'unclustered-point'];
         layersToRemove.forEach(layerId => {
             if (map.getLayer(layerId)) {
@@ -323,9 +320,8 @@ function toggleClustering() {
             btn.classList.remove('active');
         }
         
-        if (btnTopLuoghi) {
-            btnTopLuoghi.style.display = 'none';
-        }
+        // RIMOSSO: Non nascondiamo più il pulsante
+        // btnTopLuoghi.style.display = 'none';
         
         const modal = document.getElementById('top-luoghi-modal');
         if (modal && modal.classList.contains('show')) {
@@ -571,6 +567,12 @@ function show2019InfoPopup() {
 
 // Open Top Luoghi Modal (ICONA AGGIORNATA)
 function openTopLuoghiModal() {
+    // Verifica se il clustering è attivo, altrimenti attivalo
+    if (!showClustering) {
+        alert('Attiva prima la modalità Clustering per visualizzare i Top Luoghi');
+        return;
+    }
+    
     const modal = document.getElementById('top-luoghi-modal');
     const tbody = document.getElementById('top-luoghi-body');
     const countEl = document.getElementById('top-luoghi-count');

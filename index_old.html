@@ -457,7 +457,7 @@
                 <p><strong>Incidenti mappati:</strong> 23.487 incidenti (83,2% del totale) con coordinate geografiche valide.</p>
                 <p><strong>Esclusioni:</strong></p>
                 <ul style="margin-left: 20px; margin-bottom: 16px;">
-                    <li style="margin-bottom: 8px;"><strong>1.560 incidenti (5,5%)</strong> - Coordinate esterne ai confini comunali</li>
+                    <li style="margin-bottom: 8px;"><strong>1.560 incidenti (5,5%)</strong> - Coordinate esterne ai confini comunali. Si tratta di errori che potrebbero essere corretti tramite geocoding, qualora si disponesse di tempo sufficiente. Tuttavia, data la necessità di procedere speditamente in questa fase dell'analisi, si è scelto di escluderli dai vari dataset.</li>
                     <li><strong>3.192 incidenti del 2019 (11,3%)</strong> - Privi di coordinate geografiche</li>
                 </ul>
             </div>
@@ -489,186 +489,123 @@
         </div>
     </div>
 
-    <!-- Analytics Panel -->
-    <div class="analytics-panel" id="analytics-panel">
-        <div class="analytics-header">
-            <div class="analytics-header-top">
-                <h2><i class="fas fa-chart-line"></i> Analisi Avanzata Incidenti</h2>
-                <button class="analytics-close" id="analytics-close">×</button>
-            </div>
-            <div class="analytics-filters-info" id="analytics-filters-info">
-                <strong>Dati Visualizzati:</strong>
-                <span id="active-filters-text">Tutti gli incidenti (2015-2023)</span>
-            </div>
-        </div>
+    <!-- Map Controls Container -->
+    <div class="map-controls-container">
+   </div>
+
+<!-- Analytics Side Panel -->
+<div id="analytics-side-panel">
+    <!-- Sezione 1: Controlli Mappa -->
+<div class="panel-section section-map-controls">
+    <div class="section-header">
+        <i class="fas fa-map"></i>
+        <span>Controlli Mappa</span>
+    </div>
+    <div class="section-content">
+        <select id="basemap-select" class="panel-select" title="Seleziona Mappa di Base">
+            <option value="carto-light" selected>Carto Light</option>
+            <option value="carto-dark">Carto Dark</option>
+            <option value="osm">OpenStreetMap</option>
+            <option value="satellite">Satellite</option>
+        </select>
         
-        <div class="analytics-tabs">
-            <button class="analytics-tab active" data-tab="panoramica"><i class="fas fa-chart-bar"></i> Panoramica</button>
-            <button class="analytics-tab" data-tab="temporale"><i class="fas fa-calendar-alt"></i> Temporale</button>
-            <button class="analytics-tab" data-tab="oraria"><i class="fas fa-clock"></i> Oraria</button>
-            <button class="analytics-tab" data-tab="condizioni"><i class="fas fa-cloud-sun"></i> Condizioni</button>
-            <button class="analytics-tab" data-tab="insights"><i class="fas fa-lightbulb"></i> Insights</button>
+        <!-- Prima riga: Clustering e Heatmap -->
+        <div class="panel-btn-row">
+            <button class="panel-btn btn-primary" id="btn-clustering-map" title="Visualizza clustering geografico">
+                <i class="fas fa-circle"></i>
+                <span>Clustering</span>
+            </button>
+			 <button class="panel-btn btn-info" id="btn-data-table-map" title="Tabella dati">
+                <i class="fas fa-table"></i>
+                <span>Tabella</span>
+            </button>    
+        </div
+        <!-- Seconda riga: Tabella e Top Luoghi -->
+        <div class="panel-btn-row">
+            <button class="panel-btn btn-success" id="btn-heatmap-map" title="Mappa di calore">
+                <i class="fas fa-fire"></i>
+                <span>Heatmap</span>
+            </button>
+            <button class="panel-btn btn-warning" id="btn-top-luoghi-map" title="Top 25 strade con più incidenti">
+                <i class="fas fa-trophy"></i>
+                <span>Top Strade</span>
+            </button>
         </div>
-
-        <div class="analytics-content">
-            <!-- Panoramica Tab -->
-            <div class="analytics-tab-content active" id="tab-panoramica">
-                <div class="charts-grid">
-                    <div class="chart-container">
-                        <h3>Trend Annuale Incidenti</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="chart-trend-annuale"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <h3>Distribuzione per Tipologia</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="chart-tipologia"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <h3>Analisi Stagionale</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="chart-stagionale"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <h3>Feriale vs Weekend</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="chart-feriale-weekend"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Temporale Tab -->
-            <div class="analytics-tab-content" id="tab-temporale">
-                <div class="charts-grid">
-                    <div class="chart-container chart-full">
-                        <h3>Distribuzione per Giorno della Settimana</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="chart-giorno-settimana"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-container chart-full">
-                        <h3>Evoluzione Annuale (Feriti vs Non Feriti)</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="chart-evoluzione-anni"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Oraria Tab -->
-            <div class="analytics-tab-content" id="tab-oraria">
-                <div class="charts-grid">
-                    <div class="chart-container chart-full">
-                        <h3>Distribuzione per Fascia Oraria</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="chart-fascia-oraria"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <h3>Top 3 Fasce per Incidenti</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="chart-top-incidenti"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <h3>Top 3 Fasce per Feriti</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="chart-top-feriti"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Condizioni Tab -->
-            <div class="analytics-tab-content" id="tab-condizioni">
-                <div class="charts-grid">
-                    <div class="chart-container">
-                        <h3>Luce vs Buio</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="chart-luce-buio"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <h3>Dettaglio Condizioni Luce</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="chart-condizioni-dettaglio"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-container chart-full">
-                        <h3>Confronto Stagionale delle Condizioni</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="chart-stagioni-condizioni"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Insights Tab -->
-            <div class="analytics-tab-content" id="tab-insights">
-                <div class="insights-container">
-                    <div class="stats-realtime">
-                        <h3><i class="fas fa-chart-bar"></i> Statistiche in Tempo Reale</h3>
-                        <div class="stats-realtime-grid">
-                            <div class="stat-realtime-item">
-                                <div class="stat-realtime-label">Totale Incidenti</div>
-                                <div class="stat-realtime-value" id="realtime-total">0</div>
-                            </div>
-                            <div class="stat-realtime-item">
-                                <div class="stat-realtime-label">Totale Feriti</div>
-                                <div class="stat-realtime-value" id="realtime-feriti">0</div>
-                            </div>
-                            <div class="stat-realtime-item">
-                                <div class="stat-realtime-label">% con Feriti</div>
-                                <div class="stat-realtime-value" id="realtime-percentuale">0%</div>
-                            </div>
-                            <div class="stat-realtime-item">
-                                <div class="stat-realtime-label">Media Feriti</div>
-                                <div class="stat-realtime-value" id="realtime-media">0</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="insights-auto">
-                        <h3><i class="fas fa-lightbulb"></i> Insights Automatici</h3>
-                        <div class="insight-item">
-                            <div class="insight-icon"><i class="fas fa-calendar-day"></i></div>
-                            <div class="insight-content">
-                                <div class="insight-label">Giorno più pericoloso</div>
-                                <div class="insight-value" id="insight-giorno">-</div>
-                            </div>
-                        </div>
-                        <div class="insight-item">
-                            <div class="insight-icon"><i class="fas fa-clock"></i></div>
-                            <div class="insight-content">
-                                <div class="insight-label">Fascia oraria critica</div>
-                                <div class="insight-value" id="insight-fascia">-</div>
-                            </div>
-                        </div>
-                        <div class="insight-item">
-                            <div class="insight-icon"><i class="fas fa-leaf"></i></div>
-                            <div class="insight-content">
-                                <div class="insight-label">Stagione più rischiosa</div>
-                                <div class="insight-value" id="insight-stagione">-</div>
-                            </div>
-                        </div>
-                        <div class="insight-item">
-                            <div class="insight-icon"><i class="fas fa-moon"></i></div>
-                            <div class="insight-content">
-                                <div class="insight-label">Condizione più pericolosa</div>
-                                <div class="insight-value" id="insight-condizione">-</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <!-- Terza riga: Reset Filtri e Analisi -->
+        <div class="panel-btn-row">
+	            <button class="panel-btn btn-purple" id="btn-analytics-map" title="Dashboard analisi">
+                <i class="fas fa-chart-line"></i>
+                <span>Analisi</span>
+            </button>	
+            <button class="panel-btn btn-danger" id="btn-reset-map" title="Reset Filtri">
+                <i class="fas fa-sync-alt"></i>
+                <span>Reset Filtri</span>
+            </button>
+        </div>
+    </div>
+</div>
+    <!-- Sezione 2: Tipologie Incidenti -->
+    <div class="panel-section section-types">
+        <div class="section-header">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span id="legend-chart-title">Tipologie Incidenti</span>
+        </div>
+        <div class="section-content">
+            <div class="chart-wrapper-panel">
+                <canvas id="legend-chart"></canvas>
             </div>
         </div>
     </div>
-<!-- Top Luoghi Modal -->
-<div class="modal" id="top-luoghi-modal">
+
+    <!-- Sezione 3: Periodo Giorno/Notte -->
+    <div class="panel-section section-period">
+        <div class="section-header">
+            <i class="fas fa-sun"></i>
+            <i class="fas fa-moon"></i>
+            <span>Periodo</span>
+        </div>
+        <div class="section-content">
+            <div class="period-switches">
+                <button id="switch-giorno" class="period-switch" data-period="Giorno" title="Filtra incidenti diurni">
+                    <i class="fas fa-sun"></i>
+                    <span>Giorno</span>
+                    <span id="count-giorno" class="period-count">0</span>
+                </button>
+                <button id="switch-notte" class="period-switch" data-period="Notte" title="Filtra incidenti notturni">
+                    <i class="fas fa-moon"></i>
+                    <span>Notte</span>
+                    <span id="count-notte" class="period-count">0</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sezione 4: Analisi Mensile -->
+    <div class="panel-section section-monthly">
+        <div class="section-header">
+            <i class="fas fa-chart-bar"></i>
+            <span>Incidenti per Mese</span>
+        </div>
+        <div class="section-content">
+            <div class="chart-wrapper-panel">
+                <canvas id="monthly-area-chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sezione 5: Analisi Feriti/Morti -->
+    <div class="panel-section section-injuries">
+        <div class="section-header">
+            <i class="fas fa-ambulance"></i>
+            <span>Feriti/Morti per Mese</span>
+        </div>
+        <div class="section-content">
+            <div class="chart-wrapper-panel">
+                <canvas id="monthly-injuries-chart"></canvas>
+            </div>
+        </div>
+    </div>
+
     <div class="modal-content" style="max-width: 1000px;">
         <div class="modal-header">
             <h3><i class="fas fa-trophy"></i> Top 25 vie con più incidenti</h3>
@@ -758,7 +695,7 @@
         <ul>
             <li><strong>23.487 incidenti (83,2%)</strong> hanno coordinate geografiche precise e sono mappabili</li>
             <li><strong>3.192 incidenti del 2019 (11,3%)</strong> sono privi di geolocalizzazione, una lacuna significativa che rende quell'anno problematico per analisi territoriali</li>
-            <li><strong>1.560 incidenti (5,5%)</strong> presentano coordinate esterne ai confini comunali</li>
+            <li><strong>1.560 incidenti (5,5%)</strong> presentano coordinate esterne ai confini comunali. Si tratta di errori che potrebbero essere corretti tramite geocoding, qualora si disponesse di tempo sufficiente. Tuttavia, data la necessità di procedere speditamente in questa fase dell'analisi, si è scelto di escluderli dai vari dataset.</li>
         </ul>
         
         <p>Il 2023, ultimo anno disponibile nel dataset, viene impostato come anno di default nella dashboard - un segnale dell'importanza di analizzare i dati più recenti per orientare le politiche di sicurezza.</p>
@@ -1105,10 +1042,18 @@
                     
                     <p><strong><i class="fas fa-landmark"></i> Comunità:</strong></p>
                     <p><a href="http://opendatasicilia.it/" target="_blank" rel="noopener">OpenDataSicilia</a> - Comunità civica che promuove la cultura dei dati aperti in Sicilia</p>
-                    
-                    <p><strong><p> <i class="fas fa-heart"></i> Ringraziamenti:</strong></p>
+					
+					
+					<div class="info-note">
+                    <strong><i class="fas fa-hands-helping"></i> Ringraziamenti</strong>
+                    <p>Si ringrazia il Comune di Palermo - Polizia Municipale per la pubblicazione dei dati in formato aperto, rendendo possibile questa analisi e sensibilizzazione.</p>
 					<p>Un grazie speciale a <a href="https://www.linkedin.com/in/andreaborruso/" title="Andrea Borruso" target="_blank">Andrea Borruso</a> e <a href="https://www.linkedin.com/in/salvatore-fiandaca-23a1a250/" title="Totò Fiandaca" target="_blank">Totò Fiandaca</a> per il prezioso supporto tecnico, per la loro disponibilità e per aver condiviso con generosità competenze ed esperienza.</p>
-                                      
+                </div>
+
+                <div class="license-box">
+                    <strong><i class="fas fa-shield-alt"></i> Responsabilità</strong>
+                    <p>I dati sono forniti "as is". L'elaborazione è a scopo informativo e di sensibilizzazione. Per informazioni ufficiali contattare la Polizia Municipale di Palermo.</p>
+                        </div>              
                     <p><strong><i class="fas fa-envelope"></i> Contatti:</strong></p>
                     <p>Per segnalazioni, suggerimenti o collaborazioni: <a href="https://groups.google.com/g/opendatasicilia?pli=1" target="_blank" rel="noopener">contattaci</a></p>
                 </div>
