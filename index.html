@@ -284,7 +284,7 @@
 <!-- Analytics Side Panel -->
 <div id="analytics-side-panel">
     <!-- Sezione 1: Controlli Mappa -->
-   <div class="panel-section section-map-controls">
+<div class="panel-section section-map-controls">
     <div class="section-header">
         <i class="fas fa-map"></i>
         <span>Controlli Mappa</span>
@@ -296,28 +296,37 @@
             <option value="osm">OpenStreetMap</option>
             <option value="satellite">Satellite</option>
         </select>
-                <!-- Pulsanti affiancati -->
-        <div class="panel-btn-row">
-        <button class="panel-btn btn-primary" id="btn-clustering-map" title="Visualizza clustering geografico">
-            <i class="fas fa-circle"></i>
-            <span>Clustering</span>
-        </button>
         
-        <button class="panel-btn btn-warning" id="btn-top-luoghi-map" style="display: none;" title="Top 25 vie">
-            <i class="fas fa-trophy"></i>
-            <span>Top Luoghi</span>
-        </button>
-        
-        <button class="panel-btn btn-success" id="btn-heatmap-map" title="Mappa di calore">
-            <i class="fas fa-fire"></i>
-            <span>Heatmap</span>
-        </button>
-        </div>
-        <!-- Pulsanti affiancati -->
+        <!-- Prima riga: Clustering e Heatmap -->
         <div class="panel-btn-row">
-            <button class="panel-btn btn-info" id="btn-data-table-map" title="Tabella dati">
+            <button class="panel-btn btn-primary" id="btn-clustering-map" title="Visualizza clustering geografico">
+                <i class="fas fa-circle"></i>
+                <span>Clustering</span>
+            </button>
+                        <button class="panel-btn btn-info" id="btn-data-table-map" title="Tabella dati">
                 <i class="fas fa-table"></i>
                 <span>Tabella</span>
+            </button>
+        </div>
+        
+        <!-- Seconda riga: Tabella e Top Luoghi -->
+        <div class="panel-btn-row">
+		            <button class="panel-btn btn-success" id="btn-heatmap-map" title="Mappa di calore">
+                <i class="fas fa-fire"></i>
+                <span>Heatmap</span>
+            </button>
+		           
+            <button class="panel-btn btn-warning" id="btn-top-luoghi-map" title="Top 25 strade con più incidenti">
+                <i class="fas fa-trophy"></i>
+                <span>Top Strade</span>
+            </button>
+        </div>
+        
+        <!-- Terza riga: Reset Filtri e Analisi -->
+        <div class="panel-btn-row">
+            <button class="panel-btn btn-danger" id="btn-reset-map" title="Reset Filtri">
+                <i class="fas fa-sync-alt"></i>
+                <span>Reset Filtri</span>
             </button>
             
             <button class="panel-btn btn-purple" id="btn-analytics-map" title="Dashboard - Visualizza i grafici">
@@ -325,12 +334,11 @@
                 <span>DataViz</span>
             </button>
         </div>
-					            <button class="panel-btn btn-danger" id="btn-reset-map" title="Reset Filtri">
-                <i class="fas fa-sync-alt"></i>
-                <span>Reset Filtri</span>
-            </button>
     </div>
 </div>
+
+
+
 
     <!-- Sezione 2: Tipologie Incidenti -->
     <div class="panel-section section-types">
