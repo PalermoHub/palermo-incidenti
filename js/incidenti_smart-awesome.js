@@ -912,24 +912,85 @@ function updateActiveFiltersDisplay() {
     
     let filterText = [];
     
+    // Data specifica
     if (currentFilters['filter-data-selezionata']) {
         filterText.push(`Data: ${currentFilters['filter-data-selezionata']}`);
     }
     
+    // Anno
     if (currentFilters['filter-anno']) {
         filterText.push(`Anno: ${currentFilters['filter-anno']}`);
     }
     
+    // Mese
     if (currentFilters['filter-mese']) {
         filterText.push(`Mese: ${currentFilters['filter-mese']}`);
     }
     
+    // Giorno settimana
     if (currentFilters['filter-giorno-settimana']) {
         filterText.push(`Giorno: ${currentFilters['filter-giorno-settimana']}`);
     }
     
+    // *** NUOVO: Tipologia (dalle stat-grid) ***
     if (currentFilters['filter-tipologia']) {
-        filterText.push(`Tipologia: ${currentFilters['filter-tipologia']}`);
+        const tipologiaNames = {
+            'M': 'Mortale',
+            'R': 'Riserva',
+            'F': 'Feriti',
+            'C': 'Cose'
+        };
+        filterText.push(`Tipologia: ${tipologiaNames[currentFilters['filter-tipologia']]}`);
+    }
+    
+    // Circoscrizione
+    if (currentFilters['filter-circoscrizione']) {
+        filterText.push(`Circoscrizione: ${currentFilters['filter-circoscrizione']}`);
+    }
+    
+    // Quartiere
+    if (currentFilters['filter-quartiere']) {
+        filterText.push(`Quartiere: ${currentFilters['filter-quartiere']}`);
+    }
+    
+    // UPL
+    if (currentFilters['filter-upl']) {
+        filterText.push(`UPL: ${currentFilters['filter-upl']}`);
+    }
+    
+    // Giorno/Notte
+    if (currentFilters['filter-giorno-notte']) {
+        filterText.push(`${currentFilters['filter-giorno-notte']}`);
+    }
+    
+    // Stagione
+    if (currentFilters['filter-stagione']) {
+        filterText.push(`Stagione: ${currentFilters['filter-stagione']}`);
+    }
+    
+    // Feriale/Weekend
+    if (currentFilters['filter-feriale-weekend']) {
+        filterText.push(`${currentFilters['filter-feriale-weekend']}`);
+    }
+    
+    // Condizioni luce
+    if (currentFilters['filter-condizioni-luce']) {
+        filterText.push(`Luce: ${currentFilters['filter-condizioni-luce']}`);
+    }
+    
+    // Fascia oraria 4
+    if (currentFilters['filter-fascia-4']) {
+        filterText.push(`Fascia: ${currentFilters['filter-fascia-4']}`);
+    }
+    
+    // Fascia oraria 6
+    if (currentFilters['filter-fascia-6']) {
+        filterText.push(`Fascia: ${currentFilters['filter-fascia-6']}`);
+    }
+    
+    // Ora di punta
+    if (currentFilters['filter-ora-punta']) {
+        filterText.push(`${currentFilters['filter-ora-punta']}`);
     }
     
     let displayHTML = '';
@@ -946,6 +1007,7 @@ function updateActiveFiltersDisplay() {
         activeFiltersText.innerHTML = displayHTML;
     }
 }
+
 
 function switchAnalyticsTab(tabName) {
     document.querySelectorAll('.analytics-tab').forEach(tab => {
@@ -1006,16 +1068,23 @@ function addChartDownloadButtons() {
 
 // Download Chart as PNG
 // Modifica la funzione downloadChartAsPNG per gestire la fonte diversa
-
 async function downloadChartAsPNG(chartId, filename) {
     const canvas = document.getElementById(chartId);
-    if (!canvas) return;
+    if (!canvas) {
+        console.error('Canvas non trovato:', chartId);
+        return;
+    }
     
     const chartInstance = Chart.getChart(canvas);
-    if (!chartInstance) return;
+    if (!chartInstance) {
+        console.error('Istanza Chart non trovata per:', chartId);
+        return;
+    }
     
+    // Salva opzioni originali
     const originalOptions = JSON.parse(JSON.stringify(chartInstance.options));
     
+    // Modifica temporaneamente i colori per sfondo bianco
     if (chartInstance.options.scales) {
         Object.keys(chartInstance.options.scales).forEach(scaleKey => {
             const scale = chartInstance.options.scales[scaleKey];
@@ -1039,18 +1108,51 @@ async function downloadChartAsPNG(chartId, filename) {
     
     await new Promise(resolve => setTimeout(resolve, 100));
     
+    // Crea canvas temporaneo con spazio extra per footer
     const tempCanvas = document.createElement('canvas');
     const ctx = tempCanvas.getContext('2d');
     
-    const padding = 80;
+    const footerHeight = 120; // Spazio per logo + fonte + filtri
     tempCanvas.width = canvas.width;
-    tempCanvas.height = canvas.height + padding;
+    tempCanvas.height = canvas.height + footerHeight;
     
+    // Sfondo bianco
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
     
+    // Disegna grafico
     ctx.drawImage(canvas, 0, 0);
     
+    // *** RACCOGLI FILTRI ATTIVI ***
+    const activeFilters = [];
+    
+    if (currentFilters['filter-anno']) {
+        activeFilters.push(`Anno: ${currentFilters['filter-anno']}`);
+    }
+    if (currentFilters['filter-mese']) {
+        activeFilters.push(`Mese: ${currentFilters['filter-mese']}`);
+    }
+    if (currentFilters['filter-giorno-settimana']) {
+        activeFilters.push(`Giorno: ${currentFilters['filter-giorno-settimana']}`);
+    }
+    if (currentFilters['filter-tipologia']) {
+        const names = { M: 'Mortali', R: 'Riserva', F: 'Feriti', C: 'Cose' };
+        activeFilters.push(`Tipo: ${names[currentFilters['filter-tipologia']]}`);
+    }
+    if (currentFilters['filter-circoscrizione']) {
+        activeFilters.push(`Circoscrizione: ${currentFilters['filter-circoscrizione']}`);
+    }
+    if (currentFilters['filter-quartiere']) {
+        activeFilters.push(`Quartiere: ${currentFilters['filter-quartiere']}`);
+    }
+    if (currentFilters['filter-giorno-notte']) {
+        activeFilters.push(currentFilters['filter-giorno-notte']);
+    }
+    if (currentFilters['filter-stagione']) {
+        activeFilters.push(`Stagione: ${currentFilters['filter-stagione']}`);
+    }
+    
+    // Carica e disegna logo
     const logo = new Image();
     logo.crossOrigin = 'anonymous';
     logo.src = 'img/pa_hub_new.png';
@@ -1059,46 +1161,101 @@ async function downloadChartAsPNG(chartId, filename) {
         const logoHeight = 35;
         const logoWidth = logo.width * (logoHeight / logo.height);
         const xPos = tempCanvas.width - logoWidth - 10;
-        const yPos = tempCanvas.height - logoHeight - 35;
+        const yPos = tempCanvas.height - logoHeight - 75;
         
         ctx.drawImage(logo, xPos, yPos, logoWidth, logoHeight);
         
+        // Fonte dati
         ctx.fillStyle = '#1e293b';
-        ctx.font = 'bold 11px Titillium Web';
+        ctx.font = 'bold 11px Arial';
         ctx.textAlign = 'left';
         
-        // MODIFICA: Gestisci fonte diversa per Serie Storica
-        if (chartId === 'chart-serie-storica') {
-            ctx.fillText('Fonte Dati: Istat - ACI - Rielaborazione: opendatasicilia.it', 10, tempCanvas.height - 35);
+        if (chartId.includes('serie-storica')) {
+            ctx.fillText('Fonte Dati: Istat - ACI - Rielaborazione: opendatasicilia.it', 10, tempCanvas.height - 75);
         } else {
-            ctx.fillText('Fonte Dati: dati.gov.it - Comune di Palermo - Rielaborazione: opendatasicilia.it', 10, tempCanvas.height - 35);
+            ctx.fillText('Fonte Dati: dati.gov.it - Comune di Palermo - Rielaborazione: opendatasicilia.it', 10, tempCanvas.height - 75);
         }
         
-        ctx.font = '10px Titillium Web';
+        // *** DISEGNA FILTRI ATTIVI ***
+        if (activeFilters.length > 0) {
+            ctx.font = 'bold 10px Arial';
+            ctx.fillStyle = '#3b82f6';
+            ctx.fillText('Filtri applicati:', 10, tempCanvas.height - 55);
+            
+            ctx.font = '10px Arial';
+            ctx.fillStyle = '#1e293b';
+            
+            const filtersText = activeFilters.join(' • ');
+            const maxWidth = tempCanvas.width - 20;
+            
+            // Word wrap per i filtri
+            const words = filtersText.split(' ');
+            let line = '';
+            let y = tempCanvas.height - 40;
+            
+            for (let i = 0; i < words.length; i++) {
+                const testLine = line + words[i] + ' ';
+                const metrics = ctx.measureText(testLine);
+                
+                if (metrics.width > maxWidth && i > 0) {
+                    ctx.fillText(line, 10, y);
+                    line = words[i] + ' ';
+                    y += 12;
+                } else {
+                    line = testLine;
+                }
+            }
+            ctx.fillText(line, 10, y);
+        } else {
+            ctx.font = '10px Arial';
+            ctx.fillStyle = '#64748b';
+            ctx.fillText('Nessun filtro applicato - Tutti gli incidenti (2015-2023)', 10, tempCanvas.height - 55);
+        }
+        
+        // URL
+        ctx.font = '10px Arial';
         ctx.fillStyle = '#3b82f6';
         ctx.fillText('https://opendatasicilia.github.io/incidenti_palermo/', 10, tempCanvas.height - 20);
         
+        // Download
         const link = document.createElement('a');
         link.download = filename + '.png';
         link.href = tempCanvas.toDataURL('image/png');
         link.click();
         
+        console.log('✓ PNG generato con successo');
+        
+        // Ripristina opzioni originali
         chartInstance.options = originalOptions;
         chartInstance.update();
     };
     
     logo.onerror = function() {
+        console.warn('Logo non caricato, genero PNG senza logo');
+        
+        // Disegna senza logo
         ctx.fillStyle = '#1e293b';
-        ctx.font = 'bold 11px Titillium Web';
+        ctx.font = 'bold 11px Arial';
         ctx.textAlign = 'left';
         
-        if (chartId === 'chart-serie-storica') {
-            ctx.fillText('Fonte Dati: Istat - ACI - Rielaborazione: opendatasicilia.it', 10, tempCanvas.height - 35);
+        if (chartId.includes('serie-storica')) {
+            ctx.fillText('Fonte Dati: Istat - ACI - Rielaborazione: opendatasicilia.it', 10, tempCanvas.height - 75);
         } else {
-            ctx.fillText('Fonte Dati: dati.gov.it - Comune di Palermo - Rielaborazione: opendatasicilia.it', 10, tempCanvas.height - 35);
+            ctx.fillText('Fonte Dati: dati.gov.it - Comune di Palermo - Rielaborazione: opendatasicilia.it', 10, tempCanvas.height - 75);
         }
         
-        ctx.font = '10px Titillium Web';
+        // Filtri
+        if (activeFilters.length > 0) {
+            ctx.font = 'bold 10px Arial';
+            ctx.fillStyle = '#3b82f6';
+            ctx.fillText('Filtri applicati:', 10, tempCanvas.height - 55);
+            
+            ctx.font = '10px Arial';
+            ctx.fillStyle = '#1e293b';
+            ctx.fillText(activeFilters.join(' • '), 10, tempCanvas.height - 40);
+        }
+        
+        ctx.font = '10px Arial';
         ctx.fillStyle = '#3b82f6';
         ctx.fillText('https://opendatasicilia.github.io/incidenti_palermo/', 10, tempCanvas.height - 20);
         
@@ -1111,8 +1268,6 @@ async function downloadChartAsPNG(chartId, filename) {
         chartInstance.update();
     };
 }
-
-
 // Data Table Functions
 function openDataTable() {
     const filteredData = getFilteredData();
@@ -1892,6 +2047,7 @@ function updateAllFilters() {
 }
 
 // Update Stats
+
 function updateStats() {
     const filteredData = getFilteredData();
     const stats = { M: 0, R: 0, F: 0, C: 0 };
@@ -1915,6 +2071,17 @@ function updateStats() {
     if (statCose) statCose.textContent = stats.C.toLocaleString('it-IT');
     if (statTotal) statTotal.textContent = (stats.M + stats.R + stats.F + stats.C).toLocaleString('it-IT');
     
+    // *** NUOVO: Aggiorna stato attivo delle stat-item ***
+    const selectedTipo = currentFilters['filter-tipologia'];
+    document.querySelectorAll('.stat-item').forEach(item => {
+        const tipo = item.dataset.tipo;
+        if (selectedTipo === tipo) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
+    });
+    
     const labelTotale = document.querySelector('.stat-total .stat-label');
     if (labelTotale) {
         let labelText = 'Totale Incidenti';
@@ -1937,6 +2104,7 @@ function updateStats() {
 
     console.log('Statistiche:', stats, `su ${filteredData.length} incidenti filtrati`);
 }
+
 
 // Update Year Stats
 function updateYearStats() {
@@ -4445,8 +4613,9 @@ function setupEventListeners() {
                 handler(e);
             }
         });
-        
+        		
         element.addEventListener('click', handler);
+				
     }
     
     const btnResetCharts = document.getElementById('btn-reset-charts');
@@ -4525,6 +4694,15 @@ function setupEventListeners() {
         });
     });
     
+			    document.querySelectorAll('.stat-item').forEach(item => {
+        addTouchClickListener(item, () => {
+            const tipo = item.dataset.tipo;
+            if (tipo) {
+                filterByTipologia(tipo);
+            }
+        });
+    });
+	
     const buttonsConfig = [
         { id: 'btn-toggle-heatmap', handler: toggleHeatmap },
         { id: 'btn-heatmap-map', handler: toggleHeatmap },
