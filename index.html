@@ -502,10 +502,15 @@
                 <h2><i class="fas fa-chart-line"></i> Vsualizzazione dei dati (DataViz)</h2>
                 <button class="analytics-close" id="analytics-close">×</button>
             </div>
-            <div class="analytics-filters-info" id="analytics-filters-info">
-                <strong>Dati Visualizzati:</strong>
-                <span id="active-filters-text">Tutti gli incidenti (2015-2023)</span>
-            </div>
+<div class="analytics-filters-info">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <strong>Dati Visualizzati:</strong>
+        <button class="btn-reset-analytics" id="btn-reset-analytics" title="Reset filtri visualizzazione">
+            <i class="fas fa-sync-alt"></i>
+        </button>
+    </div>
+    <span id="active-filters-text">Tutti gli incidenti (2015-2023)</span>
+</div>
         </div>
         
 <!-- Nella sezione .analytics-tabs, PRIMA di tutti gli altri tab -->
@@ -540,36 +545,23 @@
 </div>
 
     <!-- Panoramica Tab - rimuovi "active" dalla classe -->
-    <div class="analytics-tab-content" id="tab-panoramica">
-                <div class="charts-grid">
-                    <div class="chart-container">
-                        <h3>Trend Annuale Incidenti</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="chart-trend-annuale"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <h3>Distribuzione per Tipologia</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="chart-tipologia"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <h3>Analisi Stagionale</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="chart-stagionale"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <h3>Feriale vs Weekend</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="chart-feriale-weekend"></canvas>
-                        </div>
-                    </div>
-                </div>
+<div class="analytics-tab-content" id="tab-panoramica">
+    <div class="charts-grid charts-grid-two-col">
+        <div class="chart-container">
+            <h3>Incidenti per Quartiere</h3>
+            <div class="chart-wrapper">
+                <canvas id="chart-quartieri-heatmap"></canvas>
             </div>
-
-            <!-- Temporale Tab -->
+        </div>
+        <div class="chart-container">
+            <h3>Top 25 Strade con più Incidenti</h3>
+            <div class="chart-wrapper">
+                <canvas id="chart-top-strade"></canvas>
+            </div>
+        </div>
+    </div>
+</div>     
+	   <!-- Temporale Tab -->
             <div class="analytics-tab-content" id="tab-temporale">
                 <div class="charts-grid">
                     <div class="chart-container chart-full">

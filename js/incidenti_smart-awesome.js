@@ -1027,7 +1027,10 @@ function switchAnalyticsTab(tabName) {
 function updateAnalytics() {
     const filteredData = getFilteredData();
     
-    updateSerieStoricaChart(); // AGGIUNGI QUESTA RIGA
+    // AGGIUNGI QUESTA RIGA ALL'INIZIO
+    updateActiveFiltersDisplay();
+    
+    updateSerieStoricaChart();
     updatePanoramicaCharts(filteredData);
     updateTemporaleCharts(filteredData);
     updateOrariaCharts(filteredData);
@@ -2221,13 +2224,14 @@ function filterByYear(year) {
         closeSidebar();
     }
     
+    // AGGIUNGI/VERIFICA QUESTA PARTE
     const analyticsPanel = document.getElementById('analytics-panel');
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
-        updateAnalytics();
+        updateAnalytics();  // Questa chiamata aggiornerà anche updateActiveFiltersDisplay()
     }
 }
 
-// Filter By Tipologia
+
 function filterByTipologia(tipo) {
     const currentTipo = currentFilters['filter-tipologia'];
     
@@ -2251,8 +2255,49 @@ function filterByTipologia(tipo) {
     updateMonthlyInjuriesChart();
     updateMonthlyAreaChart();
     
+    // AGGIUNGI/VERIFICA QUESTA PARTE
+    calculateTopLuoghi();
+    updateTopLuoghiModalIfOpen();
+    
     const analyticsPanel = document.getElementById('analytics-panel');
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
+        updateAnalytics();  // Aggiorna anche il testo dei filtri
+    }
+}
+
+
+// Filter By Quartiere
+function filterByQuartiere(quartiere) {
+    const currentQuartiere = currentFilters['filter-quartiere'];
+    
+    if (currentQuartiere === quartiere) {
+        currentFilters['filter-quartiere'] = '';
+    } else {
+        currentFilters['filter-quartiere'] = quartiere;
+    }
+    
+    // Aggiorna anche la select
+    const filterQuartiere = document.getElementById('filter-quartiere');
+    if (filterQuartiere) {
+        filterQuartiere.value = currentFilters['filter-quartiere'];
+    }
+    
+    // Aggiorna tutto
+    updateAllFilters();
+    updateMapData();
+    updateStats();
+    updateYearStats();
+    updateLegendChart();
+    updatePeriodSwitches();
+    updateMonthlyInjuriesChart();
+    updateMonthlyAreaChart();
+    
+    calculateTopLuoghi();
+    updateTopLuoghiModalIfOpen();
+    
+    const analyticsPanel = document.getElementById('analytics-panel');
+    if (analyticsPanel && analyticsPanel.classList.contains('open')) {
+        updateActiveFiltersDisplay();
         updateAnalytics();
     }
 }
@@ -3661,188 +3706,293 @@ plugins: {
     }
 }
 // Panoramica Charts
+
+// Panoramica Charts - VERSIONE AGGIORNATA CON QUARTIERI E TOP STRADE
 function updatePanoramicaCharts(data) {
-    const commonOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: { 
-                display: true,
-                labels: {
-                    color: '#f1f5f9',
-                    font: { size: 10 }
-                }
-            },
-            datalabels: {
-                display: true,
-                color: '#1e293b',
-                font: {
-                    weight: 'bold',
-                    size: 9
-                },
-                formatter: (value) => value > 0 ? value : ''
-            }
-        }
+ // ========================================
+// GRAFICO 1: SINISTRI PER QUARTIERE (HEATMAP CONTINUA)
+// ========================================
+const quartiereData = {};
+data.forEach(row => {
+    const quartiere = row.Quartiere;
+    if (quartiere && quartiere !== 'null') {
+        quartiereData[quartiere] = (quartiereData[quartiere] || 0) + 1;
+    }
+});
+
+const sortedQuartieri = Object.entries(quartiereData)
+    .sort((a, b) => b[1] - a[1]);
+
+const quartieriLabels = sortedQuartieri.map(q => q[0]);
+const quartieriCounts = sortedQuartieri.map(q => q[1]);
+
+function interpolateColor(color1, color2, factor) {
+    const c1 = {
+        r: parseInt(color1.slice(1, 3), 16),
+        g: parseInt(color1.slice(3, 5), 16),
+        b: parseInt(color1.slice(5, 7), 16)
+    };
+    const c2 = {
+        r: parseInt(color2.slice(1, 3), 16),
+        g: parseInt(color2.slice(3, 5), 16),
+        b: parseInt(color2.slice(5, 7), 16)
     };
     
-    const allYears = ['2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'];
-    const selectedYear = currentFilters['filter-anno'];
+    const r = Math.round(c1.r + factor * (c2.r - c1.r));
+    const g = Math.round(c1.g + factor * (c2.g - c1.g));
+    const b = Math.round(c1.b + factor * (c2.b - c1.b));
     
-    const yearData = {};
-    
-    const tempFilters = {...currentFilters};
-    delete tempFilters['filter-anno'];
-    
-    const dataForYearCount = allIncidenti.filter(row => {
-        for (const [filterId, property] of Object.entries(filterConfig)) {
-            if (filterId === 'filter-anno') continue;
-            const value = tempFilters[filterId];
-            if (!value) continue;
+    return `rgb(${r}, ${g}, ${b})`;
+}
 
-            const rowValue = row[property];
-            
-            if (String(rowValue) !== String(value)) return false;
-        }
-        return true;
-    });
-    
-    dataForYearCount.forEach(row => {
-        const year = String(row.Anno);
-        if (year && allYears.includes(year)) {
-            yearData[year] = (yearData[year] || 0) + 1;
-        }
-    });
-    
-    const incidenti2019NonMappati = 3192;
-    yearData['2019'] = (yearData['2019'] || 0) + incidenti2019NonMappati;
-    
-    const counts = allYears.map(y => yearData[y] || 0);
-    
-    const pointBackgroundColors = allYears.map(y => y === selectedYear ? '#ef4444' : '#3b82f6');
-    const pointBorderColors = allYears.map(y => y === selectedYear ? '#dc2626' : '#2563eb');
-    const pointRadius = allYears.map(y => y === selectedYear ? 6 : 4);
-    
-    const trendCanvas = document.getElementById('chart-trend-annuale');
-    if (trendCanvas) {
-        if (analyticsCharts.trendAnnuale) analyticsCharts.trendAnnuale.destroy();
-        analyticsCharts.trendAnnuale = new Chart(trendCanvas, {
-            type: 'line',
-            data: {
-                labels: allYears,
-                datasets: [{
-                    label: 'Incidenti',
-                    data: counts,
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    tension: 0.4,
-                    fill: true,
-                    pointBackgroundColor: pointBackgroundColors,
-                    pointBorderColor: pointBorderColors,
-                    pointRadius: pointRadius,
-                    pointHoverRadius: 7
-                }]
+const maxCount = Math.max(...quartieriCounts);
+const minCount = Math.min(...quartieriCounts);
+
+const colorStart = '#fef3c7';
+const colorEnd = '#991b1b';
+
+const quartieriColors = quartieriCounts.map(count => {
+    const intensity = (count - minCount) / (maxCount - minCount);
+    return interpolateColor(colorStart, colorEnd, intensity);
+});
+
+const selectedQuartiere = currentFilters['filter-quartiere'];
+
+const quartiereCanvas = document.getElementById('chart-quartieri-heatmap');
+if (quartiereCanvas) {
+    if (analyticsCharts.quartieriHeatmap) analyticsCharts.quartieriHeatmap.destroy();
+    analyticsCharts.quartieriHeatmap = new Chart(quartiereCanvas, {
+        type: 'bar',
+        data: {
+            labels: quartieriLabels,
+            datasets: [{
+                label: 'Incidenti',
+                data: quartieriCounts,
+                backgroundColor: quartieriColors,
+                borderColor: quartieriLabels.map(q => 
+                    selectedQuartiere === q ? '#ffffff' : 'transparent'
+                ),
+                borderWidth: quartieriLabels.map(q => 
+                    selectedQuartiere === q ? 3 : 0
+                ),
+                categoryPercentage: 1.0,  // AGGIUNGI - rimuove spazio tra categorie
+                barPercentage: 1.0        // AGGIUNGI - rimuove spazio interno barre
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    right: 40,
+                    left: 0,
+                    top: 0,
+                    bottom: 0
+                }
             },
-            options: {
-                ...commonOptions,
-                plugins: {
-                    ...commonOptions.plugins,
-                    datalabels: {
-                        display: true,
-                        align: (context) => {
-                            return context.dataIndex % 2 === 0 ? 'top' : 'bottom';
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                    padding: 12,
+                    titleFont: { size: 12, weight: 'bold' },
+                    bodyFont: { size: 11 },
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.parsed.x;
+                            const total = quartieriCounts.reduce((a, b) => a + b, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return `Incidenti: ${value} (${percentage}%)`;
                         },
-                        offset: 6,
-                        color: (context) => {
-                            const year = allYears[context.dataIndex];
-                            return year === selectedYear ? '#ef4444' : '#1e293b';
-                        },
-                        font: { 
-                            weight: 'bold', 
-                            size: 9
-                        },
-                        backgroundColor: 'rgba(241, 245, 249, 0.95)',
-                        borderRadius: 3,
-                        padding: 3
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const year = allYears[context.dataIndex];
-                                if (year === '2019') {
-                                    return `Totale: ${context.parsed.y} (include ${incidenti2019NonMappati} non mappati)`;
-                                }
-                                return `Incidenti: ${context.parsed.y}`;
-                            },
-                            afterLabel: function(context) {
-                                const year = allYears[context.dataIndex];
-                                if (year === selectedYear) {
-                                    return '(Anno selezionato)';
-                                }
-                                return '';
+                        afterLabel: function(context) {
+                            const quartiere = quartieriLabels[context.dataIndex];
+                            if (selectedQuartiere === quartiere) {
+                                return '\nClicca per deselezionare';
                             }
+                            return '\nClicca per filtrare';
                         }
                     }
                 },
-                scales: {
-                    x: { 
-                        ticks: { 
-                            color: '#94a3b8',
-                            font: { size: 10 }
-                        }
+                datalabels: {
+                    display: true,
+                    anchor: 'end',
+                    align: 'end',
+                    offset: 8,
+                    color: '#f1f5f9',
+                    font: { 
+                        weight: 'bold', 
+                        size: 11 
                     },
-                    y: { 
-                        ticks: { 
-                            color: '#94a3b8',
-                            font: { size: 10 }
-                        }
-                    }
+                    formatter: (value) => value
+                }
+            },
+            scales: {
+                x: {
+                    display: false,
+                    beginAtZero: true,
+                    max: maxCount * 1.15
                 },
-                onClick: (e, items) => {
-                    if (items.length > 0) {
-                        const year = allYears[items[0].index];
-                        const currentYear = currentFilters['filter-anno'];
-                        
-                        if (currentYear === String(year)) {
-                            currentFilters['filter-anno'] = '';
-                        } else {
-                            currentFilters['filter-anno'] = String(year);
-                        }
-                        
-                        const filterAnno = document.getElementById('filter-anno');
-                        if (filterAnno) filterAnno.value = currentFilters['filter-anno'];
-                        handleFilterChange('filter-anno', currentFilters['filter-anno']);
+                y: {
+                    ticks: { 
+                        color: '#cbd5e1',
+                        font: { 
+                            size: 11, 
+                            weight: '500' 
+                        },
+                        padding: 8
+                    },
+                    grid: {
+                        display: false
+                    },
+                    border: {
+                        display: false
                     }
                 }
+            },
+            onClick: (e, items) => {
+                if (items.length > 0) {
+                    const quartiere = quartieriLabels[items[0].index];
+                    filterByQuartiere(quartiere);
+                }
+            },
+            onHover: (event, activeElements) => {
+                event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
             }
-        });
-        
-        const chartContainer = trendCanvas.closest('.chart-container');
-        if (chartContainer) {
-            let existingNote = chartContainer.querySelector('.chart-note-2019');
-            if (existingNote) {
-                existingNote.remove();
-            }
-            
-            const note = document.createElement('div');
-            note.className = 'chart-note-2019';
-            note.style.cssText = `
-                margin-top: 8px;
-                padding: 8px 12px;
-                background: rgba(59, 130, 246, 0.1);
-                border-left: 3px solid #3b82f6;
-                border-radius: 4px;
-                font-size: 10px;
-                color: #94a3b8;
-                font-style: italic;
-                line-height: 1.4;
-            `;
-            note.innerHTML = `<strong style="color: #3b82f6;">* Nota 2019:</strong> Include 3.192 incidenti non mappati (assenza coordinate geografiche nel dataset).`;
-            
-            chartContainer.appendChild(note);
         }
-    }
+    });
+}
     
-    // Altri grafici panoramici continuano nel prossimo artifact...
+// ========================================
+// GRAFICO 2: TOP 25 STRADE
+// ========================================
+const stradeData = {};
+data.forEach(row => {
+    const indirizzo = row.Indirizzo;
+    if (indirizzo && indirizzo !== 'null' && indirizzo !== 'Non specificato') {
+        stradeData[indirizzo] = (stradeData[indirizzo] || 0) + 1;
+    }
+});
+
+const sortedStrade = Object.entries(stradeData)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 25);
+
+const stradeLabels = sortedStrade.map(s => {
+    const nome = s[0];
+    return nome.length > 35 ? nome.substring(0, 32) + '...' : nome;
+});
+const stradeCounts = sortedStrade.map(s => s[1]);
+
+const stradeCanvas = document.getElementById('chart-top-strade');
+if (stradeCanvas) {
+    if (analyticsCharts.topStrade) analyticsCharts.topStrade.destroy();
+    analyticsCharts.topStrade = new Chart(stradeCanvas, {
+        type: 'bar',
+        data: {
+            labels: stradeLabels,
+            datasets: [{
+                label: 'Incidenti',
+                data: stradeCounts,
+                backgroundColor: stradeCounts.map((count, idx) => {
+                    if (idx === 0) return '#ef4444';
+                    if (idx === 1) return '#f59e0b';
+                    if (idx === 2) return '#fbbf24';
+                    return '#3b82f6';
+                }),
+                borderColor: 'transparent',
+                borderWidth: 0,
+                categoryPercentage: 1.0,  // AGGIUNGI
+                barPercentage: 1.0        // AGGIUNGI
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    right: 40,
+                    left: 0,
+                    top: 0,
+                    bottom: 0
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                    padding: 12,
+                    titleFont: { size: 11, weight: 'bold' },
+                    bodyFont: { size: 10 },
+                    callbacks: {
+                        title: function(context) {
+                            return sortedStrade[context[0].dataIndex][0];
+                        },
+                        label: function(context) {
+                            const value = context.parsed.x;
+                            const rank = context.dataIndex + 1;
+                            return `#${rank} - ${value} incidenti`;
+                        },
+                        afterLabel: function() {
+                            return 'Clicca per visualizzare sulla mappa';
+                        }
+                    }
+                },
+                datalabels: {
+                    display: true,
+                    anchor: 'end',
+                    align: 'end',
+                    offset: 8,
+                    color: '#f1f5f9',
+                    font: { 
+                        weight: 'bold', 
+                        size: 11 
+                    },
+                    formatter: (value) => value
+                }
+            },
+            scales: {
+                x: {
+                    display: false,
+                    beginAtZero: true
+                },
+                y: {
+                    ticks: { 
+                        color: '#cbd5e1',
+                        font: { 
+                            size: 10, 
+                            weight: '500' 
+                        },
+                        padding: 8
+                    },
+                    grid: {
+                        display: false
+                    },
+                    border: {
+                        display: false
+                    }
+                }
+            },
+            onClick: (e, items) => {
+                if (items.length > 0) {
+                    const indirizzo = sortedStrade[items[0].index][0];
+                    const incidente = data.find(row => row.Indirizzo === indirizzo);
+                    if (incidente && incidente.longitude && incidente.latitude) {
+                        zoomToLocation(
+                            parseFloat(incidente.longitude),
+                            parseFloat(incidente.latitude)
+                        );
+                        closeAnalytics();
+                    }
+                }
+            },
+            onHover: (event, activeElements) => {
+                event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
+            }
+        }
+    });
+}  
 }
 
 // ==========================================
@@ -4790,6 +4940,10 @@ function setupEventListeners() {
 const sidebarDesktopToggle = document.getElementById('sidebar-desktop-toggle');
 if (sidebarDesktopToggle) {
     addTouchClickListener(sidebarDesktopToggle, toggleDesktopSidebar);
+}
+const btnResetAnalytics = document.getElementById('btn-reset-analytics');
+if (btnResetAnalytics) {
+    addTouchClickListener(btnResetAnalytics, resetFilters);
 }
 }
 
