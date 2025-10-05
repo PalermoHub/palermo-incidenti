@@ -2751,14 +2751,14 @@ select option {
 /* Controlli lato sinistro - offset quando sidebar aperta */
 .maplibregl-ctrl-top-left,
 .maplibregl-ctrl-bottom-left {
-    left: 330px !important; /* 320px sidebar + 10px margine */
+    left: 315px !important; /* 320px sidebar + 10px margine */
     transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Quando sidebar è collapsed, riporta i controlli a sinistra */
 #sidebar.collapsed ~ #map .maplibregl-ctrl-top-left,
 #sidebar.collapsed ~ #map .maplibregl-ctrl-bottom-left {
-    left: 10px !important;
+    left: 5px !important;
 }
 
 /* Logo ODS bottom-left */
@@ -2780,13 +2780,13 @@ select option {
     /* Mobile: controlli sempre vicini ai bordi */
     .maplibregl-ctrl-top-left,
     .maplibregl-ctrl-bottom-left {
-        left: 10px !important;
+        left: 5px !important;
     }
     
     /* Mobile: quando sidebar aperta (overlay), controlli non si spostano */
     #sidebar.open ~ #map .maplibregl-ctrl-top-left,
     #sidebar.open ~ #map .maplibregl-ctrl-bottom-left {
-        left: 10px !important;
+        left: 5px !important;
     }
 }
 
@@ -2794,12 +2794,12 @@ select option {
 @media (min-width: 769px) and (max-width: 1024px) {
     .maplibregl-ctrl-top-left,
     .maplibregl-ctrl-bottom-left {
-        left: 330px !important;
+        left: 315px !important;
     }
     
     #sidebar.collapsed ~ #map .maplibregl-ctrl-top-left,
     #sidebar.collapsed ~ #map .maplibregl-ctrl-bottom-left {
-        left: 10px !important;
+        left: 5px !important;
     }
 }
 
