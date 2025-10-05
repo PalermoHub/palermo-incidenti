@@ -24,6 +24,8 @@ let monthlyInjuriesChart = null;
 let showClustering = false;
 let topLuoghiData = [];
 let monthlyAreaChart = null;
+let serieStoricaData = [];
+let serieStoricaChart = null;
 
 // Calendario Custom - Variabili Globali
 let customCalendarState = {
@@ -177,12 +179,14 @@ const filterDependencies = {
 // ==========================================
 
 // Initialization
+
 async function init() {
     try {
         console.log('Inizio caricamento CSV...');
         document.getElementById('loading').innerHTML = '<div>Caricamento CSV...</div><small>Download in corso</small>';
         
         await loadCSV();
+        await loadSerieStoricaCSV(); // AGGIUNGI QUESTA RIGA
         
         console.log('CSV caricato, inizializzazione mappa...');
         document.getElementById('loading').innerHTML = '<div>Creazione mappa...</div><small>Attendere</small>';
@@ -190,10 +194,10 @@ async function init() {
         initMap();
         initCustomCalendar();
         setupEventListeners();
-		restoreDesktopSidebarState();
-		
-		calculateTopLuoghi();
-		
+        restoreDesktopSidebarState();
+        
+        calculateTopLuoghi();
+        
     } catch (error) {
         console.error('Errore inizializzazione:', error);
         document.getElementById('loading').innerHTML = '<div>Errore caricamento</div><small>' + error.message + '</small>';
@@ -202,6 +206,7 @@ async function init() {
         }, 2000);
     }
 }
+
 
 // CSV Loading
 async function loadCSV() {
@@ -233,6 +238,31 @@ async function loadCSV() {
     });
 }
 
+
+// Carica CSV Serie Storica
+async function loadSerieStoricaCSV() {
+    return new Promise((resolve, reject) => {
+        Papa.parse('data/serie_storica.csv', {
+            download: true,
+            header: true,
+            dynamicTyping: true,
+            skipEmptyLines: true,
+            complete: function(results) {
+                console.log('Serie Storica CSV caricato:', results.data.length, 'righe');
+                serieStoricaData = results.data.filter(row => {
+                    return row.anno && 
+                           !isNaN(parseInt(row.anno));
+                });
+                console.log('Serie Storica validata:', serieStoricaData.length, 'righe');
+                resolve();
+            },
+            error: function(error) {
+                console.error('Errore caricamento Serie Storica CSV:', error);
+                reject(error);
+            }
+        });
+    });
+}
 // Toggle Heatmap (AGGIORNATO CON FONT AWESOME)
 function toggleHeatmap() {
     showHeatmap = !showHeatmap;
@@ -934,6 +964,7 @@ function switchAnalyticsTab(tabName) {
 function updateAnalytics() {
     const filteredData = getFilteredData();
     
+    updateSerieStoricaChart(); // AGGIUNGI QUESTA RIGA
     updatePanoramicaCharts(filteredData);
     updateTemporaleCharts(filteredData);
     updateOrariaCharts(filteredData);
@@ -973,6 +1004,8 @@ function addChartDownloadButtons() {
 }
 
 // Download Chart as PNG
+// Modifica la funzione downloadChartAsPNG per gestire la fonte diversa
+
 async function downloadChartAsPNG(chartId, filename) {
     const canvas = document.getElementById(chartId);
     if (!canvas) return;
@@ -1033,7 +1066,12 @@ async function downloadChartAsPNG(chartId, filename) {
         ctx.font = 'bold 11px Titillium Web';
         ctx.textAlign = 'left';
         
-        ctx.fillText('Fonte Dati: dati.gov.it - Comune di Palermo - Rielaborazione: opendatasicilia.it', 10, tempCanvas.height - 35);
+        // MODIFICA: Gestisci fonte diversa per Serie Storica
+        if (chartId === 'chart-serie-storica') {
+            ctx.fillText('Fonte Dati: Istat - ACI - Rielaborazione: opendatasicilia.it', 10, tempCanvas.height - 35);
+        } else {
+            ctx.fillText('Fonte Dati: dati.gov.it - Comune di Palermo - Rielaborazione: opendatasicilia.it', 10, tempCanvas.height - 35);
+        }
         
         ctx.font = '10px Titillium Web';
         ctx.fillStyle = '#3b82f6';
@@ -1052,7 +1090,13 @@ async function downloadChartAsPNG(chartId, filename) {
         ctx.fillStyle = '#1e293b';
         ctx.font = 'bold 11px Titillium Web';
         ctx.textAlign = 'left';
-        ctx.fillText('Fonte Dati: dati.gov.it - Comune di Palermo - Rielaborazione: opendatasicilia.it', 10, tempCanvas.height - 35);
+        
+        if (chartId === 'chart-serie-storica') {
+            ctx.fillText('Fonte Dati: Istat - ACI - Rielaborazione: opendatasicilia.it', 10, tempCanvas.height - 35);
+        } else {
+            ctx.fillText('Fonte Dati: dati.gov.it - Comune di Palermo - Rielaborazione: opendatasicilia.it', 10, tempCanvas.height - 35);
+        }
+        
         ctx.font = '10px Titillium Web';
         ctx.fillStyle = '#3b82f6';
         ctx.fillText('https://opendatasicilia.github.io/incidenti_palermo/', 10, tempCanvas.height - 20);
@@ -1066,6 +1110,7 @@ async function downloadChartAsPNG(chartId, filename) {
         chartInstance.update();
     };
 }
+
 
 // Data Table Functions
 function openDataTable() {
@@ -3158,6 +3203,153 @@ function checkMonthHasData(year, month) {
 function checkDayHasIncidents(dateStr) {
     return allIncidenti.filter(row => row.Data === dateStr).length;
 }
+
+
+// Serie storica
+
+function updateSerieStoricaChart() {
+    if (serieStoricaData.length === 0) {
+        console.warn('Nessun dato Serie Storica disponibile');
+        return;
+    }
+    
+    const anni = serieStoricaData.map(row => row.anno);
+    const incidenti = serieStoricaData.map(row => row.n_incidenti || 0);
+    const feriti = serieStoricaData.map(row => row.n_feriti || 0);
+    const morti = serieStoricaData.map(row => row.n_morti || 0);
+    
+    console.log('Dati Serie Storica - Anni:', anni.length);
+    console.log('Primi 3 incidenti:', incidenti.slice(0, 3));
+    console.log('Primi 3 feriti:', feriti.slice(0, 3));
+    console.log('Primi 3 morti:', morti.slice(0, 3));
+    
+    const canvas = document.getElementById('chart-serie-storica');
+    if (!canvas) return;
+    
+    if (serieStoricaChart) {
+        serieStoricaChart.destroy();
+    }
+    
+    serieStoricaChart = new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: anni,
+            datasets: [
+                {
+                    label: 'Incidenti',
+                    data: incidenti,
+                    backgroundColor: 'rgba(59, 130, 246, 0.3)',
+                    borderColor: '#3b82f6',
+                    pointBackgroundColor: '#3b82f6',
+                    pointBorderColor: '#fff',
+                    borderWidth: 2,
+                    fill: true,
+                    pointBorderWidth: 1,
+                    pointRadius: 2,
+                    pointHoverRadius: 5,
+                    tension: 0.4
+                },
+                {
+                    label: 'Feriti',
+                    data: feriti,
+                    backgroundColor: 'rgba(245, 158, 11, 0.3)',
+                    borderColor: '#f59e0b',
+                    pointBackgroundColor: '#f59e0b',
+                    pointBorderColor: '#fff',
+                    borderWidth: 2,
+                    fill: true,
+                    pointBorderWidth: 1,
+                    pointRadius: 2,
+                    pointHoverRadius: 5,
+                    tension: 0.4
+                },
+                {
+                    label: 'Morti',
+                    data: morti,
+                    backgroundColor: 'rgba(239, 68, 68, 0.3)',
+                    borderColor: '#ef4444',
+                    pointBackgroundColor: '#ef4444',
+                    pointBorderColor: '#fff',
+                    borderWidth: 2,
+                    fill: true,
+                    pointBorderWidth: 1,
+                    pointRadius: 2,
+                    pointHoverRadius: 5,
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        color: '#fff',
+                        font: { size: 11 },
+                        padding: 10,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                },
+                tooltip: {
+                    enabled: true,
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                    padding: 12,
+                    titleFont: { size: 12, weight: 'bold' },
+                    bodyFont: { size: 11 },
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.dataset.label || '';
+                            const value = context.parsed.y;
+                            return `${label}: ${value.toLocaleString('it-IT')}`;
+                        }
+                    }
+                },
+                datalabels: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    stacked: false,
+                    ticks: {
+                        color: '#fff',
+                        font: { size: 9 },
+                        maxRotation: 45,
+                        minRotation: 45
+                    },
+                    grid: {
+                        color: 'rgba(148, 163, 184, 0.1)'
+                    }
+                },
+                y: {
+                    stacked: false,
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#fff',
+                        font: { size: 10 },
+                        callback: function(value) {
+                            return value.toLocaleString('it-IT');
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(148, 163, 184, 0.1)'
+                    }
+                }
+            },
+            interaction: {
+                mode: 'index',
+                intersect: false
+            }
+        }
+    });
+    
+    console.log('✓ Grafico Serie Storica creato');
+}
+
 
 // Panoramica Charts
 function updatePanoramicaCharts(data) {

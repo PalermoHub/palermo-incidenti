@@ -507,17 +507,33 @@
             </div>
         </div>
         
-        <div class="analytics-tabs">
-            <button class="analytics-tab active" data-tab="panoramica"><i class="fas fa-chart-bar"></i> Panoramica</button>
-            <button class="analytics-tab" data-tab="temporale"><i class="fas fa-calendar-alt"></i> Temporale</button>
-            <button class="analytics-tab" data-tab="oraria"><i class="fas fa-clock"></i> Oraria</button>
-            <button class="analytics-tab" data-tab="condizioni"><i class="fas fa-cloud-sun"></i> Condizioni</button>
-            <button class="analytics-tab" data-tab="insights"><i class="fas fa-lightbulb"></i> Insights</button>
-        </div>
+<!-- Nella sezione .analytics-tabs, PRIMA di tutti gli altri tab -->
+<div class="analytics-tabs">
+    <button class="analytics-tab active" data-tab="serie-storica"><i class="fas fa-chart-area"></i> Serie Storica</button>
+    <button class="analytics-tab" data-tab="panoramica"><i class="fas fa-chart-bar"></i> Panoramica</button>
+    <button class="analytics-tab" data-tab="temporale"><i class="fas fa-calendar-alt"></i> Temporale</button>
+    <button class="analytics-tab" data-tab="oraria"><i class="fas fa-clock"></i> Oraria</button>
+    <button class="analytics-tab" data-tab="condizioni"><i class="fas fa-cloud-sun"></i> Condizioni</button>
+    <button class="analytics-tab" data-tab="insights"><i class="fas fa-lightbulb"></i> Insights</button>
+</div>
 
         <div class="analytics-content">
             <!-- Panoramica Tab -->
-            <div class="analytics-tab-content active" id="tab-panoramica">
+           <div class="analytics-content">
+    <!-- NUOVO TAB SERIE STORICA -->
+    <div class="analytics-tab-content active" id="tab-serie-storica">
+        <div class="charts-grid">
+            <div class="chart-container chart-full">
+                <h3>Serie storica - incidenti stradali mortali e con feriti (199-204)</h3>
+                <div class="chart-wrapper">
+                    <canvas id="chart-serie-storica"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panoramica Tab - rimuovi "active" dalla classe -->
+    <div class="analytics-tab-content" id="tab-panoramica">
                 <div class="charts-grid">
                     <div class="chart-container">
                         <h3>Trend Annuale Incidenti</h3>
