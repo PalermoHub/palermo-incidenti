@@ -125,6 +125,7 @@ button, .legend-item, .year-stat-item, .year-stat-item-all {
 #map {
     flex: 1;
     height: 100vh;
+	width:100%;
 }
 
 /* Header */
@@ -2654,5 +2655,168 @@ select option {
     .panel-btn-row .panel-btn {
         font-size: 9px;
         padding: 6px 4px;
+    }
+}
+
+/* ==========================================
+   SIDEBAR - POSIZIONAMENTO FISSO SU TUTTI I DISPOSITIVI
+   ========================================== */
+
+/* Sidebar sempre fixed */
+#sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 320px;
+    height: 100vh;
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    box-shadow: 4px 0 20px rgba(0,0,0,0.5);
+    overflow-y: auto;
+    z-index: 1000;
+    border-right: 1px solid rgba(148, 163, 184, 0.1);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Stato collapsed per desktop */
+#sidebar.collapsed {
+    transform: translateX(-320px);
+}
+
+/* Map occupa tutto lo spazio disponibile */
+#map {
+    flex: 1;
+    height: 100vh;
+    width: 100%;
+    margin-left: 0; /* Rimuovi qualsiasi margine */
+}
+
+/* Toggle Tab per Desktop - AGGIORNATO */
+.sidebar-desktop-toggle {
+    position: fixed;
+    left: 320px;
+    top: 150px;
+    z-index: 1001;
+    background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
+    color: white;
+    width: 32px;
+    height: 60px;
+    border: none;
+    border-radius: 0 8px 8px 0;
+    cursor: pointer;
+    box-shadow: 4px 0 12px rgba(0,0,0,0.3);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+/* Quando sidebar è collapsed, sposta il toggle a sinistra */
+#sidebar.collapsed ~ .sidebar-desktop-toggle {
+    left: 0;
+}
+
+/* Desktop: mostra il toggle */
+@media (min-width: 769px) {
+    .sidebar-desktop-toggle {
+        display: flex;
+    }
+}
+
+/* Mobile: comportamento esistente */
+@media (max-width: 768px) {
+    #sidebar {
+        left: -380px;
+        width: 360px;
+    }
+    
+    #sidebar.open {
+        left: 0;
+        transform: none;
+    }
+    
+    #sidebar.collapsed {
+        transform: none;
+    }
+    
+    .sidebar-desktop-toggle {
+        display: none;
+    }
+}
+
+/* ==========================================
+   MAPLIBRE CONTROLS - SEGUONO LA SIDEBAR
+   ========================================== */
+
+/* Controlli lato sinistro - offset quando sidebar aperta */
+.maplibregl-ctrl-top-left,
+.maplibregl-ctrl-bottom-left {
+    left: 330px !important; /* 320px sidebar + 10px margine */
+    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Quando sidebar è collapsed, riporta i controlli a sinistra */
+#sidebar.collapsed ~ #map .maplibregl-ctrl-top-left,
+#sidebar.collapsed ~ #map .maplibregl-ctrl-bottom-left {
+    left: 10px !important;
+}
+
+/* Logo ODS bottom-left */
+.maplibregl-ctrl-ods {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Controlli lato destro - rimangono fissi */
+.maplibregl-ctrl-top-right,
+.maplibregl-ctrl-bottom-right {
+    transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==========================================
+   RESPONSIVE - MOBILE
+   ========================================== */
+
+@media (max-width: 768px) {
+    /* Mobile: controlli sempre vicini ai bordi */
+    .maplibregl-ctrl-top-left,
+    .maplibregl-ctrl-bottom-left {
+        left: 10px !important;
+    }
+    
+    /* Mobile: quando sidebar aperta (overlay), controlli non si spostano */
+    #sidebar.open ~ #map .maplibregl-ctrl-top-left,
+    #sidebar.open ~ #map .maplibregl-ctrl-bottom-left {
+        left: 10px !important;
+    }
+}
+
+/* Tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .maplibregl-ctrl-top-left,
+    .maplibregl-ctrl-bottom-left {
+        left: 330px !important;
+    }
+    
+    #sidebar.collapsed ~ #map .maplibregl-ctrl-top-left,
+    #sidebar.collapsed ~ #map .maplibregl-ctrl-bottom-left {
+        left: 10px !important;
+    }
+}
+
+
+/* Analytics Side Panel - si espande quando sidebar chiusa */
+#analytics-side-panel {
+    transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Opzionale: espandi leggermente quando c'è più spazio */
+#sidebar.collapsed ~ #map #analytics-side-panel {
+    width: 360px; /* +20px quando sidebar chiusa */
+}
+
+@media (max-width: 768px) {
+    #sidebar.collapsed ~ #map #analytics-side-panel {
+        width: 340px; /* Mantieni dimensione originale su mobile */
     }
 }

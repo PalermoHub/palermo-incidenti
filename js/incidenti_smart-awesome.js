@@ -190,6 +190,7 @@ async function init() {
         initMap();
         initCustomCalendar();
         setupEventListeners();
+		restoreDesktopSidebarState();
 		
 		calculateTopLuoghi();
 		
@@ -363,6 +364,51 @@ function toggleSidebar() {
             overlay.classList.remove('show');
         }
     }
+	
+	// Toggle Desktop Sidebar
+function toggleDesktopSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('sidebar-desktop-toggle');
+    const toggleIcon = toggleBtn?.querySelector('i');
+    
+    if (!sidebar) return;
+    
+    // Toggle collapsed state
+    sidebar.classList.toggle('collapsed');
+    
+    // Update icon
+    if (toggleIcon) {
+        if (sidebar.classList.contains('collapsed')) {
+            toggleIcon.className = 'fas fa-chevron-right';
+            toggleBtn.title = 'Apri pannello filtri';
+        } else {
+            toggleIcon.className = 'fas fa-chevron-left';
+            toggleBtn.title = 'Chiudi pannello filtri';
+        }
+    }
+    
+    // Salva stato in localStorage
+    localStorage.setItem('sidebarDesktopState', 
+        sidebar.classList.contains('collapsed') ? 'collapsed' : 'open'
+    );
+}
+
+// Ripristina stato sidebar al caricamento
+function restoreDesktopSidebarState() {
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('sidebar-desktop-toggle');
+    const toggleIcon = toggleBtn?.querySelector('i');
+    const savedState = localStorage.getItem('sidebarDesktopState');
+    
+    // Default: aperta (nessuna classe collapsed)
+    if (savedState === 'collapsed') {
+        sidebar?.classList.add('collapsed');
+        if (toggleIcon) {
+            toggleIcon.className = 'fas fa-chevron-right';
+            toggleBtn.title = 'Apri pannello filtri';
+        }
+    }
+}
 }
 
 function closeSidebar() {
@@ -374,6 +420,58 @@ function closeSidebar() {
     if (toggle) toggle.classList.remove('active');
     if (overlay) overlay.classList.remove('show');
 }
+
+// ===== AGGIUNGI QUESTE FUNZIONI QUI =====
+
+// Toggle Desktop Sidebar
+function toggleDesktopSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('sidebar-desktop-toggle');
+    const toggleIcon = toggleBtn?.querySelector('i');
+    
+    if (!sidebar) return;
+    
+    // Toggle collapsed state
+    sidebar.classList.toggle('collapsed');
+    
+
+    // Update icon
+    if (toggleIcon) {
+        if (sidebar.classList.contains('collapsed')) {
+            toggleIcon.className = 'fas fa-chevron-right';
+            toggleBtn.title = 'Apri pannello filtri';
+        } else {
+            toggleIcon.className = 'fas fa-chevron-left';
+            toggleBtn.title = 'Chiudi pannello filtri';
+        }
+    }
+    
+    // Salva stato in localStorage
+    localStorage.setItem('sidebarDesktopState', 
+        sidebar.classList.contains('collapsed') ? 'collapsed' : 'open'
+    );
+}
+
+// Ripristina stato sidebar al caricamento
+// Ripristina stato sidebar al caricamento
+function restoreDesktopSidebarState() {
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('sidebar-desktop-toggle');
+    const toggleIcon = toggleBtn?.querySelector('i');
+    
+    // FORZA SEMPRE APERTO ALL'AVVIO
+    sidebar?.classList.remove('collapsed'); // Rimuovi classe collapsed se presente
+    if (toggleIcon) {
+        toggleIcon.className = 'fas fa-chevron-left';
+        toggleBtn.title = 'Chiudi pannello filtri';
+    }
+    
+    // Opzionale: pulisci il localStorage per partire sempre da zero
+    localStorage.removeItem('sidebarDesktopState');
+
+}
+
+// ===== FINE NUOVE FUNZIONI =====
 
 // ==========================================
 // PARTE 3 - incidenti_part3
@@ -1045,7 +1143,7 @@ function initMap() {
     map = new maplibregl.Map({
         container: 'map',
         style: basemapStyles['carto-light'],
-        center: [13.3913, 38.1454],
+        center: [13.3423, 38.1451],
         zoom: 11.65,
         minZoom: 9,
         maxZoom: 18,
@@ -1064,7 +1162,7 @@ function initMap() {
             
             this._container.onclick = () => {
                 map.flyTo({
-                    center: [13.3913, 38.1454],
+                    center: [13.3423, 38.1451],
 					zoom: 11.65,
                     duration: 1500,
                     essential: true
@@ -2035,7 +2133,7 @@ function resetFilters() {
 	
 	    if (map) {
         map.flyTo({
-            center: [13.3913, 38.1454],  // Centro Palermo
+            center: [13.3423, 38.1451],  // Centro Palermo
             zoom: 11.65,                     // Zoom iniziale
             duration: 1500,               // Animazione 1.5 secondi
             essential: true
@@ -4176,6 +4274,12 @@ function setupEventListeners() {
 
     const btnDownloadLuoghi = document.getElementById('btn-download-luoghi-csv');
     if (btnDownloadLuoghi) addTouchClickListener(btnDownloadLuoghi, downloadTopLuoghiCSV);
+	
+	// Desktop Sidebar Toggle
+const sidebarDesktopToggle = document.getElementById('sidebar-desktop-toggle');
+if (sidebarDesktopToggle) {
+    addTouchClickListener(sidebarDesktopToggle, toggleDesktopSidebar);
+}
 }
 
 // Initialize App
