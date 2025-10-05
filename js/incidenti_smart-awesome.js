@@ -25,7 +25,8 @@ let showClustering = false;
 let topLuoghiData = [];
 let monthlyAreaChart = null;
 let serieStoricaData = [];
-let serieStoricaChart = null;
+let serieStoricaChartIncidenti = null;
+let serieStoricaChartMorti = null;
 
 // Calendario Custom - Variabili Globali
 let customCalendarState = {
@@ -3206,161 +3207,291 @@ function checkDayHasIncidents(dateStr) {
 
 
 // Serie storica
-
 function updateSerieStoricaChart() {
     if (serieStoricaData.length === 0) {
         console.warn('Nessun dato Serie Storica disponibile');
         return;
     }
     
-    // Filtra e pulisci i dati, rimuovendo righe con valori null/undefined/0
+    // Filtra e pulisci i dati
     const datiPuliti = serieStoricaData.filter(row => {
         return row.anno && 
-               row.n_incidenti > 0 && 
-               row.n_feriti >= 0 && 
-               row.n_morti >= 0;
+               row.n_incidenti > 0;
     });
     
-    console.log('Dati Serie Storica - Totale righe:', serieStoricaData.length);
     console.log('Dati Serie Storica - Righe valide:', datiPuliti.length);
-    console.log('Primo record:', datiPuliti[0]);
-    console.log('Ultimo record:', datiPuliti[datiPuliti.length - 1]);
     
     const anni = datiPuliti.map(row => row.anno);
-    const incidenti = datiPuliti.map(row => row.n_incidenti);
-    const feriti = datiPuliti.map(row => row.n_feriti);
-    const morti = datiPuliti.map(row => row.n_morti);
+    const incidenti = datiPuliti.map(row => row.n_incidenti || 0);
+    const feriti = datiPuliti.map(row => row.n_feriti || 0);
+    const incidentiMortali = datiPuliti.map(row => row.n_inc_mort || 0);
+    const morti = datiPuliti.map(row => row.n_morti || 0);
     
-    const canvas = document.getElementById('chart-serie-storica');
-    if (!canvas) return;
-    
-    if (serieStoricaChart) {
-        serieStoricaChart.destroy();
+    // ========================================
+    // PRIMO GRAFICO: INCIDENTI E FERITI
+    // ========================================
+    const canvasIncidenti = document.getElementById('chart-serie-storica-incidenti');
+    if (canvasIncidenti) {
+        if (serieStoricaChartIncidenti) {
+            serieStoricaChartIncidenti.destroy();
+        }
+        
+        serieStoricaChartIncidenti = new Chart(canvasIncidenti, {
+            type: 'line',
+            data: {
+                labels: anni,
+                datasets: [
+                    {
+                        label: 'Incidenti con feriti',
+                        data: incidenti,
+                        backgroundColor: 'rgba(59, 130, 246, 0.85)',
+                        borderColor: '#3b82f6',
+                        pointBackgroundColor: '#3b82f6',
+                        pointBorderColor: '#fff',
+                        borderWidth: 2,
+                        fill: true,
+                        pointBorderWidth: 1,
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Feriti',
+                        data: feriti,
+                        backgroundColor: 'rgba(245, 158, 11, 0.75)',
+                        borderColor: '#f59e0b',
+                        pointBackgroundColor: '#f59e0b',
+                        pointBorderColor: '#fff',
+                        borderWidth: 2,
+                        fill: true,
+                        pointBorderWidth: 1,
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: {
+                            color: '#fff',
+                            font: { size: 12 },
+                            padding: 12,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        padding: 14,
+                        titleFont: { size: 13, weight: 'bold' },
+                        bodyFont: { size: 12 },
+                        bodySpacing: 6,
+                        callbacks: {
+                            title: function(context) {
+                                return `Anno ${context[0].label}`;
+                            },
+                            label: function(context) {
+                                const label = context.dataset.label || '';
+                                const value = context.parsed.y;
+                                return `${label}: ${value.toLocaleString('it-IT')}`;
+                            }
+                        }
+                    },
+                   datalabels: {
+    display: true,
+    align: 'top',
+    anchor: 'end',
+    offset: 4,
+    color: function(context) {
+        return context.dataset.borderColor;
+    },
+    font: {
+        weight: 'bold',
+        size: 9
+    },
+    //backgroundColor: 'rgba(15, 23, 42, 0.8)',
+	color: '#fff',	
+    borderRadius: 3,
+    padding: 2,
+    formatter: (value) => value > 0 ? value.toLocaleString('it-IT') : ''
+}
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: '#fff',
+                            font: { size: 10 },
+                            maxRotation: 45,
+                            minRotation: 45
+                        },
+                        grid: {
+                            color: 'rgba(148, 163, 184, 0.1)'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#fff',
+                            font: { size: 11 },
+                            callback: function(value) {
+                                return value.toLocaleString('it-IT');
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(148, 163, 184, 0.1)'
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                }
+            }
+        });
+        
+        console.log('✓ Grafico Incidenti/Feriti creato');
     }
     
-    serieStoricaChart = new Chart(canvas, {
-        type: 'line',
-        data: {
-            labels: anni,
-            datasets: [
-                {
-                    label: 'Incidenti',
-                    data: incidenti,
-                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                    borderColor: '#3b82f6',
-                    pointBackgroundColor: '#3b82f6',
-                    pointBorderColor: '#fff',
-                    borderWidth: 2,
-                    fill: true,
-                    pointBorderWidth: 1,
-                    pointRadius: 3,
-                    pointHoverRadius: 6,
-                    tension: 0.4
-                },
-                {
-                    label: 'Feriti',
-                    data: feriti,
-                    backgroundColor: 'rgba(245, 158, 11, 0.2)',
-                    borderColor: '#f59e0b',
-                    pointBackgroundColor: '#f59e0b',
-                    pointBorderColor: '#fff',
-                    borderWidth: 2,
-                    fill: true,
-                    pointBorderWidth: 1,
-                    pointRadius: 3,
-                    pointHoverRadius: 6,
-                    tension: 0.4
-                },
-                {
-                    label: 'Morti',
-                    data: morti,
-                    backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                    borderColor: '#ef4444',
-                    pointBackgroundColor: '#ef4444',
-                    pointBorderColor: '#fff',
-                    borderWidth: 3,
-                    fill: true,
-                    pointBorderWidth: 2,
-                    pointRadius: 5,
-                    pointHoverRadius: 8,
-                    tension: 0.4
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'bottom',
-                    labels: {
-                        color: '#fff',
-                        font: { size: 12 },
-                        padding: 12,
-                        usePointStyle: true,
-                        pointStyle: 'circle'
-                    }
-                },
-                tooltip: {
-                    enabled: true,
-                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                    padding: 14,
-                    titleFont: { size: 13, weight: 'bold' },
-                    bodyFont: { size: 12 },
-                    bodySpacing: 6,
-                    callbacks: {
-                        title: function(context) {
-                            return `Anno ${context[0].label}`;
-                        },
-                        label: function(context) {
-                            const label = context.dataset.label || '';
-                            const value = context.parsed.y;
-                            return `${label}: ${value.toLocaleString('it-IT')}`;
-                        }
-                    }
-                },
-                datalabels: {
-                    display: false
-                }
-            },
-            scales: {
-                x: {
-                    ticks: {
-                        color: '#fff',
-                        font: { size: 10 },
-                        maxRotation: 45,
-                        minRotation: 45
+    // ========================================
+    // SECONDO GRAFICO: INCIDENTI MORTALI E MORTI
+    // ========================================
+    const canvasMorti = document.getElementById('chart-serie-storica-morti');
+    if (canvasMorti) {
+        if (serieStoricaChartMorti) {
+            serieStoricaChartMorti.destroy();
+        }
+        
+        serieStoricaChartMorti = new Chart(canvasMorti, {
+            type: 'line',
+            data: {
+                labels: anni,
+                datasets: [
+                    {
+                        label: 'Incidenti con deceduti',
+                        data: incidentiMortali,
+                        backgroundColor: 'rgba(168, 85, 247, 0.85)',
+                        borderColor: '#a855f7',
+                        pointBackgroundColor: '#a855f7',
+                        pointBorderColor: '#fff',
+                        borderWidth: 2,
+                        fill: true,
+                        pointBorderWidth: 1,
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                        tension: 0.4
                     },
-                    grid: {
-                        color: 'rgba(148, 163, 184, 0.15)'
+                    {
+                        label: 'Deceduti',
+                        data: morti,
+                        backgroundColor: 'rgba(239, 68, 68, 0.75)',
+                        borderColor: '#ef4444',
+                        pointBackgroundColor: '#ef4444',
+                        pointBorderColor: '#fff',
+                        borderWidth: 2,
+                        fill: true,
+                        pointBorderWidth: 1,
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                        tension: 0.4
                     }
-                },
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        color: '#fff',
-                        font: { size: 11 },
-                        callback: function(value) {
-                            return value.toLocaleString('it-IT');
-                        }
-                    },
-                    grid: {
-                        color: 'rgba(148, 163, 184, 0.15)'
-                    }
-                }
+                ]
             },
-            interaction: {
-                mode: 'index',
-                intersect: false
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+plugins: {
+    legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+            color: '#fff',
+            font: { size: 12 },
+            padding: 12,
+            usePointStyle: true,
+            pointStyle: 'circle'
+        }
+    },
+    tooltip: {
+        enabled: true,
+        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+        padding: 14,
+        titleFont: { size: 13, weight: 'bold' },
+        bodyFont: { size: 12 },
+        bodySpacing: 6,
+        callbacks: {
+            title: function(context) {
+                return `Anno ${context[0].label}`;
+            },
+            label: function(context) {
+                const label = context.dataset.label || '';
+                const value = context.parsed.y;
+                return `${label}: ${value.toLocaleString('it-IT')}`;
             }
         }
-    });
-    
-    console.log('✓ Grafico Serie Storica creato con', anni.length, 'anni');
+    },
+    datalabels: {
+        display: function(context) {
+            // Mostra etichette solo per il dataset "Morti" (indice 1)
+            return context.datasetIndex === 1;
+        },
+        align: 'top',
+        anchor: 'end',
+        offset: 4,
+        color: '#fff',
+        font: {
+            weight: 'bold',
+            size: 10
+        },
+        backgroundColor: 'rgba(15, 23, 42, 0.8)',
+        borderRadius: 3,
+        padding: 2,
+        formatter: (value) => value > 0 ? value.toLocaleString('it-IT') : ''
+    }
+},
+
+                scales: {
+                    x: {
+                        ticks: {
+                            color: '#fff',
+                            font: { size: 10 },
+                            maxRotation: 45,
+                            minRotation: 45
+                        },
+                        grid: {
+                            color: 'rgba(148, 163, 184, 0.1)'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#fff',
+                            font: { size: 11 },
+                            callback: function(value) {
+                                return value.toLocaleString('it-IT');
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(148, 163, 184, 0.1)'
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                }
+            }
+        });
+        
+        console.log('✓ Grafico Incidenti Mortali/Morti creato');
+    }
 }
-
-
 // Panoramica Charts
 function updatePanoramicaCharts(data) {
     const commonOptions = {
