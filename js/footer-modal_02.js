@@ -3,12 +3,10 @@
     'use strict';
     
     let isModalOpen = false;
-    let activeTooltip = null;
     
     // Initialize
     function init() {
         setupEventListeners();
-        initializeTooltips();
     }
     
     // Setup Event Listeners
@@ -62,116 +60,7 @@
             if (e.key === 'Escape' && isModalOpen) {
                 closeModal();
             }
-            if (e.key === 'Escape' && activeTooltip) {
-                closeTooltip();
-            }
         });
-        
-        // Close tooltip when clicking outside
-        document.addEventListener('click', (e) => {
-            if (activeTooltip && !e.target.closest('.as-is-term') && !e.target.closest('.as-is-tooltip')) {
-                closeTooltip();
-            }
-        });
-    }
-    
-    // Initialize Tooltips for "as is" terms
-    function initializeTooltips() {
-        // Find all elements with class "as-is-term" or wrap "as is" text
-        const asIsTerms = document.querySelectorAll('.as-is-term');
-        
-        asIsTerms.forEach(term => {
-            term.style.cursor = 'help';
-            term.style.textDecoration = 'underline dotted';
-            term.style.textDecorationColor = '#666';
-            
-            term.addEventListener('click', (e) => {
-                e.stopPropagation();
-                showTooltip(term);
-            });
-            
-            // Optional: show on hover
-            term.addEventListener('mouseenter', () => {
-                term.style.textDecorationColor = '#0066cc';
-            });
-            
-            term.addEventListener('mouseleave', () => {
-                term.style.textDecorationColor = '#666';
-            });
-        });
-    }
-    
-    // Show Tooltip
-    function showTooltip(element) {
-        // Close any existing tooltip
-        closeTooltip();
-        
-        // Create tooltip element
-        const tooltip = document.createElement('div');
-        tooltip.className = 'as-is-tooltip';
-        tooltip.innerHTML = `
-            <div class="as-is-tooltip-content">
-                <button class="as-is-tooltip-close" aria-label="Chiudi">&times;</button>
-                <h4>Cosa significa "as is"?</h4>
-                <p>I dati sono forniti <strong>"as is"</strong> (letteralmente "così come sono") significa che:</p>
-                <ul>
-                    <li>Le informazioni sono presentate nel loro stato attuale, senza modifiche o verifiche aggiuntive</li>
-                    <li>Non viene fornita alcuna garanzia sulla loro accuratezza, completezza o aggiornamento</li>
-                    <li>L'utente accetta i dati nella loro forma originale e si assume la responsabilità del loro utilizzo</li>
-                    <li>Il fornitore non è responsabile per eventuali errori o omissioni nei dati</li>
-                </ul>
-                <p class="as-is-note">⚠️ Si consiglia sempre di verificare i dati critici prima dell'utilizzo.</p>
-            </div>
-        `;
-        
-        // Position tooltip near the element
-        document.body.appendChild(tooltip);
-        positionTooltip(tooltip, element);
-        
-        // Add close button listener
-        const closeBtn = tooltip.querySelector('.as-is-tooltip-close');
-        closeBtn.addEventListener('click', closeTooltip);
-        
-        // Animate in
-        setTimeout(() => {
-            tooltip.classList.add('show');
-        }, 10);
-        
-        activeTooltip = tooltip;
-    }
-    
-    // Position Tooltip
-    function positionTooltip(tooltip, element) {
-        const rect = element.getBoundingClientRect();
-        const tooltipRect = tooltip.getBoundingClientRect();
-        
-        let top = rect.bottom + window.scrollY + 10;
-        let left = rect.left + window.scrollX;
-        
-        // Adjust if tooltip goes off screen
-        if (left + tooltipRect.width > window.innerWidth) {
-            left = window.innerWidth - tooltipRect.width - 20;
-        }
-        
-        if (top + tooltipRect.height > window.innerHeight + window.scrollY) {
-            top = rect.top + window.scrollY - tooltipRect.height - 10;
-        }
-        
-        tooltip.style.top = `${top}px`;
-        tooltip.style.left = `${left}px`;
-    }
-    
-    // Close Tooltip
-    function closeTooltip() {
-        if (activeTooltip) {
-            activeTooltip.classList.remove('show');
-            setTimeout(() => {
-                if (activeTooltip && activeTooltip.parentNode) {
-                    activeTooltip.parentNode.removeChild(activeTooltip);
-                }
-                activeTooltip = null;
-            }, 300);
-        }
     }
     
     // Toggle Modal
@@ -197,9 +86,6 @@
             
             // Prevent body scroll
             document.body.style.overflow = 'hidden';
-            
-            // Re-initialize tooltips when modal opens
-            setTimeout(initializeTooltips, 100);
         }
     }
     
@@ -218,9 +104,6 @@
             if (backToTopBtn) {
                 backToTopBtn.classList.remove('show');
             }
-            
-            // Close any open tooltip
-            closeTooltip();
             
             // Wait for animation to complete
             setTimeout(() => {
@@ -252,10 +135,7 @@
         if (selectedTab) selectedTab.classList.add('active');
         if (selectedContent) selectedContent.classList.add('active');
         
-        // Close any open tooltip when switching tabs
-        closeTooltip();
-        
-        // Scroll to top when changing tab
+        // ✅ SCROLL TO TOP WHEN CHANGING TAB
         const modalContent = document.querySelector('.footer-modal-content');
         if (modalContent) {
             modalContent.scrollTo({
@@ -263,9 +143,6 @@
                 behavior: 'smooth'
             });
         }
-        
-        // Re-initialize tooltips for new tab content
-        setTimeout(initializeTooltips, 100);
     }
     
     // Initialize on DOM ready
