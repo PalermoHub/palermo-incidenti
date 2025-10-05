@@ -192,7 +192,7 @@ button, .legend-item, .year-stat-item, .year-stat-item-all {
     padding: 10px 12px;
     background: linear-gradient(135deg, rgba(51, 65, 85, 0.8) 0%, rgba(30, 41, 59, 0.8) 100%);
     backdrop-filter: blur(10px);
-    border-radius: 8px;
+    border-radius: 4px;
     border-left: 3px solid;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     transition: all 0.3s ease;
@@ -241,7 +241,7 @@ button, .legend-item, .year-stat-item, .year-stat-item-all {
     padding: 8px;
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
     backdrop-filter: blur(10px);
-    border-radius: 8px;
+    border-radius: 4px;
     border: 1px solid rgba(148, 163, 184, 0.2);
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     position: relative;
@@ -285,7 +285,7 @@ button, .legend-item, .year-stat-item, .year-stat-item-all {
     padding: 16px;
     background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(30, 41, 59, 0.8) 100%);
     backdrop-filter: blur(10px);
-    border-radius: 8px;
+    border-radius: 4px;
     border: 1px solid rgba(139, 92, 246, 0.3);
 }
 
@@ -308,7 +308,7 @@ button, .legend-item, .year-stat-item, .year-stat-item-all {
     width: 100%;
     padding: 5px 5px;
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.4) 0%, rgba(139, 92, 246, 0.4) 100%);
-    border-radius: 8px;
+    border-radius: 4px;
     text-align: center;
     border: 1px solid rgba(59, 130, 246, 0.5);
     cursor: pointer;
@@ -341,9 +341,9 @@ button, .legend-item, .year-stat-item, .year-stat-item-all {
 .year-stat-item {
     flex: 1;
     min-width: 80px;
-    padding: 8px 12px;
+    padding: 2px 4px;
     background: rgba(51, 65, 85, 0.6);
-    border-radius: 8px;
+    border-radius: 4px;
     text-align: center;
     border: 1px solid rgba(148, 163, 184, 0.1);
     cursor: pointer;
@@ -397,7 +397,7 @@ select, input {
     width: 100%;
     padding: 12px;
     border: 1px solid rgba(148, 163, 184, 0.2);
-    border-radius: 8px;
+    border-radius: 4px;
     font-size: 14px;
     background: rgba(30, 41, 59, 0.6);
     backdrop-filter: blur(10px);
@@ -501,7 +501,7 @@ select option {
 .filter-section {
     margin-bottom: 16px;
     border: 0px solid rgba(148, 163, 184, 0.2);
-    border-radius: 8px;
+    border-radius: 4px;
     overflow: hidden;
     background: rgba(30, 41, 59, 0.4);
     backdrop-filter: blur(10px);
@@ -564,7 +564,7 @@ select option {
     background: #0f172abd !important;
     backdrop-filter: blur(2px);
     padding: 8px;
-    border-radius: 8px;
+    border-radius: 4px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     border: 0px solid rgba(148, 163, 184, 0.2);
 }
@@ -871,7 +871,7 @@ select option {
     margin-bottom: 24px;
     background: rgba(30, 41, 59, 0.6);
     backdrop-filter: blur(10px);
-    border-radius: 8px;
+    border-radius: 4px;
     padding: 20px;
     border: 1px solid rgba(148, 163, 184, 0.1);
 }
@@ -954,7 +954,7 @@ select option {
 .coordinates-box {
     background: rgba(15, 23, 42, 0.8);
     padding: 12px;
-    border-radius: 8px;
+    border-radius: 4px;
     font-family: 'Courier New', monospace;
     font-size: 12px;
     color: #10b981;
@@ -1094,7 +1094,7 @@ select option {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 4px;
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
@@ -1149,7 +1149,7 @@ select option {
 
 .analytics-filters-info {
     background: rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
+    border-radius: 4px;
     padding: 12px 16px;
     font-size: 13px;
     line-height: 1.6;
@@ -1168,7 +1168,7 @@ select option {
     display: inline-block;
     background: rgba(255, 255, 255, 0.25);
     padding: 4px 10px;
-    border-radius: 8px;
+    border-radius: 4px;
     margin-right: 8px;
     margin-bottom: 4px;
     font-size: 12px;
@@ -1208,7 +1208,7 @@ select option {
     padding: 12px 24px;
     background: rgba(51, 65, 85, 0.6);
     border: none;
-    border-radius: 8px;
+    border-radius: 4px;
     color: #cbd5e1;
     font-size: 14px;
     font-weight: 600;
@@ -1335,7 +1335,7 @@ select option {
 .stat-realtime-item {
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
     padding: 20px;
-    border-radius: 8px;
+    border-radius: 4px;
     text-align: center;
     border: 1px solid rgba(148, 163, 184, 0.2);
 }
@@ -1362,7 +1362,7 @@ select option {
     gap: 16px;
     padding: 16px;
     background: rgba(15, 23, 42, 0.5);
-    border-radius: 8px;
+    border-radius: 4px;
     margin-bottom: 16px;
     border: 1px solid rgba(148, 163, 184, 0.1);
 }
@@ -1371,7 +1371,7 @@ select option {
     width: 50px;
     height: 50px;
     background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-    border-radius: 8px;
+    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1409,7 +1409,7 @@ select option {
     color: white;
     width: 50px;
     height: 50px;
-    border-radius: 8px;
+    border-radius: 4px;
     border: none;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
@@ -1479,15 +1479,20 @@ select option {
 .maplibregl-ctrl-ods {
     background: transparent;
     border: none;
+	text-decoration: none !important;
 }
 
 .maplibregl-ctrl-ods a {
     display: block;
     transition: all 0.3s ease;
+	text-decoration: none !important;
+	 border: none;
 }
 
 .maplibregl-ctrl-ods a:hover {
     transform: scale(1.05);
+		text-decoration: none !important;
+	 border: none;
 }
 
 .maplibregl-ctrl-ods img {
@@ -1495,10 +1500,14 @@ select option {
     width: auto;
     display: block;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+	text-decoration: none !important;
+	 border: none;
 }
 
 .maplibregl-ctrl-ods a:hover img {
     filter: drop-shadow(0 4px 8px rgba(0,0,0,0.7));
+	text-decoration: none !important;
+	 border: none;
 }
 
 /* Chart Download Button */
@@ -1509,7 +1518,7 @@ select option {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 4px;
     padding: 6px 12px;
     font-size: 11px;
     font-weight: 700;
@@ -1609,7 +1618,7 @@ select option {
 /* Custom Calendar Styles */
 .custom-calendar {
     background: rgba(15, 23, 42, 0.8);
-    border-radius: 8px;
+    border-radius: 4px;
     padding: 16px;
 }
 
@@ -1735,7 +1744,7 @@ select option {
     margin-bottom: 16px;
     padding: 12px;
     background: rgba(30, 41, 59, 0.6);
-    border-radius: 8px;
+    border-radius: 4px;
 }
 
 .calendar-month-header {
@@ -1871,7 +1880,7 @@ select option {
     width: 340px;
     background: #0f172abd !important;
     backdrop-filter: blur(2px);
-    border-radius: 8px;
+    border-radius: 4px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(59, 130, 246, 0.2);
     z-index: 1000;
@@ -1951,7 +1960,7 @@ select option {
     padding: 10px 12px;
     background: rgba(30, 41, 59, 0.9);
     border: 2px solid rgba(59, 130, 246, 0.3);
-    border-radius: 8px;
+    border-radius: 4px;
     color: #f1f5f9;
     font-size: 12px;
     font-weight: 600;
@@ -1977,7 +1986,7 @@ select option {
     gap: 8px;
     padding: 10px 14px;
     border: none;
-    border-radius: 8px;
+    border-radius: 4px;
     font-size: 12px;
     font-weight: 700;
     cursor: pointer;
@@ -2063,7 +2072,7 @@ select option {
     height: 180px;
     width: 100%;
     /*background: rgba(15, 23, 42, 0.6);
-    border-radius: 8px;*/
+    border-radius: 4px;*/
     padding: 2px;
 }
 
@@ -2086,7 +2095,7 @@ select option {
     padding: 2px 2px;
     background: linear-gradient(135deg, rgba(51, 65, 85, 0.9) 0%, rgba(30, 41, 59, 0.9) 100%);
     border: 2px solid rgba(148, 163, 184, 0.3);
-    border-radius: 8px;
+    border-radius: 4px;
     color: #cbd5e1;
     cursor: pointer;
     transition: all 0.3s ease;
