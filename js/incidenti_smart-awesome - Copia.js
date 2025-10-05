@@ -190,9 +190,7 @@ async function init() {
         initMap();
         initCustomCalendar();
         setupEventListeners();
-		
-		calculateTopLuoghi();
-		
+
     } catch (error) {
         console.error('Errore inizializzazione:', error);
         document.getElementById('loading').innerHTML = '<div>Errore caricamento</div><small>' + error.message + '</small>';
@@ -301,7 +299,7 @@ function toggleClustering() {
         // RIMOSSO: Non gestiamo più display: block/none
         // Il pulsante Top Luoghi è sempre visibile
         
-       // calculateTopLuoghi();
+        calculateTopLuoghi();
         
     } else {
         const layersToRemove = ['cluster-count', 'clusters', 'unclustered-point'];
@@ -569,11 +567,11 @@ function show2019InfoPopup() {
 
 // Open Top Luoghi Modal (ICONA AGGIORNATA)
 function openTopLuoghiModal() {
-    // RIMOSSO questo blocco:
-    // if (!showClustering) {
-    //     alert('Attiva prima la modalità Clustering per visualizzare i Top Luoghi');
-    //     return;
-    // }
+    // Verifica se il clustering è attivo, altrimenti attivalo
+    if (!showClustering) {
+        alert('Attiva prima la modalità Clustering per visualizzare i Top Luoghi');
+        return;
+    }
     
     const modal = document.getElementById('top-luoghi-modal');
     const tbody = document.getElementById('top-luoghi-body');
@@ -1606,10 +1604,10 @@ function updateMapData() {
         console.log('Cluster aggiornati con i nuovi filtri');
     }
     
-    // AGGIUNTO: Calcola sempre i Top Luoghi, indipendentemente dal clustering
-    calculateTopLuoghi();
+    if (showClustering) {
+        calculateTopLuoghi();
+    }
 }
-
 
 // ==========================================
 // PARTE 6 - incidenti_part6
@@ -1691,8 +1689,10 @@ function handleFilterChange(filterId, value) {
     updateMonthlyInjuriesChart();
     updateMonthlyAreaChart();
     
-    calculateTopLuoghi();
-    updateTopLuoghiModalIfOpen();
+    if (showClustering) {
+        calculateTopLuoghi();
+        updateTopLuoghiModalIfOpen();
+    }
     
     const analyticsPanel = document.getElementById('analytics-panel');
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
@@ -2051,8 +2051,10 @@ function resetFilters() {
     updateMonthlyInjuriesChart();
     updateMonthlyAreaChart();
     
-    calculateTopLuoghi();
-    updateTopLuoghiModalIfOpen();
+    if (showClustering) {
+        calculateTopLuoghi();
+        updateTopLuoghiModalIfOpen();
+    }
     
     const analyticsPanel = document.getElementById('analytics-panel');
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
