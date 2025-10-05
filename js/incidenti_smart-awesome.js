@@ -3213,15 +3213,23 @@ function updateSerieStoricaChart() {
         return;
     }
     
-    const anni = serieStoricaData.map(row => row.anno);
-    const incidenti = serieStoricaData.map(row => row.n_incidenti || 0);
-    const feriti = serieStoricaData.map(row => row.n_feriti || 0);
-    const morti = serieStoricaData.map(row => row.n_morti || 0);
+    // Filtra e pulisci i dati, rimuovendo righe con valori null/undefined/0
+    const datiPuliti = serieStoricaData.filter(row => {
+        return row.anno && 
+               row.n_incidenti > 0 && 
+               row.n_feriti >= 0 && 
+               row.n_morti >= 0;
+    });
     
-    console.log('Dati Serie Storica - Anni:', anni.length);
-    console.log('Primi 3 incidenti:', incidenti.slice(0, 3));
-    console.log('Primi 3 feriti:', feriti.slice(0, 3));
-    console.log('Primi 3 morti:', morti.slice(0, 3));
+    console.log('Dati Serie Storica - Totale righe:', serieStoricaData.length);
+    console.log('Dati Serie Storica - Righe valide:', datiPuliti.length);
+    console.log('Primo record:', datiPuliti[0]);
+    console.log('Ultimo record:', datiPuliti[datiPuliti.length - 1]);
+    
+    const anni = datiPuliti.map(row => row.anno);
+    const incidenti = datiPuliti.map(row => row.n_incidenti);
+    const feriti = datiPuliti.map(row => row.n_feriti);
+    const morti = datiPuliti.map(row => row.n_morti);
     
     const canvas = document.getElementById('chart-serie-storica');
     if (!canvas) return;
@@ -3238,43 +3246,43 @@ function updateSerieStoricaChart() {
                 {
                     label: 'Incidenti',
                     data: incidenti,
-                    backgroundColor: 'rgba(59, 130, 246, 0.3)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
                     borderColor: '#3b82f6',
                     pointBackgroundColor: '#3b82f6',
                     pointBorderColor: '#fff',
                     borderWidth: 2,
                     fill: true,
                     pointBorderWidth: 1,
-                    pointRadius: 2,
-                    pointHoverRadius: 5,
+                    pointRadius: 3,
+                    pointHoverRadius: 6,
                     tension: 0.4
                 },
                 {
                     label: 'Feriti',
                     data: feriti,
-                    backgroundColor: 'rgba(245, 158, 11, 0.3)',
+                    backgroundColor: 'rgba(245, 158, 11, 0.2)',
                     borderColor: '#f59e0b',
                     pointBackgroundColor: '#f59e0b',
                     pointBorderColor: '#fff',
                     borderWidth: 2,
                     fill: true,
                     pointBorderWidth: 1,
-                    pointRadius: 2,
-                    pointHoverRadius: 5,
+                    pointRadius: 3,
+                    pointHoverRadius: 6,
                     tension: 0.4
                 },
                 {
                     label: 'Morti',
                     data: morti,
-                    backgroundColor: 'rgba(239, 68, 68, 0.3)',
+                    backgroundColor: 'rgba(239, 68, 68, 0.2)',
                     borderColor: '#ef4444',
                     pointBackgroundColor: '#ef4444',
                     pointBorderColor: '#fff',
-                    borderWidth: 2,
+                    borderWidth: 3,
                     fill: true,
-                    pointBorderWidth: 1,
-                    pointRadius: 2,
-                    pointHoverRadius: 5,
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
                     tension: 0.4
                 }
             ]
@@ -3288,8 +3296,8 @@ function updateSerieStoricaChart() {
                     position: 'bottom',
                     labels: {
                         color: '#fff',
-                        font: { size: 11 },
-                        padding: 10,
+                        font: { size: 12 },
+                        padding: 12,
                         usePointStyle: true,
                         pointStyle: 'circle'
                     }
@@ -3297,10 +3305,14 @@ function updateSerieStoricaChart() {
                 tooltip: {
                     enabled: true,
                     backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                    padding: 12,
-                    titleFont: { size: 12, weight: 'bold' },
-                    bodyFont: { size: 11 },
+                    padding: 14,
+                    titleFont: { size: 13, weight: 'bold' },
+                    bodyFont: { size: 12 },
+                    bodySpacing: 6,
                     callbacks: {
+                        title: function(context) {
+                            return `Anno ${context[0].label}`;
+                        },
                         label: function(context) {
                             const label = context.dataset.label || '';
                             const value = context.parsed.y;
@@ -3314,29 +3326,27 @@ function updateSerieStoricaChart() {
             },
             scales: {
                 x: {
-                    stacked: false,
                     ticks: {
                         color: '#fff',
-                        font: { size: 9 },
+                        font: { size: 10 },
                         maxRotation: 45,
                         minRotation: 45
                     },
                     grid: {
-                        color: 'rgba(148, 163, 184, 0.1)'
+                        color: 'rgba(148, 163, 184, 0.15)'
                     }
                 },
                 y: {
-                    stacked: false,
                     beginAtZero: true,
                     ticks: {
                         color: '#fff',
-                        font: { size: 10 },
+                        font: { size: 11 },
                         callback: function(value) {
                             return value.toLocaleString('it-IT');
                         }
                     },
                     grid: {
-                        color: 'rgba(148, 163, 184, 0.1)'
+                        color: 'rgba(148, 163, 184, 0.15)'
                     }
                 }
             },
@@ -3347,7 +3357,7 @@ function updateSerieStoricaChart() {
         }
     });
     
-    console.log('✓ Grafico Serie Storica creato');
+    console.log('✓ Grafico Serie Storica creato con', anni.length, 'anni');
 }
 
 
