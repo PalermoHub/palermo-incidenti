@@ -42,6 +42,13 @@ const MESI_ITALIANI = [
     'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
 ];
 
+// Dopo le altre costanti
+const MESI_ITALIANI_CAL = [
+    'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
+    'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
+];
+
+
 const GIORNI_SETTIMANA = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
 const GIORNI_SETTIMANA_SHORT = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
 
@@ -1027,9 +1034,7 @@ function switchAnalyticsTab(tabName) {
 function updateAnalytics() {
     const filteredData = getFilteredData();
     
-    // AGGIUNGI QUESTA RIGA ALL'INIZIO
     updateActiveFiltersDisplay();
-    
     updateSerieStoricaChart();
     updatePanoramicaCharts(filteredData);
     updateTemporaleCharts(filteredData);
@@ -1037,240 +1042,169 @@ function updateAnalytics() {
     updateCondizioniCharts(filteredData);
     updateInsights(filteredData);
     
+    // IMPORTANTE: Aumenta il timeout
     setTimeout(() => {
+        console.log('Chiamata addChartDownloadButtons da updateAnalytics');
         addChartDownloadButtons();
-    }, 100);
+    }, 500); // Aumentato a 500ms
 }
-
 // Add Chart Download Buttons (ICONA AGGIORNATA)
 function addChartDownloadButtons() {
-    const chartContainers = document.querySelectorAll('.chart-container');
+    console.log('=== INIZIO addChartDownloadButtons ===');
     
-    chartContainers.forEach(container => {
-        if (container.querySelector('.chart-download-btn')) return;
+    const chartContainers = document.querySelectorAll('.chart-container');
+    console.log('Chart containers trovati:', chartContainers.length);
+    
+    chartContainers.forEach((container, index) => {
+        console.log(`\nContainer ${index + 1}:`);
+        
+        // Verifica se ha già il pulsante
+        if (container.querySelector('.chart-download-btn')) {
+            console.log('- Ha già il pulsante, skip');
+            return;
+        }
         
         const canvas = container.querySelector('canvas');
-        if (!canvas) return;
+        if (!canvas) {
+            console.log('- NESSUN CANVAS trovato');
+            return;
+        }
         
         const chartId = canvas.id;
-        const chartTitle = container.querySelector('h3')?.textContent || 'grafico';
+        console.log('- Canvas ID:', chartId);
         
+        const h3 = container.querySelector('h3');
+        const chartTitle = h3 ? h3.textContent : 'grafico';
+        console.log('- Titolo:', chartTitle);
+        
+        // Crea pulsante
         const btn = document.createElement('button');
         btn.className = 'chart-download-btn';
         btn.innerHTML = '<i class="fas fa-download"></i> PNG';
         btn.title = 'Scarica grafico come PNG';
+        btn.style.cssText = 'position: absolute; top: 10px; right: 10px; z-index: 100; background: #3b82f6; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;';
         
-        btn.onclick = () => {
+        console.log('- Pulsante creato');
+        
+        // Event listener con debug
+        btn.onclick = (e) => {
+            console.log('\n🖱️ CLICK sul pulsante download!');
+            console.log('Chart ID:', chartId);
+            console.log('Titolo:', chartTitle);
+            
+            e.preventDefault();
+            e.stopPropagation();
+            
             const filename = `${chartTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${new Date().getTime()}`;
+            console.log('Filename:', filename);
+            
+            // Chiama la funzione
             downloadChartAsPNG(chartId, filename);
         };
         
+        container.style.position = 'relative'; // Necessario per il posizionamento assoluto
         container.appendChild(btn);
+        console.log('- Pulsante aggiunto al DOM');
     });
+    
+    console.log('\n=== FINE addChartDownloadButtons ===\n');
 }
 
 // Download Chart as PNG
-// Modifica la funzione downloadChartAsPNG per gestire la fonte diversa
+
+
 async function downloadChartAsPNG(chartId, filename) {
+    console.log('\n🎨 === INIZIO downloadChartAsPNG ===');
+    console.log('Chart ID richiesto:', chartId);
+    console.log('Filename:', filename);
+    
+    // Step 1: Trova canvas
     const canvas = document.getElementById(chartId);
     if (!canvas) {
-        console.error('Canvas non trovato:', chartId);
+        console.error('❌ Canvas NON trovato:', chartId);
+        alert(`Errore: canvas "${chartId}" non trovato`);
         return;
     }
+    console.log('✓ Canvas trovato');
     
+    // Step 2: Trova istanza Chart
     const chartInstance = Chart.getChart(canvas);
     if (!chartInstance) {
-        console.error('Istanza Chart non trovata per:', chartId);
+        console.error('❌ Istanza Chart NON trovata');
+        alert('Errore: istanza Chart non trovata');
         return;
     }
+    console.log('✓ Istanza Chart trovata');
     
-    // Salva opzioni originali
-    const originalOptions = JSON.parse(JSON.stringify(chartInstance.options));
-    
-    // Modifica temporaneamente i colori per sfondo bianco
-    if (chartInstance.options.scales) {
-        Object.keys(chartInstance.options.scales).forEach(scaleKey => {
-            const scale = chartInstance.options.scales[scaleKey];
-            if (scale.ticks) {
-                scale.ticks.color = '#1e293b';
-            }
-            if (scale.grid) {
-                scale.grid.color = 'rgba(148, 163, 184, 0.3)';
-            }
-            if (scale.pointLabels) {
-                scale.pointLabels.color = '#1e293b';
-            }
-        });
-    }
-    
-    if (chartInstance.options.plugins?.legend?.labels) {
-        chartInstance.options.plugins.legend.labels.color = '#1e293b';
-    }
-    
-    chartInstance.update();
-    
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
-    // Crea canvas temporaneo con spazio extra per footer
-    const tempCanvas = document.createElement('canvas');
-    const ctx = tempCanvas.getContext('2d');
-    
-    const footerHeight = 120; // Spazio per logo + fonte + filtri
-    tempCanvas.width = canvas.width;
-    tempCanvas.height = canvas.height + footerHeight;
-    
-    // Sfondo bianco
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-    
-    // Disegna grafico
-    ctx.drawImage(canvas, 0, 0);
-    
-    // *** RACCOGLI FILTRI ATTIVI ***
-    const activeFilters = [];
-    
-    if (currentFilters['filter-anno']) {
-        activeFilters.push(`Anno: ${currentFilters['filter-anno']}`);
-    }
-    if (currentFilters['filter-mese']) {
-        activeFilters.push(`Mese: ${currentFilters['filter-mese']}`);
-    }
-    if (currentFilters['filter-giorno-settimana']) {
-        activeFilters.push(`Giorno: ${currentFilters['filter-giorno-settimana']}`);
-    }
-    if (currentFilters['filter-tipologia']) {
-        const names = { M: 'Mortali', R: 'Riserva', F: 'Feriti', C: 'Cose' };
-        activeFilters.push(`Tipo: ${names[currentFilters['filter-tipologia']]}`);
-    }
-    if (currentFilters['filter-circoscrizione']) {
-        activeFilters.push(`Circoscrizione: ${currentFilters['filter-circoscrizione']}`);
-    }
-    if (currentFilters['filter-quartiere']) {
-        activeFilters.push(`Quartiere: ${currentFilters['filter-quartiere']}`);
-    }
-    if (currentFilters['filter-giorno-notte']) {
-        activeFilters.push(currentFilters['filter-giorno-notte']);
-    }
-    if (currentFilters['filter-stagione']) {
-        activeFilters.push(`Stagione: ${currentFilters['filter-stagione']}`);
-    }
-    
-    // Carica e disegna logo
-    const logo = new Image();
-    logo.crossOrigin = 'anonymous';
-    logo.src = 'img/pa_hub_new.png';
-    
-    logo.onload = function() {
-        const logoHeight = 35;
-        const logoWidth = logo.width * (logoHeight / logo.height);
-        const xPos = tempCanvas.width - logoWidth - 10;
-        const yPos = tempCanvas.height - logoHeight - 75;
+    try {
+        // VERSIONE SEMPLIFICATA: scarica solo il grafico senza modifiche
+        console.log('Inizio generazione PNG...');
         
-        ctx.drawImage(logo, xPos, yPos, logoWidth, logoHeight);
+        // Crea canvas temporaneo
+        const tempCanvas = document.createElement('canvas');
+        const ctx = tempCanvas.getContext('2d');
         
-        // Fonte dati
+        // Stesso size del canvas originale + spazio footer
+        const footerHeight = 80;
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height + footerHeight;
+        
+        console.log(`Canvas size: ${tempCanvas.width}x${tempCanvas.height}`);
+        
+        // Sfondo bianco
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+        console.log('✓ Sfondo bianco disegnato');
+        
+        // Copia grafico
+        ctx.drawImage(canvas, 0, 0);
+        console.log('✓ Grafico copiato');
+        
+        // Footer semplice (solo testo, niente immagini per ora)
         ctx.fillStyle = '#1e293b';
         ctx.font = 'bold 11px Arial';
         ctx.textAlign = 'left';
         
-        if (chartId.includes('serie-storica')) {
-            ctx.fillText('Fonte Dati: Istat - ACI - Rielaborazione: opendatasicilia.it', 10, tempCanvas.height - 75);
-        } else {
-            ctx.fillText('Fonte Dati: dati.gov.it - Comune di Palermo - Rielaborazione: opendatasicilia.it', 10, tempCanvas.height - 75);
-        }
+        const yFooter = tempCanvas.height - 50;
         
-        // *** DISEGNA FILTRI ATTIVI ***
-        if (activeFilters.length > 0) {
-            ctx.font = 'bold 10px Arial';
-            ctx.fillStyle = '#3b82f6';
-            ctx.fillText('Filtri applicati:', 10, tempCanvas.height - 55);
-            
-            ctx.font = '10px Arial';
-            ctx.fillStyle = '#1e293b';
-            
-            const filtersText = activeFilters.join(' • ');
-            const maxWidth = tempCanvas.width - 20;
-            
-            // Word wrap per i filtri
-            const words = filtersText.split(' ');
-            let line = '';
-            let y = tempCanvas.height - 40;
-            
-            for (let i = 0; i < words.length; i++) {
-                const testLine = line + words[i] + ' ';
-                const metrics = ctx.measureText(testLine);
-                
-                if (metrics.width > maxWidth && i > 0) {
-                    ctx.fillText(line, 10, y);
-                    line = words[i] + ' ';
-                    y += 12;
-                } else {
-                    line = testLine;
-                }
-            }
-            ctx.fillText(line, 10, y);
+        // Fonte
+        if (chartId.includes('serie-storica')) {
+            ctx.fillText('Fonte: Istat - ACI - Rielaborazione: opendatasicilia.it', 10, yFooter);
         } else {
-            ctx.font = '10px Arial';
-            ctx.fillStyle = '#64748b';
-            ctx.fillText('Nessun filtro applicato - Tutti gli incidenti (2015-2023)', 10, tempCanvas.height - 55);
+            ctx.fillText('Fonte: dati.gov.it - Rielaborazione: opendatasicilia.it', 10, yFooter);
         }
         
         // URL
         ctx.font = '10px Arial';
         ctx.fillStyle = '#3b82f6';
-        ctx.fillText('https://opendatasicilia.github.io/incidenti_palermo/', 10, tempCanvas.height - 20);
+        ctx.fillText('https://opendatasicilia.github.io/incidenti_palermo/', 10, yFooter + 20);
+        
+        console.log('✓ Footer disegnato');
+        
+        // Converti a PNG
+        const dataURL = tempCanvas.toDataURL('image/png');
+        console.log('✓ PNG generato, lunghezza:', dataURL.length);
         
         // Download
         const link = document.createElement('a');
         link.download = filename + '.png';
-        link.href = tempCanvas.toDataURL('image/png');
+        link.href = dataURL;
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
         
-        console.log('✓ PNG generato con successo');
+        console.log('✅ Download completato!');
+        console.log('=== FINE downloadChartAsPNG ===\n');
         
-        // Ripristina opzioni originali
-        chartInstance.options = originalOptions;
-        chartInstance.update();
-    };
-    
-    logo.onerror = function() {
-        console.warn('Logo non caricato, genero PNG senza logo');
-        
-        // Disegna senza logo
-        ctx.fillStyle = '#1e293b';
-        ctx.font = 'bold 11px Arial';
-        ctx.textAlign = 'left';
-        
-        if (chartId.includes('serie-storica')) {
-            ctx.fillText('Fonte Dati: Istat - ACI - Rielaborazione: opendatasicilia.it', 10, tempCanvas.height - 75);
-        } else {
-            ctx.fillText('Fonte Dati: dati.gov.it - Comune di Palermo - Rielaborazione: opendatasicilia.it', 10, tempCanvas.height - 75);
-        }
-        
-        // Filtri
-        if (activeFilters.length > 0) {
-            ctx.font = 'bold 10px Arial';
-            ctx.fillStyle = '#3b82f6';
-            ctx.fillText('Filtri applicati:', 10, tempCanvas.height - 55);
-            
-            ctx.font = '10px Arial';
-            ctx.fillStyle = '#1e293b';
-            ctx.fillText(activeFilters.join(' • '), 10, tempCanvas.height - 40);
-        }
-        
-        ctx.font = '10px Arial';
-        ctx.fillStyle = '#3b82f6';
-        ctx.fillText('https://opendatasicilia.github.io/incidenti_palermo/', 10, tempCanvas.height - 20);
-        
-        const link = document.createElement('a');
-        link.download = filename + '.png';
-        link.href = tempCanvas.toDataURL('image/png');
-        link.click();
-        
-        chartInstance.options = originalOptions;
-        chartInstance.update();
-    };
+    } catch (error) {
+        console.error('❌ ERRORE durante download:', error);
+        console.error('Stack trace:', error.stack);
+        alert('Errore durante il download: ' + error.message);
+    }
 }
+
+
+
 // Data Table Functions
 function openDataTable() {
     const filteredData = getFilteredData();
@@ -4179,8 +4113,169 @@ function updatePanoramicaCharts_continued(data) {
     }
 }
 
-// Temporale Charts
+// Update Temporale Charts - VERSIONE CON FASCE 6
 function updateTemporaleCharts(data) {
+    
+    // ========================================
+    // GRAFICI 1-4: STAGIONI CON FASCE ORARIE
+    // ========================================
+    
+    // Configurazione stagioni
+    const stagioniConfig = [
+        { 
+            nome: 'Primavera', 
+            canvasId: 'chart-primavera-oraria',
+            colorChiaro: '#a7f3d0',
+            colorScuro: '#10b981'
+        },
+        { 
+            nome: 'Estate', 
+            canvasId: 'chart-estate-oraria',
+            colorChiaro: '#fef08a',
+            colorScuro: '#fbbf24'
+        },
+        { 
+            nome: 'Autunno', 
+            canvasId: 'chart-autunno-oraria',
+            colorChiaro: '#fdba74',
+            colorScuro: '#fb923c'
+        },
+        { 
+            nome: 'Inverno', 
+            canvasId: 'chart-inverno-oraria',
+            colorChiaro: '#93c5fd',
+            colorScuro: '#3b82f6'
+        }
+    ];
+    
+    // Fasce orarie dal dataset (ordine cronologico)
+    const fasceOrarie = ['Notte', 'Alba', 'Mattina', 'Pranzo', 'Pomeriggio', 'Sera'];
+    
+    // Crea un grafico per ogni stagione
+    stagioniConfig.forEach(stagione => {
+        const datiStagione = data.filter(row => row.Stagione === stagione.nome);
+        
+        // Raggruppa per fascia oraria e tipo giorno
+        const datiOrari = {};
+        fasceOrarie.forEach(fascia => {
+            datiOrari[fascia] = { feriale: 0, weekend: 0 };
+        });
+        
+        datiStagione.forEach(row => {
+            const fascia = row['Fascia oraria dettagliata (6 fasce)'];
+            const tipoGiorno = row['Feriale/Weekend'];
+            
+            if (fascia && datiOrari[fascia]) {
+                if (tipoGiorno === 'Feriale') {
+                    datiOrari[fascia].feriale++;
+                } else if (tipoGiorno === 'Weekend') {
+                    datiOrari[fascia].weekend++;
+                }
+            }
+        });
+        
+        const datiFeriali = fasceOrarie.map(f => datiOrari[f].feriale);
+        const datiWeekend = fasceOrarie.map(f => datiOrari[f].weekend);
+        
+        const canvas = document.getElementById(stagione.canvasId);
+        if (canvas) {
+            const chartKey = stagione.canvasId.replace('chart-', '').replace(/-/g, '_');
+            if (analyticsCharts[chartKey]) analyticsCharts[chartKey].destroy();
+            
+            analyticsCharts[chartKey] = new Chart(canvas, {
+                type: 'bar',
+                data: {
+                    labels: fasceOrarie,
+                    datasets: [
+                        {
+                            label: 'Feriale',
+                            data: datiFeriali,
+                            backgroundColor: stagione.colorChiaro,
+                            borderColor: 'transparent',
+                            borderWidth: 0,
+                            barPercentage: 0.9,
+                            categoryPercentage: 0.8
+                        },
+                        {
+                            label: 'Weekend',
+                            data: datiWeekend,
+                            backgroundColor: stagione.colorScuro,
+                            borderColor: 'transparent',
+                            borderWidth: 0,
+                            barPercentage: 0.9,
+                            categoryPercentage: 0.8
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            padding: 12,
+                            titleFont: { size: 11, weight: 'bold' },
+                            bodyFont: { size: 10 },
+                            callbacks: {
+                                title: function(context) {
+                                    return `${stagione.nome} - ${context[0].label}`;
+                                },
+                                label: function(context) {
+                                    const label = context.dataset.label;
+                                    const value = context.parsed.y;
+                                    return `${label}: ${value.toLocaleString('it-IT')}`;
+                                },
+                                footer: function(context) {
+                                    const fascia = fasceOrarie[context[0].dataIndex];
+                                    const totale = datiOrari[fascia].feriale + datiOrari[fascia].weekend;
+                                    return `\nTotale: ${totale.toLocaleString('it-IT')}`;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            display: true,
+                            anchor: 'end',
+                            align: 'top',
+                            offset: 2,
+                            color: '#f1f5f9',
+                            font: { weight: 'bold', size: 9 },
+                            formatter: (value) => value > 0 ? value : ''
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { 
+                                color: '#f1f5f9',
+                                font: { size: 9 }
+                            },
+                            grid: { display: false }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: { 
+                                color: '#f1f5f9',
+                                font: { size: 9 }
+                            },
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                        }
+                    },
+                    onClick: (e, items) => {
+                        filterByStagione(stagione.nome);
+                    },
+                    onHover: (event, activeElements) => {
+                        event.native.target.style.cursor = 'pointer';
+                    }
+                }
+            });
+        }
+    });
+    
+    // ========================================
+    // GRAFICO 5: GIORNO SETTIMANA
+    // ========================================
     const giornoData = {};
     data.forEach(row => {
         const giorno = row['Giorno settimana'];
@@ -4192,6 +4287,8 @@ function updateTemporaleCharts(data) {
     const giorni = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
     const giorniCounts = giorni.map(g => giornoData[g] || 0);
     
+    const selectedGiorno = currentFilters['filter-giorno-settimana'];
+    
     const giornoCanvas = document.getElementById('chart-giorno-settimana');
     if (giornoCanvas) {
         if (analyticsCharts.giornoSettimana) analyticsCharts.giornoSettimana.destroy();
@@ -4202,7 +4299,15 @@ function updateTemporaleCharts(data) {
                 datasets: [{
                     label: 'Incidenti',
                     data: giorniCounts,
-                    backgroundColor: '#3b82f6'
+                    backgroundColor: giorni.map(g => 
+                        selectedGiorno === g ? '#2563eb' : '#3b82f6'
+                    ),
+                    borderColor: giorni.map(g => 
+                        selectedGiorno === g ? '#ffffff' : 'transparent'
+                    ),
+                    borderWidth: giorni.map(g => 
+                        selectedGiorno === g ? 2 : 0
+                    )
                 }]
             },
             options: {
@@ -4210,109 +4315,417 @@ function updateTemporaleCharts(data) {
                 maintainAspectRatio: false,
                 plugins: {
                     legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        padding: 12,
+                        titleFont: { size: 11, weight: 'bold' },
+                        bodyFont: { size: 10 },
+                        callbacks: {
+                            label: function(context) {
+                                return `Incidenti: ${context.parsed.y.toLocaleString('it-IT')}`;
+                            },
+                            afterLabel: function(context) {
+                                const giorno = giorni[context.dataIndex];
+                                if (selectedGiorno === giorno) {
+                                    return '\nClicca per deselezionare';
+                                }
+                                return '\nClicca per filtrare';
+                            }
+                        }
+                    },
                     datalabels: {
                         display: true,
                         anchor: 'end',
                         align: 'top',
                         offset: 2,
-                        color: '#1e293b',
-                        font: { weight: 'bold', size: 9 },
-                        backgroundColor: 'rgba(241, 245, 249, 0.95)',
-                        borderRadius: 3,
-                        padding: 3
+                        color: '#f1f5f9',
+                        font: { weight: 'bold', size: 10 },
+                        formatter: (value) => value > 0 ? value.toLocaleString('it-IT') : ''
                     }
                 },
                 scales: {
                     x: { 
                         ticks: { 
-                            color: '#94a3b8',
+                            color: '#f1f5f9',
                             font: { size: 10 }
-                        }
+                        },
+                        grid: { display: false }
                     },
                     y: { 
+                        beginAtZero: true,
                         ticks: { 
-                            color: '#94a3b8',
+                            color: '#f1f5f9',
                             font: { size: 10 }
-                        }
+                        },
+                        grid: { color: 'rgba(148, 163, 184, 0.1)' }
                     }
+                },
+                onClick: (e, items) => {
+                    if (items.length > 0) {
+                        const giorno = giorni[items[0].index];
+                        filterByGiornoSettimana(giorno);
+                    }
+                },
+                onHover: (event, activeElements) => {
+                    event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
                 }
             }
         });
     }
     
-    // Evoluzione anni
-    const yearDataConFeriti = {};
-    const yearDataSenzaFeriti = {};
+    // ========================================
+    // GRAFICO 6: GIORNI DEL MESE (AREA)
+    // ========================================
+    const giorniMeseData = {};
+    for (let i = 1; i <= 31; i++) {
+        giorniMeseData[i] = 0;
+    }
     
     data.forEach(row => {
-        const year = row.Anno;
-        const tipo = row.Tipologia;
-        if (year) {
-            if (tipo === 'F' || tipo === 'R' || tipo === 'M') {
-                yearDataConFeriti[year] = (yearDataConFeriti[year] || 0) + 1;
-            } else {
-                yearDataSenzaFeriti[year] = (yearDataSenzaFeriti[year] || 0) + 1;
+        const dataStr = row.Data;
+        if (dataStr) {
+            const giorno = parseInt(dataStr.split('/')[0]);
+            if (giorno >= 1 && giorno <= 31) {
+                giorniMeseData[giorno]++;
             }
         }
     });
     
-    const years = [...new Set([...Object.keys(yearDataConFeriti), ...Object.keys(yearDataSenzaFeriti)])].sort();
+    const giorniMeseLabels = Array.from({length: 31}, (_, i) => i + 1);
+    const giorniMeseCounts = giorniMeseLabels.map(g => giorniMeseData[g]);
     
-    const evoluzioneCanvas = document.getElementById('chart-evoluzione-anni');
-    if (evoluzioneCanvas) {
-        if (analyticsCharts.evoluzioneAnni) analyticsCharts.evoluzioneAnni.destroy();
-        analyticsCharts.evoluzioneAnni = new Chart(evoluzioneCanvas, {
-            type: 'bar',
+    const giorniMeseCanvas = document.getElementById('chart-giorni-mese');
+    if (giorniMeseCanvas) {
+        if (analyticsCharts.giorniMese) analyticsCharts.giorniMese.destroy();
+        analyticsCharts.giorniMese = new Chart(giorniMeseCanvas, {
+            type: 'line',
             data: {
-                labels: years,
-                datasets: [
-                    {
-                        label: 'Con Feriti',
-                        data: years.map(y => yearDataConFeriti[y] || 0),
-                        backgroundColor: '#ef4444'
-                    },
-                    {
-                        label: 'Senza Feriti',
-                        data: years.map(y => yearDataSenzaFeriti[y] || 0),
-                        backgroundColor: '#10b981'
-                    }
-                ]
+                labels: giorniMeseLabels,
+                datasets: [{
+                    label: 'Incidenti',
+                    data: giorniMeseCounts,
+                    backgroundColor: 'rgba(139, 92, 246, 0.5)',
+                    borderColor: '#8b5cf6',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#8b5cf6',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 1,
+                    pointRadius: 2,
+                    pointHoverRadius: 5
+                }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                scales: {
-                    x: { 
-                        stacked: true,
-                        ticks: { 
-                            color: '#94a3b8',
-                            font: { size: 10 }
-                        }
-                    },
-                    y: { 
-                        stacked: true,
-                        ticks: { 
-                            color: '#94a3b8',
-                            font: { size: 10 }
-                        }
-                    }
-                },
                 plugins: {
-                    legend: {
-                        display: true,
-                        labels: {
-                            color: '#f1f5f9',
-                            font: { size: 10 }
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        padding: 12,
+                        titleFont: { size: 11, weight: 'bold' },
+                        bodyFont: { size: 10 },
+                        callbacks: {
+                            title: function(context) {
+                                return `Giorno ${context[0].label}`;
+                            },
+                            label: function(context) {
+                                return `Incidenti: ${context.parsed.y}`;
+                            }
                         }
                     },
                     datalabels: {
                         display: false
                     }
+                },
+                scales: {
+                    x: {
+                        ticks: { 
+                            color: '#f1f5f9',
+                            font: { size: 9 },
+                            maxRotation: 0
+                        },
+                        grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: { 
+                            color: '#f1f5f9',
+                            font: { size: 10 }
+                        },
+                        grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                    }
                 }
             }
         });
     }
+    
+	// ========================================
+// GRAFICO 7: CALENDARIO HEATMAP CON FILTRO
+// ========================================
+const calendarioData = {};
+
+data.forEach(row => {
+    const dataStr = row.Data;
+    if (dataStr) {
+        const [giorno, mese, anno] = dataStr.split('/').map(Number);
+        const key = `${mese}-${giorno}`;
+        calendarioData[key] = (calendarioData[key] || 0) + 1;
+    }
+});
+
+const maxIncidenti = Math.max(...Object.values(calendarioData), 1);
+
+function getIntensityClass(count) {
+    if (count === 0) return 'empty';
+    const intensity = count / maxIncidenti;
+    
+    if (intensity <= 0.14) return 'intensity-1';
+    if (intensity <= 0.28) return 'intensity-2';
+    if (intensity <= 0.42) return 'intensity-3';
+    if (intensity <= 0.57) return 'intensity-4';
+    if (intensity <= 0.71) return 'intensity-5';
+    if (intensity <= 0.85) return 'intensity-6';
+    return 'intensity-7';
 }
+
+const mesiCompleti = [
+    'gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno',
+    'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'
+];
+
+const MESI_ITALIANI_CAL = [
+    'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
+    'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
+];
+
+const calendarioContainer = document.getElementById('chart-calendario-heatmap');
+if (calendarioContainer) {
+    let html = '<div class="calendar-heatmap-grid">';
+    
+    // Header con numeri giorni
+    html += '<div class="calendar-heatmap-header">';
+    html += '<div class="calendar-heatmap-month-label"></div>';
+    
+    for (let giorno = 1; giorno <= 31; giorno++) {
+        html += `<div class="calendar-heatmap-day-label">${giorno}</div>`;
+    }
+    html += '</div>';
+    
+    // Righe per ogni mese
+    for (let mese = 1; mese <= 12; mese++) {
+        html += `<div class="calendar-heatmap-month-label">${mesiCompleti[mese - 1]}</div>`;
+        
+        const giorniInMese = new Date(2023, mese, 0).getDate();
+        
+        for (let giorno = 1; giorno <= 31; giorno++) {
+            const key = `${mese}-${giorno}`;
+            const count = calendarioData[key] || 0;
+            
+            if (giorno > giorniInMese) {
+                html += `<div class="calendar-heatmap-cell empty"></div>`;
+            } else {
+                const intensityClass = getIntensityClass(count);
+                const dataCompleta = `${String(giorno).padStart(2, '0')}/${String(mese).padStart(2, '0')}`;
+                const title = count > 0 ? `${giorno} ${mesiCompleti[mese - 1]}: ${count} incidenti\nClicca per filtrare` : `${giorno} ${mesiCompleti[mese - 1]}`;
+                
+                // Verifica se questa cella è attiva
+                const isActive = currentFilters['filter-data-selezionata'] === dataCompleta + '/' + (currentFilters['filter-anno'] || '2023');
+                
+                html += `<div class="calendar-heatmap-cell ${intensityClass} ${isActive ? 'active' : ''}" 
+                              data-mese="${mese}" 
+                              data-giorno="${giorno}"
+                              data-count="${count}"
+                              data-data-completa="${dataCompleta}"
+                              title="${title}">
+                    ${count > 0 ? count : ''}
+                </div>`;
+            }
+        }
+    }
+    
+    html += '</div>';
+    calendarioContainer.innerHTML = html;
+    
+    // Event listener per il filtro
+    calendarioContainer.querySelectorAll('.calendar-heatmap-cell:not(.empty)').forEach(cell => {
+        cell.addEventListener('click', () => {
+            const mese = parseInt(cell.dataset.mese);
+            const giorno = parseInt(cell.dataset.giorno);
+            const count = parseInt(cell.dataset.count);
+            const dataCompleta = cell.dataset.dataCompleta;
+            
+            // Filtra anche se count è 0 (mostra che non ci sono incidenti quel giorno)
+            filterByCalendarioData(mese, giorno, dataCompleta);
+        });
+    });
+}
+	
+}
+
+// Filter By Calendario Data
+function filterByCalendarioData(mese, giorno, dataCompleta) {
+    const meseName = MESI_ITALIANI_CAL[mese - 1];
+    const anno = currentFilters['filter-anno'] || '2023';
+    const dataCompletaConAnno = `${dataCompleta}/${anno}`;
+    
+    // Toggle: se già selezionato, deseleziona
+    if (currentFilters['filter-data-selezionata'] === dataCompletaConAnno) {
+        delete currentFilters['filter-data-selezionata'];
+        delete currentFilters['filter-mese'];
+    } else {
+        // Imposta nuova data
+        currentFilters['filter-data-selezionata'] = dataCompletaConAnno;
+        currentFilters['filter-mese'] = meseName;
+        
+        // Assicurati che l'anno sia impostato
+        if (!currentFilters['filter-anno']) {
+            currentFilters['filter-anno'] = '2023';
+        }
+    }
+    
+    // Aggiorna select
+    const filterMese = document.getElementById('filter-mese');
+    if (filterMese) {
+        filterMese.value = currentFilters['filter-mese'] || '';
+    }
+    
+    const filterAnno = document.getElementById('filter-anno');
+    if (filterAnno) {
+        filterAnno.value = currentFilters['filter-anno'] || '';
+    }
+    
+    // Aggiorna tutto il sistema
+    updateAllFilters();
+    updateMapData();
+    updateStats();
+    updateYearStats();
+    updateLegendChart();
+    updatePeriodSwitches();
+    updateMonthlyInjuriesChart();
+    updateMonthlyAreaChart();
+    
+    calculateTopLuoghi();
+    updateTopLuoghiModalIfOpen();
+    
+    // Aggiorna analytics se aperto
+    const analyticsPanel = document.getElementById('analytics-panel');
+    if (analyticsPanel && analyticsPanel.classList.contains('open')) {
+        updateActiveFiltersDisplay();
+        updateAnalytics();
+    }
+    
+    // Scroll alla mappa per vedere i risultati
+    if (window.innerWidth <= 768) {
+        closeAnalytics();
+    }
+}
+
+
+
+
+// Filter By Stagione
+function filterByStagione(stagione) {
+    const currentStagione = currentFilters['filter-stagione'];
+    
+    if (currentStagione === stagione) {
+        currentFilters['filter-stagione'] = '';
+    } else {
+        currentFilters['filter-stagione'] = stagione;
+    }
+    
+    const filterStagione = document.getElementById('filter-stagione');
+    if (filterStagione) {
+        filterStagione.value = currentFilters['filter-stagione'];
+    }
+    
+    updateAllFilters();
+    updateMapData();
+    updateStats();
+    updateYearStats();
+    updateLegendChart();
+    updatePeriodSwitches();
+    updateMonthlyInjuriesChart();
+    updateMonthlyAreaChart();
+    
+    calculateTopLuoghi();
+    updateTopLuoghiModalIfOpen();
+    
+    const analyticsPanel = document.getElementById('analytics-panel');
+    if (analyticsPanel && analyticsPanel.classList.contains('open')) {
+        updateAnalytics();
+    }
+}
+
+// Filter By Giorno Settimana
+function filterByGiornoSettimana(giorno) {
+    const currentGiorno = currentFilters['filter-giorno-settimana'];
+    
+    if (currentGiorno === giorno) {
+        currentFilters['filter-giorno-settimana'] = '';
+    } else {
+        currentFilters['filter-giorno-settimana'] = giorno;
+    }
+    
+    const filterGiorno = document.getElementById('filter-giorno-settimana');
+    if (filterGiorno) {
+        filterGiorno.value = currentFilters['filter-giorno-settimana'];
+    }
+    
+    updateAllFilters();
+    updateMapData();
+    updateStats();
+    updateYearStats();
+    updateLegendChart();
+    updatePeriodSwitches();
+    updateMonthlyInjuriesChart();
+    updateMonthlyAreaChart();
+    
+    calculateTopLuoghi();
+    updateTopLuoghiModalIfOpen();
+    
+    const analyticsPanel = document.getElementById('analytics-panel');
+    if (analyticsPanel && analyticsPanel.classList.contains('open')) {
+        updateAnalytics();
+    }
+}
+
+
+
+// Filter By Giorno Settimana (se non esiste già)
+function filterByGiornoSettimana(giorno) {
+    const currentGiorno = currentFilters['filter-giorno-settimana'];
+    
+    if (currentGiorno === giorno) {
+        currentFilters['filter-giorno-settimana'] = '';
+    } else {
+        currentFilters['filter-giorno-settimana'] = giorno;
+    }
+    
+    const filterGiorno = document.getElementById('filter-giorno-settimana');
+    if (filterGiorno) {
+        filterGiorno.value = currentFilters['filter-giorno-settimana'];
+    }
+    
+    updateAllFilters();
+    updateMapData();
+    updateStats();
+    updateYearStats();
+    updateLegendChart();
+    updatePeriodSwitches();
+    updateMonthlyInjuriesChart();
+    updateMonthlyAreaChart();
+    
+    calculateTopLuoghi();
+    updateTopLuoghiModalIfOpen();
+    
+    const analyticsPanel = document.getElementById('analytics-panel');
+    if (analyticsPanel && analyticsPanel.classList.contains('open')) {
+        updateAnalytics();
+    }
+}
+
 
 // Oraria Charts
 function updateOrariaCharts(data) {

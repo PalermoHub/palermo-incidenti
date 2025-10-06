@@ -25,7 +25,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
-    
+
     <style>
         .demo-badge {
             position: absolute;
@@ -561,25 +561,84 @@
         </div>
     </div>
 </div>     
-	   <!-- Temporale Tab -->
-            <div class="analytics-tab-content" id="tab-temporale">
-                <div class="charts-grid">
-                    <div class="chart-container chart-full">
-                        <h3>Distribuzione per Giorno della Settimana</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="chart-giorno-settimana"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-container chart-full">
-                        <h3>Evoluzione Annuale (Feriti vs Non Feriti)</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="chart-evoluzione-anni"></canvas>
-                        </div>
-                    </div>
+
+<!-- Temporale Tab -->
+<div class="analytics-tab-content" id="tab-temporale">
+    
+    <!-- Griglia principale a 2 colonne -->
+    <div class="charts-grid">
+        
+        <!-- COLONNA SINISTRA -->
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+            
+            <!-- 1. Distribuzione per Giorno della Settimana -->
+            <div class="chart-container" style="min-height: 280px;">
+                <h3>Distribuzione per Giorno della Settimana</h3>
+                <div class="chart-wrapper">
+                    <canvas id="chart-giorno-settimana"></canvas>
                 </div>
             </div>
+            
+            <!-- 2. Primavera -->
+            <div class="chart-container" style="min-height: 240px;">
+                <h3>Primavera - Distribuzione Oraria</h3>
+                <div class="chart-wrapper">
+                    <canvas id="chart-primavera-oraria"></canvas>
+                </div>
+            </div>
+            
+            <!-- 3. Autunno -->
+            <div class="chart-container" style="min-height: 240px;">
+                <h3>Autunno - Distribuzione Oraria</h3>
+                <div class="chart-wrapper">
+                    <canvas id="chart-autunno-oraria"></canvas>
+                </div>
+            </div>
+            
+        </div>
+        
+        <!-- COLONNA DESTRA -->
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+            
+            <!-- 1. Incidenti per Giorno del Mese -->
+            <div class="chart-container" style="min-height: 280px;">
+                <h3>Incidenti per Giorno del Mese</h3>
+                <div class="chart-wrapper">
+                    <canvas id="chart-giorni-mese"></canvas>
+                </div>
+            </div>
+            
+            <!-- 2. Estate -->
+            <div class="chart-container" style="min-height: 240px;">
+                <h3>Estate - Distribuzione Oraria</h3>
+                <div class="chart-wrapper">
+                    <canvas id="chart-estate-oraria"></canvas>
+                </div>
+            </div>
+            
+            <!-- 3. Inverno -->
+            <div class="chart-container" style="min-height: 240px;">
+                <h3>Inverno - Distribuzione Oraria</h3>
+                <div class="chart-wrapper">
+                    <canvas id="chart-inverno-oraria"></canvas>
+                </div>
+            </div>
+            
+        </div>
+        
+    </div>
+    
+    <!-- CALENDARIO HEATMAP A TUTTA LARGHEZZA IN BASSO -->
+    <div class="chart-container chart-full" style="min-height: 330px; margin-top: 24px;">
+        <h3>Calendario Incidenti (Heatmap)</h3>
+        <div class="chart-wrapper">
+            <div id="chart-calendario-heatmap" class="calendar-heatmap"></div>
+        </div>
+    </div>
+    
+</div>
 
-            <!-- Oraria Tab -->
+		  <!-- Oraria Tab -->
             <div class="analytics-tab-content" id="tab-oraria">
                 <div class="charts-grid">
                     <div class="chart-container chart-full">

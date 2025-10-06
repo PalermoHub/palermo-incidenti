@@ -147,20 +147,27 @@
 
 .analytics-tab-content {
     display: none;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
 }
 
 .analytics-tab-content.active {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 
 .analytics-content {
     flex: 1;
     overflow-y: auto;
-    padding: 5px 32px;
+    overflow-x: hidden;
+    padding: 5px 32px 32px 32px;
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 200px); /* Sottrai altezza header + tabs */
+    height: calc(100vh - 200px);
 }
 
 .analytics-content::-webkit-scrollbar {
@@ -188,13 +195,12 @@
     flex: 1;
 }
 
+/* Grid charts con scroll */
 .charts-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 450px), 1fr));
     gap: 20px;
-    flex: 1;
     align-content: start;
-    overflow-y: auto;
     padding-bottom: 20px;
 }
 
@@ -213,9 +219,39 @@
     position: relative;
 }
 
+/* Scrollbar personalizzata */
+.analytics-content::-webkit-scrollbar,
+.analytics-tab-content::-webkit-scrollbar {
+    width: 10px;
+}
+
+.analytics-content::-webkit-scrollbar-track,
+.analytics-tab-content::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.5);
+}
+
+.analytics-content::-webkit-scrollbar-thumb,
+.analytics-tab-content::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.3);
+    border-radius: 5px;
+}
+
+.analytics-content::-webkit-scrollbar-thumb:hover,
+.analytics-tab-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.5);
+}
+
+/* Responsive: colonna singola su schermi piccoli */
+@media (max-width: 1200px) {
+    #tab-temporale .charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Calendario a tutta larghezza */
 .chart-container.chart-full {
     grid-column: 1 / -1;
-    max-height: calc(100vh - 250px); /* Grafico full usa tutto lo spazio */
+    min-height: 300px;
 }
 
 .chart-container h3 {
@@ -423,8 +459,164 @@
     transform: rotate(180deg) scale(0.95);
 }
 
-/* Adattamento altezza grafici Panoramica */
-.charts-grid-two-col .chart-container {
-    max-height: calc(100vh - 250px);
-    min-height: calc(100vh - 280px); /* MODIFICATO per occupare tutto lo spazio */
+/* Chart Container - altezza flessibile */
+.chart-container {
+    background: rgba(30, 41, 59, 0) !important;
+    backdrop-filter: none !important;
+    border-radius: 0px;
+    padding: 0px;
+    border: 0px solid rgba(148, 163, 184, 0.2);
+    box-shadow: none !important;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
 }
+
+/* Per il tab temporale con 2 colonne */
+#tab-temporale .charts-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+
+
+
+/* Layout responsive per tab temporale */
+@media (max-width: 1200px) {
+    #tab-temporale .charts-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Calendario Heatmap Custom - COMPATTO */
+.calendar-heatmap {
+    width: 100%;
+    overflow-x: auto;
+    padding: 10px;
+}
+
+.calendar-heatmap-grid {
+    display: inline-grid;
+    grid-template-columns: 70px repeat(31, minmax(18px, 1fr));
+    gap: 1px;
+    width: 100%;
+    font-size: 9px;
+}
+
+.calendar-heatmap-header {
+    display: contents;
+}
+
+.calendar-heatmap-day-label,
+.calendar-heatmap-month-label {
+    background: rgba(30, 41, 59, 0.6);
+    color: #f1f5f9;
+    padding: 4px 2px;
+    text-align: center;
+    font-weight: 600;
+    border-radius: 2px;
+    font-size: 8px;
+}
+
+.calendar-heatmap-month-label {
+    text-align: right;
+    padding-right: 6px;
+    font-size: 9px;
+}
+
+.calendar-heatmap-cell {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(15, 23, 42, 0.3);
+    font-size: 8px;
+}
+
+.calendar-heatmap-cell:hover {
+    transform: scale(1.15);
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    font-size: 10px;
+}
+
+.calendar-heatmap-cell.empty {
+    background: rgba(148, 163, 184, 0.1);
+    color: transparent;
+    cursor: default;
+}
+
+.calendar-heatmap-cell.empty:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.calendar-heatmap-cell.active {
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px #3b82f6;
+    z-index: 100;
+}
+
+/* Gradiente di colori basato sull'intensità */
+.calendar-heatmap-cell.intensity-1 {
+    background: #fed7aa;
+    color: #1e293b;
+}
+
+.calendar-heatmap-cell.intensity-2 {
+    background: #fdba74;
+    color: #1e293b;
+}
+
+.calendar-heatmap-cell.intensity-3 {
+    background: #fb923c;
+    color: #1e293b;
+}
+
+.calendar-heatmap-cell.intensity-4 {
+    background: #f97316;
+    color: #fff;
+}
+
+.calendar-heatmap-cell.intensity-5 {
+    background: #ea580c;
+    color: #fff;
+}
+
+.calendar-heatmap-cell.intensity-6 {
+    background: #c2410c;
+    color: #fff;
+}
+
+.calendar-heatmap-cell.intensity-7 {
+    background: #991b1b;
+    color: #fff;
+}
+
+@media (max-width: 1400px) {
+    .calendar-heatmap-grid {
+        font-size: 8px;
+        grid-template-columns: 65px repeat(31, minmax(16px, 1fr));
+    }
+    
+    .calendar-heatmap-cell {
+        font-size: 7px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .calendar-heatmap-grid {
+        font-size: 7px;
+        grid-template-columns: 60px repeat(31, minmax(14px, 1fr));
+    }
+    
+    .calendar-heatmap-cell {
+        font-size: 6px;
+    }
+}
+
