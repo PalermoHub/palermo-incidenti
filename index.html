@@ -638,29 +638,38 @@
     
 </div>
 
-		  <!-- Oraria Tab -->
-            <div class="analytics-tab-content" id="tab-oraria">
-                <div class="charts-grid">
-                    <div class="chart-container chart-full">
-                        <h3>Distribuzione per Fascia Oraria</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="chart-fascia-oraria"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <h3>Top 3 Fasce per Incidenti</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="chart-top-incidenti"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <h3>Top 3 Fasce per Feriti</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="chart-top-feriti"></canvas>
-                        </div>
-                    </div>
-                </div>
+<!-- Oraria Tab -->
+<div class="analytics-tab-content" id="tab-oraria">
+    <div class="charts-grid charts-grid-two-col">
+        <!-- Prima riga: Fasce Orarie -->
+        <div class="chart-container">
+            <h3>Distribuzione per Fascia Oraria</h3>
+            <div class="chart-wrapper">
+                <canvas id="chart-fascia-oraria"></canvas>
             </div>
+        </div>
+        <div class="chart-container">
+            <h3>Incidenti per Orario</h3>
+            <div class="chart-wrapper">
+                <canvas id="chart-orari-dettaglio"></canvas>
+            </div>
+        </div>
+        
+        <!-- Seconda riga: Distribuzione Settimanale -->
+        <div class="chart-container">
+            <h3>Distribuzione Settimanale</h3>
+            <div class="chart-wrapper">
+                <canvas id="chart-settimanale-area"></canvas>
+            </div>
+        </div>
+        <div class="chart-container">
+            <h3>Feriali vs Weekend</h3>
+            <div class="chart-wrapper">
+                <canvas id="chart-settimanale-barre"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
 
             <!-- Condizioni Tab
             <div class="analytics-tab-content" id="tab-condizioni">

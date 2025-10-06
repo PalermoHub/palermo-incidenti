@@ -212,8 +212,8 @@
     padding: 0px;
     border: 0px solid rgba(148, 163, 184, 0.2);
     box-shadow: none !important;
-    min-height: 300px; /* Ridotto da 400px */
-    max-height: calc((100vh - 250px) / 2); /* Massimo metà dello spazio disponibile */
+    min-height: 300px;
+    height: 100%;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -620,3 +620,111 @@
     }
 }
 
+/* Responsive per tab Panoramica */
+.charts-grid-two-col {
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.charts-grid-two-col .chart-container {
+    max-height: calc(100vh - 250px);
+    min-height: 400px;
+}
+
+/* Responsive: adattamento automatico */
+@media (max-width: 1600px) {
+    .charts-grid-two-col .chart-container {
+        min-height: 350px;
+    }
+}
+
+@media (max-width: 1400px) {
+    .charts-grid-two-col .chart-container {
+        min-height: 300px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .charts-grid-two-col {
+        grid-template-columns: 1fr;
+    }
+    
+    .charts-grid-two-col .chart-container {
+        min-height: 400px;
+        max-height: 500px;
+    }
+}
+
+@media (max-width: 768px) {
+    .charts-grid-two-col .chart-container {
+        min-height: 300px;
+    }
+}
+
+/* Miglioramento per Analytics Panel su schermi grandi */
+@media (min-width: 1920px) {
+    .analytics-panel {
+        width: calc(100vw - 340px);
+    }
+    
+    .charts-grid-two-col .chart-container {
+        min-height: 450px;
+    }
+}
+
+
+/* Tab Oraria - 4 grafici in griglia 2x2 */
+#tab-oraria .charts-grid-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 24px;
+    height: calc(100vh - 300px);
+    min-height: 600px;
+}
+
+#tab-oraria .chart-container {
+    min-height: 250px;
+    height: 100%;
+}
+
+/* Panoramica - adattamento automatico */
+#tab-panoramica .charts-grid-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    height: calc(100vh - 300px);
+}
+
+#tab-panoramica .chart-container {
+    min-height: 400px;
+    height: 100%;
+}
+
+/* Responsive tablet */
+@media (max-width: 1400px) {
+    #tab-oraria .charts-grid-two-col,
+    #tab-panoramica .charts-grid-two-col {
+        height: auto;
+        grid-template-rows: auto;
+    }
+    
+    #tab-oraria .chart-container {
+        min-height: 300px;
+        height: auto;
+    }
+}
+
+/* Responsive mobile */
+@media (max-width: 1200px) {
+    #tab-oraria .charts-grid-two-col,
+    #tab-panoramica .charts-grid-two-col {
+        grid-template-columns: 1fr;
+    }
+    
+    #tab-oraria .chart-container,
+    #tab-panoramica .chart-container {
+        min-height: 350px;
+        max-height: 500px;
+    }
+}

@@ -4728,6 +4728,8 @@ function filterByGiornoSettimana(giorno) {
 
 
 // Oraria Charts
+
+// Oraria Charts - VERSIONE COMPLETA CON 4 GRAFICI
 function updateOrariaCharts(data) {
     const fasciaData = {};
     data.forEach(row => {
@@ -4737,20 +4739,350 @@ function updateOrariaCharts(data) {
         }
     });
     
-    const fasce = ['Alba', 'Mattina', 'Pranzo', 'Pomeriggio', 'Sera', 'Notte'];
-    const fascePresenti = fasce.filter(f => fasciaData[f]);
-    const fasceCounts = fascePresenti.map(f => fasciaData[f]);
+    const fasce = ['Notte', 'Alba', 'Mattina', 'Pranzo', 'Pomeriggio', 'Sera'];
+    const fasceCounts = fasce.map(f => fasciaData[f] || 0);
     
+    const fasceColors = {
+        'Notte': '#1e3a8a',
+        'Alba': '#fbbf24',
+        'Mattina': '#3b82f6',
+        'Pranzo': '#f59e0b',
+        'Pomeriggio': '#10b981',
+        'Sera': '#8b5cf6'
+    };
+    
+    const selectedFascia = currentFilters['filter-fascia-6'];
+    
+    // ========================================
+    // GRAFICO 1: DISTRIBUZIONE AD AREE (Fasce Orarie)
+    // ========================================
     const fasciaCanvas = document.getElementById('chart-fascia-oraria');
     if (fasciaCanvas) {
         if (analyticsCharts.fasciaOraria) analyticsCharts.fasciaOraria.destroy();
+        
         analyticsCharts.fasciaOraria = new Chart(fasciaCanvas, {
-            type: 'polarArea',
+            type: 'line',
             data: {
-                labels: fascePresenti,
+                labels: fasce,
                 datasets: [{
+                    label: 'Incidenti',
                     data: fasceCounts,
-                    backgroundColor: ['#fbbf24', '#3b82f6', '#f59e0b', '#10b981', '#8b5cf6', '#1e3a8a']
+                    backgroundColor: fasce.map((f, idx) => {
+                        const color = fasceColors[f];
+                        return selectedFascia === f ? color + 'DD' : color + '99';
+                    }),
+                    borderColor: fasce.map(f => fasceColors[f]),
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: fasce.map(f => 
+                        selectedFascia === f ? '#ffffff' : fasceColors[f]
+                    ),
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 1,
+                    pointRadius: fasce.map(f => 
+                        selectedFascia === f ? 6 : 4
+                    ),
+                    pointHoverRadius: 8,
+                    segment: {
+                        backgroundColor: (ctx) => {
+                            const idx = ctx.p0DataIndex;
+                            const fascia = fasce[idx];
+                            const color = fasceColors[fascia];
+                            return selectedFascia === fascia ? color + 'DD' : color + '99';
+                        }
+                    }
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        padding: 12,
+                        titleFont: { size: 12, weight: 'bold' },
+                        bodyFont: { size: 11 },
+                        callbacks: {
+                            title: function(context) {
+                                return fasce[context[0].dataIndex];
+                            },
+                            label: function(context) {
+                                const value = context.parsed.y;
+                                const total = fasceCounts.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                return `Incidenti: ${value.toLocaleString('it-IT')} (${percentage}%)`;
+                            },
+                            afterLabel: function(context) {
+                                const fascia = fasce[context.dataIndex];
+                                if (selectedFascia === fascia) {
+                                    return '\nClicca per deselezionare';
+                                }
+                                return '\nClicca per filtrare';
+                            }
+                        }
+                    },
+                    datalabels: {
+                        display: true,
+                        anchor: 'end',
+                        align: 'top',
+                        offset: 4,
+                        color: '#f1f5f9',
+                        font: { 
+                            weight: 'bold', 
+                            size: 11 
+                        },
+                        formatter: (value) => value > 0 ? value.toLocaleString('it-IT') : ''
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { 
+                            color: '#f1f5f9',
+                            font: { size: 11, weight: '600' }
+                        },
+                        grid: { 
+                            color: 'rgba(148, 163, 184, 0.1)',
+                            drawBorder: false
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: { 
+                            color: '#f1f5f9',
+                            font: { size: 11 }
+                        },
+                        grid: { 
+                            color: 'rgba(148, 163, 184, 0.1)',
+                            drawBorder: false
+                        }
+                    }
+                },
+                onClick: (e, items) => {
+                    if (items.length > 0) {
+                        const fascia = fasce[items[0].index];
+                        filterByFasciaOraria(fascia);
+                    }
+                },
+                onHover: (event, activeElements) => {
+                    event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
+                }
+            }
+        });
+    }
+    
+    // ========================================
+    // GRAFICO 2: BARRE ORIZZONTALI CON ORARI
+    // ========================================
+    const orariLabels = [
+        '0:00 - 5:00 / 22:00 - 0:00',
+        '5:00 - 7:00',
+        '7:00 - 12:00',
+        '12:00 - 14:00',
+        '14:00 - 18:00',
+        '18:00 - 22:00'
+    ];
+    
+    const orariCanvas = document.getElementById('chart-orari-dettaglio');
+    if (orariCanvas) {
+        if (analyticsCharts.orariDettaglio) analyticsCharts.orariDettaglio.destroy();
+        
+        analyticsCharts.orariDettaglio = new Chart(orariCanvas, {
+            type: 'bar',
+            data: {
+                labels: orariLabels,
+                datasets: [{
+                    label: 'Incidenti',
+                    data: fasceCounts,
+                    backgroundColor: fasce.map(f => 
+                        selectedFascia === f ? fasceColors[f] + 'FF' : fasceColors[f] + 'CC'
+                    ),
+                    borderColor: fasce.map(f => 
+                        selectedFascia === f ? '#ffffff' : 'transparent'
+                    ),
+                    borderWidth: fasce.map(f => 
+                        selectedFascia === f ? 2 : 0
+                    )
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        right: 40,
+                        left: 10,
+                        top: 10,
+                        bottom: 10
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        padding: 12,
+                        titleFont: { size: 12, weight: 'bold' },
+                        bodyFont: { size: 11 },
+                        callbacks: {
+                            title: function(context) {
+                                const idx = context[0].dataIndex;
+                                return `${fasce[idx]} (${orariLabels[idx]})`;
+                            },
+                            label: function(context) {
+                                const value = context.parsed.x;
+                                const total = fasceCounts.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                return `Incidenti: ${value.toLocaleString('it-IT')} (${percentage}%)`;
+                            },
+                            afterLabel: function(context) {
+                                const fascia = fasce[context.dataIndex];
+                                if (selectedFascia === fascia) {
+                                    return '\nClicca per deselezionare';
+                                }
+                                return '\nClicca per filtrare';
+                            }
+                        }
+                    },
+                    datalabels: {
+                        display: true,
+                        anchor: 'end',
+                        align: 'end',
+                        offset: 8,
+                        color: '#f1f5f9',
+                        font: { 
+                            weight: 'bold', 
+                            size: 12 
+                        },
+                        formatter: (value) => value > 0 ? value.toLocaleString('it-IT') : ''
+                    }
+                },
+                scales: {
+                    x: {
+                        display: false,
+                        beginAtZero: true
+                    },
+                    y: {
+                        ticks: { 
+                            color: '#f1f5f9',
+                            font: { 
+                                size: 11, 
+                                weight: '600' 
+                            },
+                            padding: 8
+                        },
+                        grid: {
+                            display: false
+                        },
+                        border: {
+                            display: false
+                        }
+                    }
+                },
+                onClick: (e, items) => {
+                    if (items.length > 0) {
+                        const fascia = fasce[items[0].index];
+                        filterByFasciaOraria(fascia);
+                    }
+                },
+                onHover: (event, activeElements) => {
+                    event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
+                }
+            }
+        });
+    }
+	
+// ========================================
+    // GRAFICO 3: DISTRIBUZIONE SETTIMANALE CON COLORI CORRETTI
+    // ========================================
+    const giornoData = {};
+    data.forEach(row => {
+        const giorno = row['Giorno settimana'];
+        if (giorno) {
+            giornoData[giorno] = (giornoData[giorno] || 0) + 1;
+        }
+    });
+    
+    const giorni = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
+    const giorniCounts = giorni.map(g => giornoData[g] || 0);
+    
+    const selectedGiorno = currentFilters['filter-giorno-settimana'];
+    
+    const settimanaleAreaCanvas = document.getElementById('chart-settimanale-area');
+    if (settimanaleAreaCanvas) {
+        if (analyticsCharts.settimanaleArea) analyticsCharts.settimanaleArea.destroy();
+        
+        // Plugin per colorare l'area con due colori
+        const areaColorPlugin = {
+            id: 'areaColorPlugin',
+            beforeDatasetDraw(chart, args) {
+                const { ctx, chartArea: { left, right, top, bottom }, scales: { x, y } } = chart;
+                
+                if (args.index !== 0) return; // Solo sul primo dataset
+                
+                const meta = chart.getDatasetMeta(0);
+                if (!meta.data || meta.data.length === 0) return;
+                
+                ctx.save();
+                
+                // Disegna area feriali (Lunedì-Venerdì, indici 0-4)
+                ctx.beginPath();
+                ctx.moveTo(left, bottom);
+                for (let i = 0; i <= 4; i++) {
+                    const point = meta.data[i];
+                    if (point) {
+                        ctx.lineTo(point.x, point.y);
+                    }
+                }
+                ctx.lineTo(meta.data[4].x, bottom);
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(59, 130, 246, 0.6)';
+                ctx.fill();
+                
+                // Disegna area weekend (Venerdì-Domenica, indici 4-6)
+                ctx.beginPath();
+                ctx.moveTo(meta.data[4].x, bottom);
+                for (let i = 4; i <= 6; i++) {
+                    const point = meta.data[i];
+                    if (point) {
+                        ctx.lineTo(point.x, point.y);
+                    }
+                }
+                ctx.lineTo(meta.data[6].x, bottom);
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(139, 92, 246, 0.6)';
+                ctx.fill();
+                
+                ctx.restore();
+            }
+        };
+        
+        analyticsCharts.settimanaleArea = new Chart(settimanaleAreaCanvas, {
+            type: 'line',
+            data: {
+                labels: giorni,
+                datasets: [{
+                    label: 'Incidenti',
+                    data: giorniCounts,
+                    backgroundColor: 'transparent', // Il plugin gestisce il colore
+                    borderColor: '#3b82f6',
+                    borderWidth: 2,
+                    fill: false, // Disabilitiamo il fill predefinito
+                    tension: 0.4,
+                    pointBackgroundColor: giorni.map((g, idx) => {
+                        if (selectedGiorno === g) return '#ffffff';
+                        return idx < 5 ? '#3b82f6' : '#8b5cf6';
+                    }),
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 1,
+                    pointRadius: giorni.map(g => selectedGiorno === g ? 6 : 4),
+                    pointHoverRadius: 8,
+                    segment: {
+                        borderColor: (ctx) => {
+                            return ctx.p0DataIndex < 5 ? '#3b82f6' : '#8b5cf6';
+                        }
+                    }
                 }]
             },
             options: {
@@ -4759,149 +5091,329 @@ function updateOrariaCharts(data) {
                 plugins: {
                     legend: { 
                         display: true,
+                        position: 'bottom',
                         labels: {
                             color: '#f1f5f9',
-                            font: { size: 10 }
+                            font: { size: 11 },
+                            padding: 10,
+                            generateLabels: function() {
+                                return [
+                                    {
+                                        text: 'Feriali',
+                                        fillStyle: 'rgba(59, 130, 246, 0.6)',
+                                        strokeStyle: '#3b82f6',
+                                        lineWidth: 2,
+                                        pointStyle: 'circle'
+                                    },
+                                    {
+                                        text: 'Weekend',
+                                        fillStyle: 'rgba(139, 92, 246, 0.6)',
+                                        strokeStyle: '#8b5cf6',
+                                        lineWidth: 2,
+                                        pointStyle: 'circle'
+                                    }
+                                ];
+                            }
                         }
                     },
-                    datalabels: {
-                        display: true,
-                        color: '#1e293b',
-                        font: { weight: 'bold', size: 10 },
-                        formatter: (value, ctx) => {
-                            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = ((value / total) * 100).toFixed(1);
-                            return `${value}\n${percentage}%`;
-                        },
-                        backgroundColor: 'rgba(241, 245, 249, 0.95)',
-                        borderRadius: 3,
-                        padding: 3
-                    }
-                },
-                scales: {
-                    r: {
-                        ticks: { 
-                            color: '#94a3b8', 
-                            backdropColor: 'transparent',
-                            font: { size: 9 }
-                        },
-                        grid: { color: 'rgba(148, 163, 184, 0.2)' }
-                    }
-                }
-            }
-        });
-    }
-    
-    // Top incidenti e feriti per fascia
-    const sortedFasce = Object.entries(fasciaData).sort((a, b) => b[1] - a[1]).slice(0, 3);
-    
-    const topIncidentiCanvas = document.getElementById('chart-top-incidenti');
-    if (topIncidentiCanvas) {
-        if (analyticsCharts.topIncidenti) analyticsCharts.topIncidenti.destroy();
-        analyticsCharts.topIncidenti = new Chart(topIncidentiCanvas, {
-            type: 'bar',
-            data: {
-                labels: sortedFasce.map(f => f[0]),
-                datasets: [{
-                    label: 'Incidenti',
-                    data: sortedFasce.map(f => f[1]),
-                    backgroundColor: '#ef4444'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                indexAxis: 'y',
-                plugins: {
-                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        padding: 12,
+                        titleFont: { size: 12, weight: 'bold' },
+                        bodyFont: { size: 11 },
+                        callbacks: {
+                            title: function(context) {
+                                return giorni[context[0].dataIndex];
+                            },
+                            label: function(context) {
+                                const idx = context.dataIndex;
+                                const value = giorniCounts[idx];
+                                const total = giorniCounts.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                const tipo = idx < 5 ? 'Feriale' : 'Weekend';
+                                return `${tipo}: ${value.toLocaleString('it-IT')} (${percentage}%)`;
+                            },
+                            afterLabel: function(context) {
+                                const giorno = giorni[context.dataIndex];
+                                if (selectedGiorno === giorno) {
+                                    return '\nClicca per deselezionare';
+                                }
+                                return '\nClicca per filtrare';
+                            }
+                        }
+                    },
                     datalabels: {
                         display: true,
                         anchor: 'end',
-                        align: 'right',
+                        align: 'top',
                         offset: 4,
-                        color: '#1e293b',
-                        font: { weight: 'bold', size: 10 },
-                        backgroundColor: 'rgba(241, 245, 249, 0.95)',
-                        borderRadius: 3,
-                        padding: 3
+                        color: '#f1f5f9',
+                        font: { 
+                            weight: 'bold', 
+                            size: 11 
+                        },
+                        formatter: (value) => value > 0 ? value.toLocaleString('it-IT') : ''
                     }
                 },
                 scales: {
-                    x: { 
+                    x: {
                         ticks: { 
-                            color: '#94a3b8',
-                            font: { size: 10 }
+                            color: '#f1f5f9',
+                            font: { size: 10, weight: '600' }
+                        },
+                        grid: { 
+                            color: 'rgba(148, 163, 184, 0.1)',
+                            drawBorder: false
                         }
                     },
-                    y: { 
+                    y: {
+                        beginAtZero: true,
                         ticks: { 
-                            color: '#94a3b8',
-                            font: { size: 10 }
+                            color: '#f1f5f9',
+                            font: { size: 11 }
+                        },
+                        grid: { 
+                            color: 'rgba(148, 163, 184, 0.1)',
+                            drawBorder: false
                         }
                     }
+                },
+                onClick: (e, items) => {
+                    if (items.length > 0) {
+                        const giorno = giorni[items[0].index];
+                        filterByGiornoSettimana(giorno);
+                    }
+                },
+                onHover: (event, activeElements) => {
+                    event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
                 }
-            }
+            },
+            plugins: [areaColorPlugin]
         });
     }
-    
-    const feritiData = {};
+
+	
+ 
+   
+    // ========================================
+    // GRAFICO 4: FERIALI VS WEEKEND (BARRE)
+    // ========================================
+    const ferialiData = {};
     data.forEach(row => {
-        const fascia = row['Fascia oraria dettagliata (6 fasce)'];
-        const tipo = row.Tipologia;
-        if (fascia && (tipo === 'F' || tipo === 'R' || tipo === 'M')) {
-            feritiData[fascia] = (feritiData[fascia] || 0) + 1;
+        const tipo = row['Feriale/Weekend'];
+        if (tipo) {
+            ferialiData[tipo] = (ferialiData[tipo] || 0) + 1;
         }
     });
     
-    const sortedFeriti = Object.entries(feritiData).sort((a, b) => b[1] - a[1]).slice(0, 3);
+    const ferialiLabels = ['Feriale', 'Weekend'];
+    const ferialiCounts = ferialiLabels.map(f => ferialiData[f] || 0);
+    const selectedFerialeWeekend = currentFilters['filter-feriale-weekend'];
     
-    const topFeritiCanvas = document.getElementById('chart-top-feriti');
-    if (topFeritiCanvas) {
-        if (analyticsCharts.topFeriti) analyticsCharts.topFeriti.destroy();
-        analyticsCharts.topFeriti = new Chart(topFeritiCanvas, {
+    const settimanaleBarreCanvas = document.getElementById('chart-settimanale-barre');
+    if (settimanaleBarreCanvas) {
+        if (analyticsCharts.settimanaleBarre) analyticsCharts.settimanaleBarre.destroy();
+        
+        analyticsCharts.settimanaleBarre = new Chart(settimanaleBarreCanvas, {
             type: 'bar',
             data: {
-                labels: sortedFeriti.map(f => f[0]),
+                labels: ferialiLabels,
                 datasets: [{
-                    label: 'Incidenti con Feriti',
-                    data: sortedFeriti.map(f => f[1]),
-                    backgroundColor: '#a855f7'
+                    label: 'Incidenti',
+                    data: ferialiCounts,
+                    backgroundColor: ferialiLabels.map(f => {
+                        const color = f === 'Feriale' ? '#3b82f6' : '#8b5cf6';
+                        return selectedFerialeWeekend === f ? color + 'FF' : color + 'CC';
+                    }),
+                    borderColor: ferialiLabels.map(f => 
+                        selectedFerialeWeekend === f ? '#ffffff' : 'transparent'
+                    ),
+                    borderWidth: ferialiLabels.map(f => 
+                        selectedFerialeWeekend === f ? 2 : 0
+                    )
                 }]
             },
             options: {
+                indexAxis: 'y',
                 responsive: true,
                 maintainAspectRatio: false,
-                indexAxis: 'y',
+                layout: {
+                    padding: {
+                        right: 40,
+                        left: 10,
+                        top: 10,
+                        bottom: 10
+                    }
+                },
                 plugins: {
                     legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        padding: 12,
+                        titleFont: { size: 12, weight: 'bold' },
+                        bodyFont: { size: 11 },
+                        callbacks: {
+                            label: function(context) {
+                                const value = context.parsed.x;
+                                const total = ferialiCounts.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                return `Incidenti: ${value.toLocaleString('it-IT')} (${percentage}%)`;
+                            },
+                            afterLabel: function(context) {
+                                const tipo = ferialiLabels[context.dataIndex];
+                                if (selectedFerialeWeekend === tipo) {
+                                    return '\nClicca per deselezionare';
+                                }
+                                return '\nClicca per filtrare';
+                            }
+                        }
+                    },
                     datalabels: {
                         display: true,
                         anchor: 'end',
-                        align: 'right',
-                        offset: 4,
-                        color: '#1e293b',
-                        font: { weight: 'bold', size: 10 },
-                        backgroundColor: 'rgba(241, 245, 249, 0.95)',
-                        borderRadius: 3,
-                        padding: 3
+                        align: 'end',
+                        offset: 8,
+                        color: '#f1f5f9',
+                        font: { 
+                            weight: 'bold', 
+                            size: 12 
+                        },
+                        formatter: (value) => value > 0 ? value.toLocaleString('it-IT') : ''
                     }
                 },
                 scales: {
-                    x: { 
-                        ticks: { 
-                            color: '#94a3b8',
-                            font: { size: 10 }
-                        }
+                    x: {
+                        display: false,
+                        beginAtZero: true
                     },
-                    y: { 
+                    y: {
                         ticks: { 
-                            color: '#94a3b8',
-                            font: { size: 10 }
+                            color: '#f1f5f9',
+                            font: { 
+                                size: 12, 
+                                weight: '600' 
+                            },
+                            padding: 8
+                        },
+                        grid: {
+                            display: false
+                        },
+                        border: {
+                            display: false
                         }
                     }
+                },
+                onClick: (e, items) => {
+                    if (items.length > 0) {
+                        const tipo = ferialiLabels[items[0].index];
+                        filterByFerialeWeekend(tipo);
+                    }
+                },
+                onHover: (event, activeElements) => {
+                    event.native.target.style.cursor = activeElements.length > 0 ? 'pointer' : 'default';
                 }
             }
         });
+    }
+}
+
+// Funzione di filtro per fascia oraria
+function filterByFasciaOraria(fascia) {
+    const currentFascia = currentFilters['filter-fascia-6'];
+    
+    if (currentFascia === fascia) {
+        currentFilters['filter-fascia-6'] = '';
+    } else {
+        currentFilters['filter-fascia-6'] = fascia;
+    }
+    
+    const filterFascia6 = document.getElementById('filter-fascia-6');
+    if (filterFascia6) {
+        filterFascia6.value = currentFilters['filter-fascia-6'];
+    }
+    
+    updateAllFilters();
+    updateMapData();
+    updateStats();
+    updateYearStats();
+    updateLegendChart();
+    updatePeriodSwitches();
+    updateMonthlyInjuriesChart();
+    updateMonthlyAreaChart();
+    
+    calculateTopLuoghi();
+    updateTopLuoghiModalIfOpen();
+    
+    const analyticsPanel = document.getElementById('analytics-panel');
+    if (analyticsPanel && analyticsPanel.classList.contains('open')) {
+        updateAnalytics();
+    }
+}
+
+// Funzione di filtro per Feriale/Weekend
+function filterByFerialeWeekend(tipo) {
+    const currentTipo = currentFilters['filter-feriale-weekend'];
+    
+    if (currentTipo === tipo) {
+        currentFilters['filter-feriale-weekend'] = '';
+    } else {
+        currentFilters['filter-feriale-weekend'] = tipo;
+    }
+    
+    const filterFerialeWeekend = document.getElementById('filter-feriale-weekend');
+    if (filterFerialeWeekend) {
+        filterFerialeWeekend.value = currentFilters['filter-feriale-weekend'];
+    }
+    
+    updateAllFilters();
+    updateMapData();
+    updateStats();
+    updateYearStats();
+    updateLegendChart();
+    updatePeriodSwitches();
+    updateMonthlyInjuriesChart();
+    updateMonthlyAreaChart();
+    
+    calculateTopLuoghi();
+    updateTopLuoghiModalIfOpen();
+    
+    const analyticsPanel = document.getElementById('analytics-panel');
+    if (analyticsPanel && analyticsPanel.classList.contains('open')) {
+        updateAnalytics();
+    }
+}
+
+
+// Funzione di filtro per fascia oraria
+function filterByFasciaOraria(fascia) {
+    const currentFascia = currentFilters['filter-fascia-6'];
+    
+    if (currentFascia === fascia) {
+        currentFilters['filter-fascia-6'] = '';
+    } else {
+        currentFilters['filter-fascia-6'] = fascia;
+    }
+    
+    const filterFascia6 = document.getElementById('filter-fascia-6');
+    if (filterFascia6) {
+        filterFascia6.value = currentFilters['filter-fascia-6'];
+    }
+    
+    updateAllFilters();
+    updateMapData();
+    updateStats();
+    updateYearStats();
+    updateLegendChart();
+    updatePeriodSwitches();
+    updateMonthlyInjuriesChart();
+    updateMonthlyAreaChart();
+    
+    calculateTopLuoghi();
+    updateTopLuoghiModalIfOpen();
+    
+    const analyticsPanel = document.getElementById('analytics-panel');
+    if (analyticsPanel && analyticsPanel.classList.contains('open')) {
+        updateAnalytics();
     }
 }
 
