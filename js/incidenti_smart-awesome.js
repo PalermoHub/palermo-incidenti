@@ -647,7 +647,7 @@ function show2019InfoPopup() {
         box-shadow: 0 20px 60px rgba(0,0,0,0.6);
         z-index: 10000;
         max-width: 500px;
-        border: 2px solid #3b82f6;
+        border: 2px solid #0079c6;
     `;
     
     // ICONA AGGIORNATA
@@ -4541,7 +4541,7 @@ function updatePanoramicaCharts_continued(data) {
                 datasets: [{
                     label: 'Incidenti',
                     data: Object.values(ferialeData),
-                    backgroundColor: ['#3b82f6', '#8b5cf6']
+                    backgroundColor: ['#0079c6','#ed7c89']
                 }]
             },
             options: {
@@ -4872,11 +4872,11 @@ if (giorniMeseCanvas) {
                 label: 'Incidenti',
                 data: giorniMeseCounts,
                 backgroundColor: 'rgba(139, 92, 246, 0.5)',
-                borderColor: '#8b5cf6',
+                borderColor: '#ed7c89',
                 borderWidth: 2,
                 fill: true,
                 tension: 0.4,
-                pointBackgroundColor: '#8b5cf6',
+                pointBackgroundColor: '#ed7c89',
                 pointBorderColor: '#fff',
                 pointBorderWidth: 2,          // ✅ AUMENTATO da 1 a 2
                 pointRadius: 5,               // ✅ AUMENTATO da 2 a 5
@@ -5248,7 +5248,7 @@ function updateOrariaCharts(data) {
                         return selectedFascia === f ? color + 'DD' : color + '99';
                     }),
                     borderColor: fasce.map(f => fasceColors[f]),
-                    borderWidth: 2,
+                    borderWidth: 3,
                     fill: true,
                     tension: 0.4,
                     pointBackgroundColor: fasce.map(f => 
@@ -5378,7 +5378,7 @@ function updateOrariaCharts(data) {
                         selectedFascia === f ? '#ffffff' : 'transparent'
                     ),
                     borderWidth: fasce.map(f => 
-                        selectedFascia === f ? 2 : 0
+                        selectedFascia === f ? 3 : 0
                     )
                 }]
             },
@@ -5527,7 +5527,7 @@ function updateOrariaCharts(data) {
                 }
                 ctx.lineTo(meta.data[6].x, bottom);
                 ctx.closePath();
-                ctx.fillStyle = 'rgba(139, 92, 246, 0.6)';
+                ctx.fillStyle = 'rgba(237, 124, 137, 0.6)';
                 ctx.fill();
                 
                 ctx.restore();
@@ -5542,23 +5542,35 @@ function updateOrariaCharts(data) {
                     label: 'Incidenti',
                     data: giorniCounts,
                     backgroundColor: 'transparent', // Il plugin gestisce il colore
-                    borderColor: '#3b82f6',
-                    borderWidth: 2,
+                    borderColor: '#0079c6',
+                    borderWidth: 3,
                     fill: false, // Disabilitiamo il fill predefinito
                     tension: 0.4,
                     pointBackgroundColor: giorni.map((g, idx) => {
                         if (selectedGiorno === g) return '#ffffff';
-                        return idx < 5 ? '#3b82f6' : '#8b5cf6';
+                        return idx < 5 ? '#0079c6' : '#ed7c89';
                     }),
                     pointBorderColor: '#fff',
                     pointBorderWidth: 1,
                     pointRadius: giorni.map(g => selectedGiorno === g ? 6 : 4),
                     pointHoverRadius: 8,
                     segment: {
-                        borderColor: (ctx) => {
-                            return ctx.p0DataIndex < 5 ? '#3b82f6' : '#8b5cf6';
-                        }
-                    }
+    borderColor: (ctx) => {
+        // Segmento specifico tra venerdì (indice 4) e sabato (indice 5)
+        if (ctx.p0DataIndex === 4 && ctx.p1DataIndex === 5) {
+            return '#ed7c89'; // Colore per la transizione (es. giallo/arancione)
+        }
+        // Altri segmenti
+        return ctx.p0DataIndex < 5 ? '#0079c6' : '#ed7c89';
+    },
+    borderWidth: (ctx) => {
+        // Spessore maggiore per il segmento tra venerdì e sabato
+        if (ctx.p0DataIndex === 4 && ctx.p1DataIndex === 5) {
+            return 4; // Spessore aumentato
+        }
+        return 4; // Spessore normale per gli altri segmenti
+    }
+}
                 }]
             },
             options: {
@@ -5576,15 +5588,15 @@ function updateOrariaCharts(data) {
                                 return [
                                     {
                                         text: 'Feriali',
-                                        fillStyle: 'rgba(59, 130, 246, 0.6)',
-                                        strokeStyle: '#3b82f6',
+                                        fillStyle: 'rgba(0, 121, 198, 0.6)',
+                                        strokeStyle: '#0079c6',
                                         lineWidth: 2,
                                         pointStyle: 'circle'
                                     },
                                     {
                                         text: 'Weekend',
-                                        fillStyle: 'rgba(139, 92, 246, 0.6)',
-                                        strokeStyle: '#8b5cf6',
+                                        fillStyle: 'rgba(237, 124, 137, 0.6)',
+                                        strokeStyle: '#ed7c89',
                                         lineWidth: 2,
                                         pointStyle: 'circle'
                                     }
@@ -5698,7 +5710,7 @@ function updateOrariaCharts(data) {
                     label: 'Incidenti',
                     data: ferialiCounts,
                     backgroundColor: ferialiLabels.map(f => {
-                        const color = f === 'Feriale' ? '#3b82f6' : '#8b5cf6';
+                        const color = f === 'Feriale' ? '#0079c6' : '#ed7c89';
                         return selectedFerialeWeekend === f ? color + 'FF' : color + 'CC';
                     }),
                     borderColor: ferialiLabels.map(f => 
