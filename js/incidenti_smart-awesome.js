@@ -1090,7 +1090,7 @@ function addChartDownloadButtons() {
         const btn = document.createElement('button');
         btn.className = 'chart-download-btn';
         btn.innerHTML = '<i class="fas fa-download"></i> PNG';
-        btn.title = 'Scarica grafico come PNG (1027x768)';
+        btn.title = 'Scarica grafico come PNG (800x600)';
         btn.style.cssText = 'position: absolute; top: 10px; right: 10px; z-index: 100; background: #3b82f6; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;';
         
         console.log('- Pulsante creato');
@@ -1121,196 +1121,134 @@ function addChartDownloadButtons() {
 
 
 // Download Chart as PNG
+
 async function downloadChartAsPNG(chartId, filename) {
     console.log('\n🎨 === INIZIO downloadChartAsPNG ===');
-    console.log('Chart ID richiesto:', chartId);
-    console.log('Filename:', filename);
     
-    // Escludi il calendario heatmap dal download
     if (chartId.includes('calendario-heatmap')) {
-        console.log('❌ Download disabilitato per calendario heatmap');
         alert('Download disabilitato per il calendario heatmap');
         return;
     }
     
-    // Step 1: Trova canvas
     const canvas = document.getElementById(chartId);
     if (!canvas) {
-        console.error('❌ Canvas NON trovato:', chartId);
         alert(`Errore: canvas "${chartId}" non trovato`);
         return;
     }
-    console.log('✓ Canvas trovato');
     
-    // Step 2: Trova istanza Chart
     const chartInstance = Chart.getChart(canvas);
     if (!chartInstance) {
-        console.error('❌ Istanza Chart NON trovata');
         alert('Errore: istanza Chart non trovata');
         return;
     }
-    console.log('✓ Istanza Chart trovata');
     
     try {
-// ===== STEP 1: Salva colori originali e modifica per export =====
-const originalColors = {
-    scales: {},
-    legend: null,
-    datalabels: null,
-    title: null,
-    datasets: []
-};
-
-const darkColor = '#313131';
-
-// DIMENSIONI FONT - MODIFICA QUESTI VALORI
-const fontSizes = {
-    axisTicks: 6,      // Font numeri/etichette assi (default ~12)
-    axisTitle: 6,      // Font titoli assi (default ~12)
-    legend: 6,         // Font legenda (default ~12)
-    datalabels: 5,      // Font etichette sui dati (default ~10-12)
-    chartTitle: 12      // Font titolo grafico (default ~16)
-};
-
-// CONFIGURAZIONE POSIZIONE ETICHETTE
-const datalabelsConfig = {
-    anchor: 'end',      // Punto di ancoraggio: 'start', 'center', 'end'
-    align: 'top',       // Allineamento: 'start', 'center', 'end', 'top', 'bottom', 'left', 'right'
-    offset: 4           // Distanza in pixel (prova valori 0-10)
-};
-
-// 1. Modifica colori e DIMENSIONI degli ASSI
-if (chartInstance.options.scales) {
-    Object.keys(chartInstance.options.scales).forEach(scaleKey => {
-        const scale = chartInstance.options.scales[scaleKey];
-        originalColors.scales[scaleKey] = {
-            ticksColor: scale.ticks?.color,
-            ticksFont: scale.ticks?.font ? {...scale.ticks.font} : null,
-            titleColor: scale.title?.color,
-            titleFont: scale.title?.font ? {...scale.title.font} : null,
-            gridColor: scale.grid?.color
-        };
-        
-        // Colore e dimensione ticks (numeri assi)
-        if (scale.ticks) {
-            scale.ticks.color = darkColor;
-            if (!scale.ticks.font) scale.ticks.font = {};
-            scale.ticks.font.size = fontSizes.axisTicks;
-        }
-        
-        // Colore e dimensione titolo asse
-        if (scale.title) {
-            scale.title.color = darkColor;
-            if (!scale.title.font) scale.title.font = {};
-            scale.title.font.size = fontSizes.axisTitle;
-        }
-        
-        if (scale.grid) scale.grid.color = '#e5e7eb';
-    });
-}
-
-// 2. Modifica colore e DIMENSIONE LEGENDA
-if (chartInstance.options.plugins?.legend?.labels) {
-    originalColors.legend = {
-        color: chartInstance.options.plugins.legend.labels.color,
-        font: chartInstance.options.plugins.legend.labels.font ? 
-              {...chartInstance.options.plugins.legend.labels.font} : null
-    };
-    
-    chartInstance.options.plugins.legend.labels.color = darkColor;
-    if (!chartInstance.options.plugins.legend.labels.font) {
-        chartInstance.options.plugins.legend.labels.font = {};
-    }
-    chartInstance.options.plugins.legend.labels.font.size = fontSizes.legend;
-}
-
-// 3. Modifica colore e DIMENSIONE TITOLO grafico (se presente)
-if (chartInstance.options.plugins?.title) {
-    originalColors.title = {
-        color: chartInstance.options.plugins.title.color,
-        font: chartInstance.options.plugins.title.font ? 
-              {...chartInstance.options.plugins.title.font} : null
-    };
-    
-    chartInstance.options.plugins.title.color = darkColor;
-    if (!chartInstance.options.plugins.title.font) {
-        chartInstance.options.plugins.title.font = {};
-    }
-    chartInstance.options.plugins.title.font.size = fontSizes.chartTitle;
-}
-
-// 4. Modifica DATALABELS (etichette sui punti/barre)
-if (chartInstance.options.plugins?.datalabels) {
-    originalColors.datalabels = {
-        color: chartInstance.options.plugins.datalabels.color,
-        font: chartInstance.options.plugins.datalabels.font ? 
-              {...chartInstance.options.plugins.datalabels.font} : null
-    };
-    
-    chartInstance.options.plugins.datalabels.color = darkColor;
-    if (!chartInstance.options.plugins.datalabels.font) {
-        chartInstance.options.plugins.datalabels.font = {};
-    }
-    chartInstance.options.plugins.datalabels.font.size = fontSizes.datalabels;
-}
-
-// 5. Modifica colori e dimensioni nei DATASET (per etichette inline)
-if (chartInstance.data.datasets) {
-    chartInstance.data.datasets.forEach((dataset, index) => {
-        originalColors.datasets[index] = {
-            datalabels: dataset.datalabels ? JSON.parse(JSON.stringify(dataset.datalabels)) : null
-        };
-        
-        if (dataset.datalabels) {
-            if (dataset.datalabels.color) {
-                dataset.datalabels.color = darkColor;
-            }
-            if (!dataset.datalabels.font) dataset.datalabels.font = {};
-            dataset.datalabels.font.size = fontSizes.datalabels;
-        }
-    });
-}
-
-// Aggiorna il grafico
-chartInstance.update('none');
-console.log('✓ Tutti i colori e dimensioni font aggiornati per export');
-        
-        // ===== STEP 2: Dimensioni =====
-        const targetWidth = 1024;
+        // ===== CONFIGURAZIONE BASE =====
+        const targetWidth = 800;
         const originalRatio = canvas.height / canvas.width;
-        const targetHeight = Math.round(targetWidth * originalRatio);
-        const minHeight = 768;
-        const finalHeight = Math.max(targetHeight, minHeight);
+        const targetHeight = Math.max(Math.round(targetWidth * originalRatio), 600);
         
         const headerHeight = 100;
         const footerHeight = 70;
-        const chartAreaHeight = finalHeight - headerHeight - footerHeight;
+        const chartAreaHeight = targetHeight - headerHeight - footerHeight;
         
-        console.log(`Dimensioni finali: ${targetWidth}x${finalHeight}`);
+        // ===== Salva colori originali =====
+        const originalColors = {
+            scales: {},
+            legend: null,
+            datalabels: null,
+            title: null,
+            datasets: []
+        };
         
-        // Crea canvas finale
+        const darkColor = '#313131';
+           const fontSizes = {
+            axisTicks: 7,
+            axisTitle: 7,
+            legend: 7,
+            datalabels: 6,
+            chartTitle: 13
+        };
+		
+        // Modifica colori assi
+        if (chartInstance.options.scales) {
+            Object.keys(chartInstance.options.scales).forEach(scaleKey => {
+                const scale = chartInstance.options.scales[scaleKey];
+                originalColors.scales[scaleKey] = {
+                    ticksColor: scale.ticks?.color,
+                    ticksFont: scale.ticks?.font ? {...scale.ticks.font} : null,
+                    titleColor: scale.title?.color,
+                    titleFont: scale.title?.font ? {...scale.title.font} : null,
+                    gridColor: scale.grid?.color
+                };
+                
+                if (scale.ticks) scale.ticks.color = darkColor;
+                if (scale.title) scale.title.color = darkColor;
+                if (scale.grid) scale.grid.color = '#e5e7eb';
+            });
+        }
+        
+        if (chartInstance.options.plugins?.legend?.labels) {
+            originalColors.legend = {
+                color: chartInstance.options.plugins.legend.labels.color,
+                font: chartInstance.options.plugins.legend.labels.font ? 
+                      {...chartInstance.options.plugins.legend.labels.font} : null
+            };
+            chartInstance.options.plugins.legend.labels.color = darkColor;
+        }
+        
+        if (chartInstance.options.plugins?.title) {
+            originalColors.title = {
+                color: chartInstance.options.plugins.title.color,
+                font: chartInstance.options.plugins.title.font ? 
+                      {...chartInstance.options.plugins.title.font} : null
+            };
+            chartInstance.options.plugins.title.color = darkColor;
+        }
+        
+        if (chartInstance.options.plugins?.datalabels) {
+            originalColors.datalabels = {
+                color: chartInstance.options.plugins.datalabels.color,
+                font: chartInstance.options.plugins.datalabels.font ? 
+                      {...chartInstance.options.plugins.datalabels.font} : null
+            };
+            chartInstance.options.plugins.datalabels.color = darkColor;
+        }
+        
+        if (chartInstance.data.datasets) {
+            chartInstance.data.datasets.forEach((dataset, index) => {
+                originalColors.datasets[index] = {
+                    datalabels: dataset.datalabels ? JSON.parse(JSON.stringify(dataset.datalabels)) : null
+                };
+                if (dataset.datalabels?.color) {
+                    dataset.datalabels.color = darkColor;
+                }
+            });
+        }
+        
+        chartInstance.update('none');
+        
+        // ===== Crea canvas finale =====
         const finalCanvas = document.createElement('canvas');
         const ctx = finalCanvas.getContext('2d');
         
         finalCanvas.width = targetWidth;
-        finalCanvas.height = finalHeight;
+        finalCanvas.height = targetHeight;
         
         // Sfondo bianco
         ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
-        console.log('✓ Sfondo bianco disegnato');
+        ctx.fillRect(0, 0, targetWidth, targetHeight);
         
-        // ===== STEP 3: HEADER =====
+        // ===== HEADER =====
         ctx.fillStyle = '#313131';
-        ctx.font = 'bold 22px Titillium Web';
+        ctx.font = 'bold 22px Titillium Web, Arial, sans-serif';
         ctx.textAlign = 'left';
         
         const chartContainer = canvas.closest('.chart-container');
         const chartTitle = chartContainer ? chartContainer.querySelector('h3').textContent : 'Grafico Analytics';
         ctx.fillText(chartTitle, 40, 35);
         
-        ctx.font = '13px Titillium Web';
-        ctx.fillStyle = '#313131';
+        ctx.font = '13px Titillium Web, Arial, sans-serif';
         
         const activeFilters = document.getElementById('active-filters-text');
         let filtersText = 'Tutti gli incidenti (2015-2023)';
@@ -1322,9 +1260,7 @@ console.log('✓ Tutti i colori e dimensioni font aggiornati per export');
             filtersText = filtersText.replace(/\(\d+\.?\d*\)/g, '').trim();
         }
         
-        const maxWidth = targetWidth - 80;
-        const lines = wrapText(ctx, filtersText, maxWidth, 13);
-        
+        const lines = wrapText(ctx, filtersText, targetWidth - 80, 13);
         lines.forEach((line, index) => {
             ctx.fillText(line, 40, 60 + (index * 18));
         });
@@ -1336,9 +1272,7 @@ console.log('✓ Tutti i colori e dimensioni font aggiornati per export');
         ctx.lineTo(targetWidth - 40, headerHeight - 15);
         ctx.stroke();
         
-        console.log('✓ Header disegnato');
-        
-        // ===== STEP 4: GRAFICO =====
+        // ===== GRAFICO =====
         const chartCanvas = document.createElement('canvas');
         const chartWidth = targetWidth - 80;
         const chartHeight = chartAreaHeight;
@@ -1347,148 +1281,100 @@ console.log('✓ Tutti i colori e dimensioni font aggiornati per export');
         chartCanvas.height = chartHeight;
         
         const chartCtx = chartCanvas.getContext('2d');
-        
-        // Sfondo bianco per il grafico
         chartCtx.fillStyle = '#FFFFFF';
         chartCtx.fillRect(0, 0, chartWidth, chartHeight);
-        
-        // Copia il grafico (ora con testo scuro)
         chartCtx.drawImage(canvas, 0, 0, chartWidth, chartHeight);
         
-        console.log('✓ Grafico copiato su sfondo bianco');
-        
-        // Disegna sul canvas principale
         ctx.drawImage(chartCanvas, 40, headerHeight);
-        console.log('✓ Grafico posizionato');
         
-        // ===== STEP 5: FOOTER =====
+        // ===== FOOTER =====
         ctx.strokeStyle = '#d1d5db';
         ctx.beginPath();
-        ctx.moveTo(40, finalHeight - footerHeight + 10);
-        ctx.lineTo(targetWidth - 40, finalHeight - footerHeight + 10);
+        ctx.moveTo(40, targetHeight - footerHeight + 10);
+        ctx.lineTo(targetWidth - 40, targetHeight - footerHeight + 10);
         ctx.stroke();
         
-        ctx.font = '11px Titillium Web';
+        ctx.font = '11px Titillium Web, Arial, sans-serif';
         ctx.fillStyle = '#313131';
         
         if (chartId.includes('serie-storica')) {
-            ctx.fillText('Fonte: Istat - ACI - Rielaborazione: opendatasicilia.it', 40, finalHeight - 40);
+            ctx.fillText('Fonte: Istat - ACI - Rielaborazione: opendatasicilia.it', 40, targetHeight - 40);
         } else {
-            ctx.fillText('Fonte: dati.gov.it - Rielaborazione: opendatasicilia.it', 40, finalHeight - 40);
+            ctx.fillText('Fonte: dati.gov.it - Rielaborazione: opendatasicilia.it', 40, targetHeight - 40);
         }
         
-        ctx.fillText('https://opendatasicilia.github.io/incidenti_palermo/', 40, finalHeight - 20);
+        ctx.fillText('https://opendatasicilia.github.io/incidenti_palermo/', 40, targetHeight - 20);
         
         // Logo
         try {
             const logo = new Image();
-            await new Promise((resolve, reject) => {
+            logo.crossOrigin = 'anonymous';
+            await new Promise((resolve) => {
                 logo.onload = resolve;
-                logo.onerror = () => {
-                    console.warn('Logo non trovato, procedo senza');
-                    resolve();
-                };
+                logo.onerror = resolve;
                 logo.src = 'img/pa_hub_new.png';
             });
             
             if (logo.complete && logo.naturalWidth > 0) {
                 const logoWidth = 100;
                 const logoHeight = (logoWidth * logo.naturalHeight) / logo.naturalWidth;
-                const logoX = targetWidth - logoWidth - 40;
-                const logoY = finalHeight - footerHeight + 15;
-                
-                ctx.drawImage(logo, logoX, logoY, logoWidth, logoHeight);
-                console.log('✓ Logo disegnato');
+                ctx.drawImage(logo, targetWidth - logoWidth - 40, targetHeight - footerHeight + 15, logoWidth, logoHeight);
             }
-        } catch (logoError) {
-            console.warn('Errore nel caricamento logo:', logoError);
-        }
+        } catch (e) {}
         
-        console.log('✓ Footer disegnato');
-        
-        // ===== STEP 6: Download =====
+        // ===== Download =====
         const dataURL = finalCanvas.toDataURL('image/png');
-        console.log('✓ PNG generato, lunghezza:', dataURL.length);
-        
         const link = document.createElement('a');
         const safeFilename = filename.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-        link.download = `${safeFilename}_${targetWidth}x${finalHeight}.png`;
+        link.download = `${safeFilename}_${targetWidth}x${targetHeight}.png`;
         link.href = dataURL;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         
-        console.log('✅ Download completato!');
+        // ===== Ripristina colori =====
+        if (chartInstance.options.scales) {
+            Object.keys(originalColors.scales).forEach(scaleKey => {
+                const scale = chartInstance.options.scales[scaleKey];
+                const saved = originalColors.scales[scaleKey];
+                
+                if (scale.ticks && saved.ticksColor !== undefined) scale.ticks.color = saved.ticksColor;
+                if (scale.title && saved.titleColor !== undefined) scale.title.color = saved.titleColor;
+                if (scale.grid && saved.gridColor !== undefined) scale.grid.color = saved.gridColor;
+            });
+        }
         
-        // ===== STEP 7: RIPRISTINA colori originali =====
-// ===== STEP 7: RIPRISTINA colori e font originali =====
-// Ripristina assi
-if (chartInstance.options.scales) {
-    Object.keys(originalColors.scales).forEach(scaleKey => {
-        const scale = chartInstance.options.scales[scaleKey];
-        const saved = originalColors.scales[scaleKey];
+        if (originalColors.legend && chartInstance.options.plugins?.legend?.labels) {
+            if (originalColors.legend.color !== undefined) {
+                chartInstance.options.plugins.legend.labels.color = originalColors.legend.color;
+            }
+        }
         
-        if (scale.ticks) {
-            if (saved.ticksColor !== undefined) scale.ticks.color = saved.ticksColor;
-            if (saved.ticksFont) scale.ticks.font = saved.ticksFont;
+        if (originalColors.title && chartInstance.options.plugins?.title) {
+            if (originalColors.title.color !== undefined) {
+                chartInstance.options.plugins.title.color = originalColors.title.color;
+            }
         }
-        if (scale.title) {
-            if (saved.titleColor !== undefined) scale.title.color = saved.titleColor;
-            if (saved.titleFont) scale.title.font = saved.titleFont;
-        }
-        if (scale.grid && saved.gridColor !== undefined) {
-            scale.grid.color = saved.gridColor;
-        }
-    });
-}
-
-// Ripristina legenda
-if (originalColors.legend !== null && chartInstance.options.plugins?.legend?.labels) {
-    if (originalColors.legend.color !== undefined) {
-        chartInstance.options.plugins.legend.labels.color = originalColors.legend.color;
-    }
-    if (originalColors.legend.font) {
-        chartInstance.options.plugins.legend.labels.font = originalColors.legend.font;
-    }
-}
-
-// Ripristina titolo
-if (originalColors.title !== null && chartInstance.options.plugins?.title) {
-    if (originalColors.title.color !== undefined) {
-        chartInstance.options.plugins.title.color = originalColors.title.color;
-    }
-    if (originalColors.title.font) {
-        chartInstance.options.plugins.title.font = originalColors.title.font;
-    }
-}
-
-// Ripristina datalabels globali
-if (originalColors.datalabels !== null && chartInstance.options.plugins?.datalabels) {
-    if (originalColors.datalabels.color !== undefined) {
-        chartInstance.options.plugins.datalabels.color = originalColors.datalabels.color;
-    }
-    if (originalColors.datalabels.font) {
-        chartInstance.options.plugins.datalabels.font = originalColors.datalabels.font;
-    }
-}
-
-// Ripristina datalabels nei dataset
-if (originalColors.datasets && chartInstance.data.datasets) {
-    chartInstance.data.datasets.forEach((dataset, index) => {
-        if (originalColors.datasets[index]?.datalabels) {
-            dataset.datalabels = originalColors.datasets[index].datalabels;
-        }
-    });
-}
-
-chartInstance.update('none');
-console.log('✓ Configurazione grafico ripristinata');
         
-        console.log('=== FINE downloadChartAsPNG ===\n');
+        if (originalColors.datalabels && chartInstance.options.plugins?.datalabels) {
+            if (originalColors.datalabels.color !== undefined) {
+                chartInstance.options.plugins.datalabels.color = originalColors.datalabels.color;
+            }
+        }
+        
+        if (originalColors.datasets && chartInstance.data.datasets) {
+            chartInstance.data.datasets.forEach((dataset, index) => {
+                if (originalColors.datasets[index]?.datalabels) {
+                    dataset.datalabels = originalColors.datasets[index].datalabels;
+                }
+            });
+        }
+        
+        chartInstance.update('none');
+        console.log('✅ Download completato - risoluzione originale');
         
     } catch (error) {
-        console.error('❌ ERRORE durante download:', error);
-        console.error('Stack trace:', error.stack);
+        console.error('Errore download:', error);
         alert('Errore durante il download: ' + error.message);
     }
 }
@@ -4648,96 +4534,103 @@ function updateTemporaleCharts(data) {
         if (canvas) {
             const chartKey = stagione.canvasId.replace('chart-', '').replace(/-/g, '_');
             if (analyticsCharts[chartKey]) analyticsCharts[chartKey].destroy();
-            
-            analyticsCharts[chartKey] = new Chart(canvas, {
-                type: 'bar',
-                data: {
-                    labels: fasceOrarie,
-                    datasets: [
-                        {
-                            label: 'Feriale',
-                            data: datiFeriali,
-                            backgroundColor: stagione.colorChiaro,
-                            borderColor: 'transparent',
-                            borderWidth: 0,
-                            barPercentage: 0.9,
-                            categoryPercentage: 0.8
-                        },
-                        {
-                            label: 'Weekend',
-                            data: datiWeekend,
-                            backgroundColor: stagione.colorScuro,
-                            borderColor: 'transparent',
-                            borderWidth: 0,
-                            barPercentage: 0.9,
-                            categoryPercentage: 0.8
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                            padding: 12,
-                            titleFont: { size: 11, weight: 'bold' },
-                            bodyFont: { size: 10 },
-                            callbacks: {
-                                title: function(context) {
-                                    return `${stagione.nome} - ${context[0].label}`;
-                                },
-                                label: function(context) {
-                                    const label = context.dataset.label;
-                                    const value = context.parsed.y;
-                                    return `${label}: ${value.toLocaleString('it-IT')}`;
-                                },
-                                footer: function(context) {
-                                    const fascia = fasceOrarie[context[0].dataIndex];
-                                    const totale = datiOrari[fascia].feriale + datiOrari[fascia].weekend;
-                                    return `\nTotale: ${totale.toLocaleString('it-IT')}`;
-                                }
-                            }
-                        },
-                        datalabels: {
-                            display: true,
-                            anchor: 'end',
-                            align: 'top',
-                            offset: 2,
-                            color: '#f1f5f9',
-                            font: { weight: 'bold', size: 9 },
-                            formatter: (value) => value > 0 ? value : ''
-                        }
+analyticsCharts[chartKey] = new Chart(canvas, {
+    type: 'bar',
+    data: {
+        labels: fasceOrarie,
+        datasets: [
+            {
+                label: 'Feriale',
+                data: datiFeriali,
+                backgroundColor: stagione.colorChiaro,
+                borderColor: 'transparent',
+                borderWidth: 0,
+                barPercentage: 0.9,
+                categoryPercentage: 0.8
+            },
+            {
+                label: 'Weekend',
+                data: datiWeekend,
+                backgroundColor: stagione.colorScuro,
+                borderColor: 'transparent',
+                borderWidth: 0,
+                barPercentage: 0.9,
+                categoryPercentage: 0.8
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: true,  // ← CAMBIATO DA false
+                position: 'bottom',
+                labels: {
+                    color: '#f1f5f9',
+                    font: { size: 11 },
+                    padding: 10,
+                    usePointStyle: true,
+                    pointStyle: 'rect'
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                padding: 12,
+                titleFont: { size: 11, weight: 'bold' },
+                bodyFont: { size: 10 },
+                callbacks: {
+                    title: function(context) {
+                        return `${stagione.nome} - ${context[0].label}`;
                     },
-                    scales: {
-                        x: {
-                            ticks: { 
-                                color: '#f1f5f9',
-                                font: { size: 9 }
-                            },
-                            grid: { display: false }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            ticks: { 
-                                color: '#f1f5f9',
-                                font: { size: 9 }
-                            },
-                            grid: { color: 'rgba(148, 163, 184, 0.1)' }
-                        }
+                    label: function(context) {
+                        const label = context.dataset.label;
+                        const value = context.parsed.y;
+                        return `${label}: ${value.toLocaleString('it-IT')}`;
                     },
-                    onClick: (e, items) => {
-                        filterByStagione(stagione.nome);
-                    },
-                    onHover: (event, activeElements) => {
-                        event.native.target.style.cursor = 'pointer';
+                    footer: function(context) {
+                        const fascia = fasceOrarie[context[0].dataIndex];
+                        const totale = datiOrari[fascia].feriale + datiOrari[fascia].weekend;
+                        return `\nTotale: ${totale.toLocaleString('it-IT')}`;
                     }
                 }
-            });
+            },
+            datalabels: {
+                display: true,
+                anchor: 'end',
+                align: 'top',
+                offset: 2,
+                color: '#f1f5f9',
+                font: { weight: 'bold', size: 9 },
+                formatter: (value) => value > 0 ? value : ''
+            }
+        },
+        scales: {
+            x: {
+                ticks: { 
+                    color: '#f1f5f9',
+                    font: { size: 9 }
+                },
+                grid: { display: false }
+            },
+            y: {
+                beginAtZero: true,
+                ticks: { 
+                    color: '#f1f5f9',
+                    font: { size: 9 }
+                },
+                grid: { color: 'rgba(148, 163, 184, 0.1)' }
+            }
+        },
+        onClick: (e, items) => {
+            filterByStagione(stagione.nome);
+        },
+        onHover: (event, activeElements) => {
+            event.native.target.style.cursor = 'pointer';
         }
+    }
+});
+	  }
     });
     
     // ========================================
@@ -5352,7 +5245,7 @@ function updateOrariaCharts(data) {
     // GRAFICO 2: BARRE ORIZZONTALI CON ORARI
     // ========================================
     const orariLabels = [
-        '0:00 - 5:00 / 22:00 - 0:00',
+        '22:00 - 0:00 / 0:00 - 5:00',
         '5:00 - 7:00',
         '7:00 - 12:00',
         '12:00 - 14:00',
