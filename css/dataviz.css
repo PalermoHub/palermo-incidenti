@@ -693,12 +693,24 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 24px;
-    height: calc(100vh - 300px);
+    height: calc(100vh - 280px);
+    min-height: 500px;
+    align-content: stretch;
 }
 
 #tab-panoramica .chart-container {
-    min-height: 400px;
+    min-height: 300px;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+#tab-panoramica .chart-wrapper {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    width: 100%;
 }
 
 /* Responsive tablet */
@@ -717,14 +729,39 @@
 
 /* Responsive mobile */
 @media (max-width: 1200px) {
-    #tab-oraria .charts-grid-two-col,
-    #tab-panoramica .charts-grid-two-col {
+    #tab-oraria .charts-grid-two-col {
         grid-template-columns: 1fr;
     }
     
-    #tab-oraria .chart-container,
+    #tab-oraria .chart-container {
+        min-height: 350px;
+        max-height: 500px;
+    }
+}
+
+/* Responsive per Panoramica */
+@media (max-width: 1400px) {
+    #tab-panoramica .charts-grid-two-col {
+        height: calc(100vh - 250px);
+        min-height: 450px;
+    }
+}
+
+@media (max-width: 1200px) {
+    #tab-panoramica .charts-grid-two-col {
+        grid-template-columns: 1fr;
+        height: auto;
+        min-height: 400px;
+    }
+    
     #tab-panoramica .chart-container {
         min-height: 350px;
         max-height: 500px;
+    }
+}
+
+@media (max-width: 768px) {
+    #tab-panoramica .chart-container {
+        min-height: 300px;
     }
 }

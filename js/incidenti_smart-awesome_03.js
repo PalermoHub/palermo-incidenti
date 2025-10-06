@@ -1031,7 +1031,6 @@ function switchAnalyticsTab(tabName) {
     if (selectedContent) selectedContent.classList.add('active');
 }
 
-
 function updateAnalytics() {
     const filteredData = getFilteredData();
     
@@ -1040,16 +1039,15 @@ function updateAnalytics() {
     updatePanoramicaCharts(filteredData);
     updateTemporaleCharts(filteredData);
     updateOrariaCharts(filteredData);
-    // RIMOSSO: updateCondizioniCharts(filteredData);
+    updateCondizioniCharts(filteredData);
     updateInsights(filteredData);
     
     // IMPORTANTE: Aumenta il timeout
     setTimeout(() => {
         console.log('Chiamata addChartDownloadButtons da updateAnalytics');
         addChartDownloadButtons();
-    }, 500);
+    }, 500); // Aumentato a 500ms
 }
-
 // Add Chart Download Buttons (ICONA AGGIORNATA)
 function addChartDownloadButtons() {
     console.log('=== INIZIO addChartDownloadButtons ===');
@@ -1059,13 +1057,6 @@ function addChartDownloadButtons() {
     
     chartContainers.forEach((container, index) => {
         console.log(`\nContainer ${index + 1}:`);
-        
-        // Escludi il calendario heatmap
-        if (container.id === 'chart-calendario-heatmap' || 
-            container.querySelector('#chart-calendario-heatmap')) {
-            console.log('- Calendario heatmap, skip download button');
-            return;
-        }
         
         // Verifica se ha già il pulsante
         if (container.querySelector('.chart-download-btn')) {
@@ -1090,7 +1081,7 @@ function addChartDownloadButtons() {
         const btn = document.createElement('button');
         btn.className = 'chart-download-btn';
         btn.innerHTML = '<i class="fas fa-download"></i> PNG';
-        btn.title = 'Scarica grafico come PNG (1027x768)';
+        btn.title = 'Scarica grafico come PNG';
         btn.style.cssText = 'position: absolute; top: 10px; right: 10px; z-index: 100; background: #3b82f6; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;';
         
         console.log('- Pulsante creato');
@@ -1111,7 +1102,7 @@ function addChartDownloadButtons() {
             downloadChartAsPNG(chartId, filename);
         };
         
-        container.style.position = 'relative';
+        container.style.position = 'relative'; // Necessario per il posizionamento assoluto
         container.appendChild(btn);
         console.log('- Pulsante aggiunto al DOM');
     });
@@ -1119,19 +1110,13 @@ function addChartDownloadButtons() {
     console.log('\n=== FINE addChartDownloadButtons ===\n');
 }
 
-
 // Download Chart as PNG
+
+
 async function downloadChartAsPNG(chartId, filename) {
     console.log('\n🎨 === INIZIO downloadChartAsPNG ===');
     console.log('Chart ID richiesto:', chartId);
     console.log('Filename:', filename);
-    
-    // Escludi il calendario heatmap dal download
-    if (chartId.includes('calendario-heatmap')) {
-        console.log('❌ Download disabilitato per calendario heatmap');
-        alert('Download disabilitato per il calendario heatmap');
-        return;
-    }
     
     // Step 1: Trova canvas
     const canvas = document.getElementById(chartId);
@@ -1152,338 +1137,63 @@ async function downloadChartAsPNG(chartId, filename) {
     console.log('✓ Istanza Chart trovata');
     
     try {
-// ===== STEP 1: Salva colori originali e modifica per export =====
-const originalColors = {
-    scales: {},
-    legend: null,
-    datalabels: null,
-    title: null,
-    datasets: []
-};
-
-const darkColor = '#313131';
-
-// DIMENSIONI FONT - MODIFICA QUESTI VALORI
-const fontSizes = {
-    axisTicks: 6,      // Font numeri/etichette assi (default ~12)
-    axisTitle: 6,      // Font titoli assi (default ~12)
-    legend: 6,         // Font legenda (default ~12)
-    datalabels: 5,      // Font etichette sui dati (default ~10-12)
-    chartTitle: 12      // Font titolo grafico (default ~16)
-};
-
-// CONFIGURAZIONE POSIZIONE ETICHETTE
-const datalabelsConfig = {
-    anchor: 'end',      // Punto di ancoraggio: 'start', 'center', 'end'
-    align: 'top',       // Allineamento: 'start', 'center', 'end', 'top', 'bottom', 'left', 'right'
-    offset: 4           // Distanza in pixel (prova valori 0-10)
-};
-
-// 1. Modifica colori e DIMENSIONI degli ASSI
-if (chartInstance.options.scales) {
-    Object.keys(chartInstance.options.scales).forEach(scaleKey => {
-        const scale = chartInstance.options.scales[scaleKey];
-        originalColors.scales[scaleKey] = {
-            ticksColor: scale.ticks?.color,
-            ticksFont: scale.ticks?.font ? {...scale.ticks.font} : null,
-            titleColor: scale.title?.color,
-            titleFont: scale.title?.font ? {...scale.title.font} : null,
-            gridColor: scale.grid?.color
-        };
+        // VERSIONE SEMPLIFICATA: scarica solo il grafico senza modifiche
+        console.log('Inizio generazione PNG...');
         
-        // Colore e dimensione ticks (numeri assi)
-        if (scale.ticks) {
-            scale.ticks.color = darkColor;
-            if (!scale.ticks.font) scale.ticks.font = {};
-            scale.ticks.font.size = fontSizes.axisTicks;
-        }
+        // Crea canvas temporaneo
+        const tempCanvas = document.createElement('canvas');
+        const ctx = tempCanvas.getContext('2d');
         
-        // Colore e dimensione titolo asse
-        if (scale.title) {
-            scale.title.color = darkColor;
-            if (!scale.title.font) scale.title.font = {};
-            scale.title.font.size = fontSizes.axisTitle;
-        }
+        // Stesso size del canvas originale + spazio footer
+        const footerHeight = 80;
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height + footerHeight;
         
-        if (scale.grid) scale.grid.color = '#e5e7eb';
-    });
-}
-
-// 2. Modifica colore e DIMENSIONE LEGENDA
-if (chartInstance.options.plugins?.legend?.labels) {
-    originalColors.legend = {
-        color: chartInstance.options.plugins.legend.labels.color,
-        font: chartInstance.options.plugins.legend.labels.font ? 
-              {...chartInstance.options.plugins.legend.labels.font} : null
-    };
-    
-    chartInstance.options.plugins.legend.labels.color = darkColor;
-    if (!chartInstance.options.plugins.legend.labels.font) {
-        chartInstance.options.plugins.legend.labels.font = {};
-    }
-    chartInstance.options.plugins.legend.labels.font.size = fontSizes.legend;
-}
-
-// 3. Modifica colore e DIMENSIONE TITOLO grafico (se presente)
-if (chartInstance.options.plugins?.title) {
-    originalColors.title = {
-        color: chartInstance.options.plugins.title.color,
-        font: chartInstance.options.plugins.title.font ? 
-              {...chartInstance.options.plugins.title.font} : null
-    };
-    
-    chartInstance.options.plugins.title.color = darkColor;
-    if (!chartInstance.options.plugins.title.font) {
-        chartInstance.options.plugins.title.font = {};
-    }
-    chartInstance.options.plugins.title.font.size = fontSizes.chartTitle;
-}
-
-// 4. Modifica DATALABELS (etichette sui punti/barre)
-if (chartInstance.options.plugins?.datalabels) {
-    originalColors.datalabels = {
-        color: chartInstance.options.plugins.datalabels.color,
-        font: chartInstance.options.plugins.datalabels.font ? 
-              {...chartInstance.options.plugins.datalabels.font} : null
-    };
-    
-    chartInstance.options.plugins.datalabels.color = darkColor;
-    if (!chartInstance.options.plugins.datalabels.font) {
-        chartInstance.options.plugins.datalabels.font = {};
-    }
-    chartInstance.options.plugins.datalabels.font.size = fontSizes.datalabels;
-}
-
-// 5. Modifica colori e dimensioni nei DATASET (per etichette inline)
-if (chartInstance.data.datasets) {
-    chartInstance.data.datasets.forEach((dataset, index) => {
-        originalColors.datasets[index] = {
-            datalabels: dataset.datalabels ? JSON.parse(JSON.stringify(dataset.datalabels)) : null
-        };
-        
-        if (dataset.datalabels) {
-            if (dataset.datalabels.color) {
-                dataset.datalabels.color = darkColor;
-            }
-            if (!dataset.datalabels.font) dataset.datalabels.font = {};
-            dataset.datalabels.font.size = fontSizes.datalabels;
-        }
-    });
-}
-
-// Aggiorna il grafico
-chartInstance.update('none');
-console.log('✓ Tutti i colori e dimensioni font aggiornati per export');
-        
-        // ===== STEP 2: Dimensioni =====
-        const targetWidth = 1024;
-        const originalRatio = canvas.height / canvas.width;
-        const targetHeight = Math.round(targetWidth * originalRatio);
-        const minHeight = 768;
-        const finalHeight = Math.max(targetHeight, minHeight);
-        
-        const headerHeight = 100;
-        const footerHeight = 70;
-        const chartAreaHeight = finalHeight - headerHeight - footerHeight;
-        
-        console.log(`Dimensioni finali: ${targetWidth}x${finalHeight}`);
-        
-        // Crea canvas finale
-        const finalCanvas = document.createElement('canvas');
-        const ctx = finalCanvas.getContext('2d');
-        
-        finalCanvas.width = targetWidth;
-        finalCanvas.height = finalHeight;
+        console.log(`Canvas size: ${tempCanvas.width}x${tempCanvas.height}`);
         
         // Sfondo bianco
         ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+        ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
         console.log('✓ Sfondo bianco disegnato');
         
-        // ===== STEP 3: HEADER =====
-        ctx.fillStyle = '#313131';
-        ctx.font = 'bold 22px Titillium Web';
+        // Copia grafico
+        ctx.drawImage(canvas, 0, 0);
+        console.log('✓ Grafico copiato');
+        
+        // Footer semplice (solo testo, niente immagini per ora)
+        ctx.fillStyle = '#1e293b';
+        ctx.font = 'bold 11px Arial';
         ctx.textAlign = 'left';
         
-        const chartContainer = canvas.closest('.chart-container');
-        const chartTitle = chartContainer ? chartContainer.querySelector('h3').textContent : 'Grafico Analytics';
-        ctx.fillText(chartTitle, 40, 35);
+        const yFooter = tempCanvas.height - 50;
         
-        ctx.font = '13px Titillium Web';
-        ctx.fillStyle = '#313131';
-        
-        const activeFilters = document.getElementById('active-filters-text');
-        let filtersText = 'Tutti gli incidenti (2015-2023)';
-        
-        if (activeFilters) {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = activeFilters.innerHTML;
-            filtersText = tempDiv.textContent || tempDiv.innerText || '';
-            filtersText = filtersText.replace(/\(\d+\.?\d*\)/g, '').trim();
-        }
-        
-        const maxWidth = targetWidth - 80;
-        const lines = wrapText(ctx, filtersText, maxWidth, 13);
-        
-        lines.forEach((line, index) => {
-            ctx.fillText(line, 40, 60 + (index * 18));
-        });
-        
-        ctx.strokeStyle = '#d1d5db';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(40, headerHeight - 15);
-        ctx.lineTo(targetWidth - 40, headerHeight - 15);
-        ctx.stroke();
-        
-        console.log('✓ Header disegnato');
-        
-        // ===== STEP 4: GRAFICO =====
-        const chartCanvas = document.createElement('canvas');
-        const chartWidth = targetWidth - 80;
-        const chartHeight = chartAreaHeight;
-        
-        chartCanvas.width = chartWidth;
-        chartCanvas.height = chartHeight;
-        
-        const chartCtx = chartCanvas.getContext('2d');
-        
-        // Sfondo bianco per il grafico
-        chartCtx.fillStyle = '#FFFFFF';
-        chartCtx.fillRect(0, 0, chartWidth, chartHeight);
-        
-        // Copia il grafico (ora con testo scuro)
-        chartCtx.drawImage(canvas, 0, 0, chartWidth, chartHeight);
-        
-        console.log('✓ Grafico copiato su sfondo bianco');
-        
-        // Disegna sul canvas principale
-        ctx.drawImage(chartCanvas, 40, headerHeight);
-        console.log('✓ Grafico posizionato');
-        
-        // ===== STEP 5: FOOTER =====
-        ctx.strokeStyle = '#d1d5db';
-        ctx.beginPath();
-        ctx.moveTo(40, finalHeight - footerHeight + 10);
-        ctx.lineTo(targetWidth - 40, finalHeight - footerHeight + 10);
-        ctx.stroke();
-        
-        ctx.font = '11px Titillium Web';
-        ctx.fillStyle = '#313131';
-        
+        // Fonte
         if (chartId.includes('serie-storica')) {
-            ctx.fillText('Fonte: Istat - ACI - Rielaborazione: opendatasicilia.it', 40, finalHeight - 40);
+            ctx.fillText('Fonte: Istat - ACI - Rielaborazione: opendatasicilia.it', 10, yFooter);
         } else {
-            ctx.fillText('Fonte: dati.gov.it - Rielaborazione: opendatasicilia.it', 40, finalHeight - 40);
+            ctx.fillText('Fonte: dati.gov.it - Rielaborazione: opendatasicilia.it', 10, yFooter);
         }
         
-        ctx.fillText('https://opendatasicilia.github.io/incidenti_palermo/', 40, finalHeight - 20);
-        
-        // Logo
-        try {
-            const logo = new Image();
-            await new Promise((resolve, reject) => {
-                logo.onload = resolve;
-                logo.onerror = () => {
-                    console.warn('Logo non trovato, procedo senza');
-                    resolve();
-                };
-                logo.src = 'img/pa_hub_new.png';
-            });
-            
-            if (logo.complete && logo.naturalWidth > 0) {
-                const logoWidth = 100;
-                const logoHeight = (logoWidth * logo.naturalHeight) / logo.naturalWidth;
-                const logoX = targetWidth - logoWidth - 40;
-                const logoY = finalHeight - footerHeight + 15;
-                
-                ctx.drawImage(logo, logoX, logoY, logoWidth, logoHeight);
-                console.log('✓ Logo disegnato');
-            }
-        } catch (logoError) {
-            console.warn('Errore nel caricamento logo:', logoError);
-        }
+        // URL
+        ctx.font = '10px Arial';
+        ctx.fillStyle = '#3b82f6';
+        ctx.fillText('https://opendatasicilia.github.io/incidenti_palermo/', 10, yFooter + 20);
         
         console.log('✓ Footer disegnato');
         
-        // ===== STEP 6: Download =====
-        const dataURL = finalCanvas.toDataURL('image/png');
+        // Converti a PNG
+        const dataURL = tempCanvas.toDataURL('image/png');
         console.log('✓ PNG generato, lunghezza:', dataURL.length);
         
+        // Download
         const link = document.createElement('a');
-        const safeFilename = filename.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-        link.download = `${safeFilename}_${targetWidth}x${finalHeight}.png`;
+        link.download = filename + '.png';
         link.href = dataURL;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         
         console.log('✅ Download completato!');
-        
-        // ===== STEP 7: RIPRISTINA colori originali =====
-// ===== STEP 7: RIPRISTINA colori e font originali =====
-// Ripristina assi
-if (chartInstance.options.scales) {
-    Object.keys(originalColors.scales).forEach(scaleKey => {
-        const scale = chartInstance.options.scales[scaleKey];
-        const saved = originalColors.scales[scaleKey];
-        
-        if (scale.ticks) {
-            if (saved.ticksColor !== undefined) scale.ticks.color = saved.ticksColor;
-            if (saved.ticksFont) scale.ticks.font = saved.ticksFont;
-        }
-        if (scale.title) {
-            if (saved.titleColor !== undefined) scale.title.color = saved.titleColor;
-            if (saved.titleFont) scale.title.font = saved.titleFont;
-        }
-        if (scale.grid && saved.gridColor !== undefined) {
-            scale.grid.color = saved.gridColor;
-        }
-    });
-}
-
-// Ripristina legenda
-if (originalColors.legend !== null && chartInstance.options.plugins?.legend?.labels) {
-    if (originalColors.legend.color !== undefined) {
-        chartInstance.options.plugins.legend.labels.color = originalColors.legend.color;
-    }
-    if (originalColors.legend.font) {
-        chartInstance.options.plugins.legend.labels.font = originalColors.legend.font;
-    }
-}
-
-// Ripristina titolo
-if (originalColors.title !== null && chartInstance.options.plugins?.title) {
-    if (originalColors.title.color !== undefined) {
-        chartInstance.options.plugins.title.color = originalColors.title.color;
-    }
-    if (originalColors.title.font) {
-        chartInstance.options.plugins.title.font = originalColors.title.font;
-    }
-}
-
-// Ripristina datalabels globali
-if (originalColors.datalabels !== null && chartInstance.options.plugins?.datalabels) {
-    if (originalColors.datalabels.color !== undefined) {
-        chartInstance.options.plugins.datalabels.color = originalColors.datalabels.color;
-    }
-    if (originalColors.datalabels.font) {
-        chartInstance.options.plugins.datalabels.font = originalColors.datalabels.font;
-    }
-}
-
-// Ripristina datalabels nei dataset
-if (originalColors.datasets && chartInstance.data.datasets) {
-    chartInstance.data.datasets.forEach((dataset, index) => {
-        if (originalColors.datasets[index]?.datalabels) {
-            dataset.datalabels = originalColors.datasets[index].datalabels;
-        }
-    });
-}
-
-chartInstance.update('none');
-console.log('✓ Configurazione grafico ripristinata');
-        
         console.log('=== FINE downloadChartAsPNG ===\n');
         
     } catch (error) {
@@ -1493,184 +1203,7 @@ console.log('✓ Configurazione grafico ripristinata');
     }
 }
 
-// Funzione helper per wrappare il testo
-function wrapText(ctx, text, maxWidth, fontSize) {
-    const words = text.split(' ');
-    const lines = [];
-    let currentLine = words[0];
-    
-    ctx.font = `${fontSize}px Titillium Web`;
-    
-    for (let i = 1; i < words.length; i++) {
-        const word = words[i];
-        const width = ctx.measureText(currentLine + " " + word).width;
-        if (width < maxWidth) {
-            currentLine += " " + word;
-        } else {
-            lines.push(currentLine);
-            currentLine = word;
-        }
-    }
-    lines.push(currentLine);
-    return lines;
-}
 
-// Funzione helper per wrappare il testo (invariata)
-function wrapText(ctx, text, maxWidth, fontSize) {
-    const words = text.split(' ');
-    const lines = [];
-    let currentLine = words[0];
-    
-    ctx.font = `${fontSize}px Titillium Web`;
-    
-    for (let i = 1; i < words.length; i++) {
-        const word = words[i];
-        const width = ctx.measureText(currentLine + " " + word).width;
-        if (width < maxWidth) {
-            currentLine += " " + word;
-        } else {
-            lines.push(currentLine);
-            currentLine = word;
-        }
-    }
-    lines.push(currentLine);
-    return lines;
-}
-
-
-// Funzione helper per wrappare il testo (invariata)
-function wrapText(ctx, text, maxWidth, fontSize) {
-    const words = text.split(' ');
-    const lines = [];
-    let currentLine = words[0];
-    
-    ctx.font = `${fontSize}px Titillium Web`;
-    
-    for (let i = 1; i < words.length; i++) {
-        const word = words[i];
-        const width = ctx.measureText(currentLine + " " + word).width;
-        if (width < maxWidth) {
-            currentLine += " " + word;
-        } else {
-            lines.push(currentLine);
-            currentLine = word;
-        }
-    }
-    lines.push(currentLine);
-    return lines;
-}
-
-// Funzione helper per wrappare il testo
-function wrapText(ctx, text, maxWidth, fontSize) {
-    const words = text.split(' ');
-    const lines = [];
-    let currentLine = words[0];
-    
-    ctx.font = `${fontSize}px Titillium Web`;
-    
-    for (let i = 1; i < words.length; i++) {
-        const word = words[i];
-        const width = ctx.measureText(currentLine + " " + word).width;
-        if (width < maxWidth) {
-            currentLine += " " + word;
-        } else {
-            lines.push(currentLine);
-            currentLine = word;
-        }
-    }
-    lines.push(currentLine);
-    return lines;
-}
-
-// Funzione helper per wrappare il testo (invariata)
-function wrapText(ctx, text, maxWidth, fontSize) {
-    const words = text.split(' ');
-    const lines = [];
-    let currentLine = words[0];
-    
-    ctx.font = `${fontSize}px Titillium Web`;
-    
-    for (let i = 1; i < words.length; i++) {
-        const word = words[i];
-        const width = ctx.measureText(currentLine + " " + word).width;
-        if (width < maxWidth) {
-            currentLine += " " + word;
-        } else {
-            lines.push(currentLine);
-            currentLine = word;
-        }
-    }
-    lines.push(currentLine);
-    return lines;
-}
-
-// Funzione helper per wrappare il testo (invariata)
-function wrapText(ctx, text, maxWidth, fontSize) {
-    const words = text.split(' ');
-    const lines = [];
-    let currentLine = words[0];
-    
-    ctx.font = `${fontSize}px Titillium Web`;
-    
-    for (let i = 1; i < words.length; i++) {
-        const word = words[i];
-        const width = ctx.measureText(currentLine + " " + word).width;
-        if (width < maxWidth) {
-            currentLine += " " + word;
-        } else {
-            lines.push(currentLine);
-            currentLine = word;
-        }
-    }
-    lines.push(currentLine);
-    return lines;
-}
-
-
-
-// Funzione helper per wrappare il testo
-function wrapText(ctx, text, maxWidth, fontSize) {
-    const words = text.split(' ');
-    const lines = [];
-    let currentLine = words[0];
-    
-    ctx.font = `${fontSize}px Titillium Web`;
-    
-    for (let i = 1; i < words.length; i++) {
-        const word = words[i];
-        const width = ctx.measureText(currentLine + " " + word).width;
-        if (width < maxWidth) {
-            currentLine += " " + word;
-        } else {
-            lines.push(currentLine);
-            currentLine = word;
-        }
-    }
-    lines.push(currentLine);
-    return lines;
-}
-
-function switchAnalyticsTab(tabName) {
-    // Nascondi tutti i tab
-    document.querySelectorAll('.analytics-tab').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    document.querySelectorAll('.analytics-tab-content').forEach(content => {
-        content.classList.remove('active');
-    });
-    
-    // Mostra solo i tab desiderati (escludi condizioni)
-    const validTabs = ['panoramica', 'temporale', 'oraria', 'insights'];
-    if (!validTabs.includes(tabName)) {
-        tabName = 'panoramica'; // Fallback al primo tab valido
-    }
-    
-    const selectedTab = document.querySelector(`[data-tab="${tabName}"]`);
-    const selectedContent = document.getElementById(`tab-${tabName}`);
-    
-    if (selectedTab) selectedTab.classList.add('active');
-    if (selectedContent) selectedContent.classList.add('active');
-}
 
 // Data Table Functions
 function openDataTable() {
@@ -2028,7 +1561,7 @@ paint: {
         filter: ['has', 'point_count'],
         layout: {
             'text-field': ['get', 'point_count'],
-            'text-font': ['Open Sans Bold', 'Titillium Web Unicode MS Bold'],
+            'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
             'text-size': [
                 'interpolate',
                 ['linear'],
@@ -5884,6 +5417,182 @@ function filterByFasciaOraria(fascia) {
     }
 }
 
+// Condizioni Charts
+function updateCondizioniCharts(data) {
+    const luceData = {};
+    data.forEach(row => {
+        const luce = row['Giorno/Notte'];
+        if (luce) {
+            luceData[luce] = (luceData[luce] || 0) + 1;
+        }
+    });
+    
+    const luceBuioCanvas = document.getElementById('chart-luce-buio');
+    if (luceBuioCanvas) {
+        if (analyticsCharts.luceBuio) analyticsCharts.luceBuio.destroy();
+        analyticsCharts.luceBuio = new Chart(luceBuioCanvas, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(luceData),
+                datasets: [{
+                    data: Object.values(luceData),
+                    backgroundColor: ['#fbbf24', '#1e3a8a']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { 
+                        display: true,
+                        labels: {
+                            color: '#f1f5f9',
+                            font: { size: 10 }
+                        }
+                    },
+                    datalabels: {
+                        display: true,
+                        color: '#1e293b',
+                        font: { weight: 'bold', size: 10 },
+                        formatter: (value, ctx) => {
+                            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return `${value}\n(${percentage}%)`;
+                        },
+                        backgroundColor: 'rgba(241, 245, 249, 0.95)',
+                        borderRadius: 3,
+                        padding: 4
+                    }
+                }
+            }
+        });
+    }
+    
+    const condizioniData = {};
+    data.forEach(row => {
+        const cond = row['Condizioni luce (Visibilità)'];
+        if (cond) {
+            condizioniData[cond] = (condizioniData[cond] || 0) + 1;
+        }
+    });
+    
+    const condizioniCanvas = document.getElementById('chart-condizioni-dettaglio');
+    if (condizioniCanvas) {
+        if (analyticsCharts.condizioniDettaglio) analyticsCharts.condizioniDettaglio.destroy();
+        analyticsCharts.condizioniDettaglio = new Chart(condizioniCanvas, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(condizioniData),
+                datasets: [{
+                    label: 'Incidenti',
+                    data: Object.values(condizioniData),
+                    backgroundColor: '#8b5cf6'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    datalabels: {
+                        display: true,
+                        anchor: 'end',
+                        align: 'top',
+                        offset: 2,
+                        color: '#1e293b',
+                        font: { weight: 'bold', size: 9 },
+                        backgroundColor: 'rgba(241, 245, 249, 0.95)',
+                        borderRadius: 3,
+                        padding: 3
+                    }
+                },
+                scales: {
+                    x: { 
+                        ticks: { 
+                            color: '#94a3b8',
+                            font: { size: 10 }
+                        }
+                    },
+                    y: { 
+                        ticks: { 
+                            color: '#94a3b8',
+                            font: { size: 10 }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    const stagioniCondizioniData = {};
+    data.forEach(row => {
+        const stagione = row.Stagione;
+        const luce = row['Giorno/Notte'];
+        if (stagione && luce) {
+            if (!stagioniCondizioniData[stagione]) {
+                stagioniCondizioniData[stagione] = {};
+            }
+            stagioniCondizioniData[stagione][luce] = (stagioniCondizioniData[stagione][luce] || 0) + 1;
+        }
+    });
+    
+    const stagioni = ['Primavera', 'Estate', 'Autunno', 'Inverno'];
+    const giornoData = stagioni.map(s => (stagioniCondizioniData[s] && stagioniCondizioniData[s]['Giorno']) || 0);
+    const notteData = stagioni.map(s => (stagioniCondizioniData[s] && stagioniCondizioniData[s]['Notte']) || 0);
+    
+    const stagioniCondizioniCanvas = document.getElementById('chart-stagioni-condizioni');
+    if (stagioniCondizioniCanvas) {
+        if (analyticsCharts.stagioniCondizioni) analyticsCharts.stagioniCondizioni.destroy();
+        analyticsCharts.stagioniCondizioni = new Chart(stagioniCondizioniCanvas, {
+            type: 'bar',
+            data: {
+                labels: stagioni,
+                datasets: [
+                    {
+                        label: 'Giorno',
+                        data: giornoData,
+                        backgroundColor: '#fbbf24'
+                    },
+                    {
+                        label: 'Notte',
+                        data: notteData,
+                        backgroundColor: '#1e3a8a'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: {
+                            color: '#f1f5f9',
+                            font: { size: 10 }
+                        }
+                    },
+                    datalabels: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: { 
+                        ticks: { 
+                            color: '#94a3b8',
+                            font: { size: 10 }
+                        }
+                    },
+                    y: { 
+                        ticks: { 
+                            color: '#94a3b8',
+                            font: { size: 10 }
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
 
 // Update Insights
 function updateInsights(data) {
