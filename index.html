@@ -253,11 +253,11 @@
                         <select id="filter-condizioni-luce"></select>
                     </div>
                     <div class="filter-group">
-                        <label class="filter-label">Fascia Oraria (4 fasce)</label>
+                        <label class="filter-label">Fascia oraria (4 fasce)</label>
                         <select id="filter-fascia-4"></select>
                     </div>
                     <div class="filter-group">
-                        <label class="filter-label">Fascia Oraria (6 fasce)</label>
+                        <label class="filter-label">Fascia oraria (6 fasce)</label>
                         <select id="filter-fascia-6"></select>
                     </div>
                     <div class="filter-group">
@@ -518,7 +518,7 @@
     <button class="analytics-tab active" data-tab="serie-storica"><i class="fas fa-chart-area"></i> Serie Storica</button>
     <button class="analytics-tab" data-tab="panoramica"><i class="fas fa-chart-bar"></i> Panoramica</button>
     <button class="analytics-tab" data-tab="temporale"><i class="fas fa-calendar-alt"></i> Temporale</button>
-    <button class="analytics-tab" data-tab="oraria"><i class="fas fa-clock"></i> Oraria</button>
+    <button class="analytics-tab" data-tab="oraria"><i class="fas fa-clock"></i> oraria</button>
   <!--  <button class="analytics-tab" data-tab="condizioni"><i class="fas fa-cloud-sun"></i> Condizioni</button> -->
     <button class="analytics-tab" data-tab="insights"><i class="fas fa-lightbulb"></i> Insights</button>
 </div>
@@ -548,13 +548,13 @@
 <div class="analytics-tab-content" id="tab-panoramica">
     <div class="charts-grid charts-grid-two-col">
         <div class="chart-container">
-            <h3>Incidenti per Quartiere</h3>
+            <h3>Incidenti per quartiere</h3>
             <div class="chart-wrapper">
                 <canvas id="chart-quartieri-heatmap"></canvas>
             </div>
         </div>
         <div class="chart-container">
-            <h3>Top 25 Strade con più Incidenti</h3>
+            <h3>Top 25 - Strade con più incidenti</h3>
             <div class="chart-wrapper">
                 <canvas id="chart-top-strade"></canvas>
             </div>
@@ -573,7 +573,7 @@
             
             <!-- 1. Distribuzione per Giorno della Settimana -->
             <div class="chart-container" style="min-height: 280px;">
-                <h3>Distribuzione per Giorno della Settimana</h3>
+                <h3>Distribuzione per giorno della Ssettimana</h3>
                 <div class="chart-wrapper">
                     <canvas id="chart-giorno-settimana"></canvas>
                 </div>
@@ -581,7 +581,7 @@
             
             <!-- 2. Primavera -->
             <div class="chart-container" style="min-height: 240px;">
-                <h3>Primavera - Distribuzione Oraria</h3>
+                <h3>Primavera - Distribuzione per fase giornaliera</h3>
                 <div class="chart-wrapper">
                     <canvas id="chart-primavera-oraria"></canvas>
                 </div>
@@ -589,7 +589,7 @@
             
             <!-- 3. Autunno -->
             <div class="chart-container" style="min-height: 240px;">
-                <h3>Autunno - Distribuzione Oraria</h3>
+                <h3>Autunno - Distribuzione per fase giornaliera</h3>
                 <div class="chart-wrapper">
                     <canvas id="chart-autunno-oraria"></canvas>
                 </div>
@@ -602,7 +602,7 @@
             
             <!-- 1. Incidenti per Giorno del Mese -->
             <div class="chart-container" style="min-height: 280px;">
-                <h3>Incidenti per Giorno del Mese</h3>
+                <h3>Incidenti per giorno del mese</h3>
                 <div class="chart-wrapper">
                     <canvas id="chart-giorni-mese"></canvas>
                 </div>
@@ -610,7 +610,7 @@
             
             <!-- 2. Estate -->
             <div class="chart-container" style="min-height: 240px;">
-                <h3>Estate - Distribuzione Oraria</h3>
+                <h3>Estate - Distribuzione per fase giornaliera</h3>
                 <div class="chart-wrapper">
                     <canvas id="chart-estate-oraria"></canvas>
                 </div>
@@ -618,7 +618,7 @@
             
             <!-- 3. Inverno -->
             <div class="chart-container" style="min-height: 240px;">
-                <h3>Inverno - Distribuzione Oraria</h3>
+                <h3>Inverno - Distribuzione per fase giornaliera</h3>
                 <div class="chart-wrapper">
                     <canvas id="chart-inverno-oraria"></canvas>
                 </div>
@@ -630,7 +630,7 @@
     
     <!-- CALENDARIO HEATMAP A TUTTA LARGHEZZA IN BASSO -->
     <div class="chart-container chart-full" style="min-height: 330px; margin-top: 24px;">
-        <h3>Calendario Incidenti (Heatmap)</h3>
+        <h3>Calendario incidenti (Heatmap)</h3>
         <div class="chart-wrapper">
             <div id="chart-calendario-heatmap" class="calendar-heatmap"></div>
         </div>
@@ -638,18 +638,18 @@
     
 </div>
 
-<!-- Oraria Tab -->
+<!-- oraria Tab -->
 <div class="analytics-tab-content" id="tab-oraria">
     <div class="charts-grid charts-grid-two-col">
         <!-- Prima riga: Fasce Orarie -->
         <div class="chart-container">
-            <h3>Distribuzione per Fascia Oraria</h3>
+            <h3>Distribuzione per fase giornaliera</h3>
             <div class="chart-wrapper">
                 <canvas id="chart-fascia-oraria"></canvas>
             </div>
         </div>
         <div class="chart-container">
-            <h3>Incidenti per Orario</h3>
+            <h3>Distribuzione per fascia oraria</h3>
             <div class="chart-wrapper">
                 <canvas id="chart-orari-dettaglio"></canvas>
             </div>
@@ -657,7 +657,7 @@
         
         <!-- Seconda riga: Distribuzione Settimanale -->
         <div class="chart-container">
-            <h3>Distribuzione Settimanale</h3>
+            <h3>Distribuzione settimanale</h3>
             <div class="chart-wrapper">
                 <canvas id="chart-settimanale-area"></canvas>
             </div>
@@ -670,30 +670,6 @@
         </div>
     </div>
 </div>
-
-            <!-- Condizioni Tab
-            <div class="analytics-tab-content" id="tab-condizioni">
-                <div class="charts-grid">
-                    <div class="chart-container">
-                        <h3>Luce vs Buio</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="chart-luce-buio"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <h3>Dettaglio Condizioni Luce</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="chart-condizioni-dettaglio"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-container chart-full">
-                        <h3>Confronto Stagionale delle Condizioni</h3>
-                        <div class="chart-wrapper">
-                            <canvas id="chart-stagioni-condizioni"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
 
             <!-- Insights Tab -->
             <div class="analytics-tab-content" id="tab-insights">

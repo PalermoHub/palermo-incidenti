@@ -4840,93 +4840,102 @@ function updateTemporaleCharts(data) {
         });
     }
     
-    // ========================================
-    // GRAFICO 6: GIORNI DEL MESE (AREA)
-    // ========================================
-    const giorniMeseData = {};
-    for (let i = 1; i <= 31; i++) {
-        giorniMeseData[i] = 0;
+   // ========================================
+// GRAFICO 6: GIORNI DEL MESE (AREA)
+// ========================================
+const giorniMeseData = {};
+for (let i = 1; i <= 31; i++) {
+    giorniMeseData[i] = 0;
+}
+
+data.forEach(row => {
+    const dataStr = row.Data;
+    if (dataStr) {
+        const giorno = parseInt(dataStr.split('/')[0]);
+        if (giorno >= 1 && giorno <= 31) {
+            giorniMeseData[giorno]++;
+        }
     }
-    
-    data.forEach(row => {
-        const dataStr = row.Data;
-        if (dataStr) {
-            const giorno = parseInt(dataStr.split('/')[0]);
-            if (giorno >= 1 && giorno <= 31) {
-                giorniMeseData[giorno]++;
+});
+
+const giorniMeseLabels = Array.from({length: 31}, (_, i) => i + 1);
+const giorniMeseCounts = giorniMeseLabels.map(g => giorniMeseData[g]);
+
+const giorniMeseCanvas = document.getElementById('chart-giorni-mese');
+if (giorniMeseCanvas) {
+    if (analyticsCharts.giorniMese) analyticsCharts.giorniMese.destroy();
+    analyticsCharts.giorniMese = new Chart(giorniMeseCanvas, {
+        type: 'line',
+        data: {
+            labels: giorniMeseLabels,
+            datasets: [{
+                label: 'Incidenti',
+                data: giorniMeseCounts,
+                backgroundColor: 'rgba(139, 92, 246, 0.5)',
+                borderColor: '#8b5cf6',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#8b5cf6',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,          // ✅ AUMENTATO da 1 a 2
+                pointRadius: 5,               // ✅ AUMENTATO da 2 a 5
+                pointHoverRadius: 7           // ✅ AUMENTATO da 5 a 7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                    padding: 12,
+                    titleFont: { size: 11, weight: 'bold' },
+                    bodyFont: { size: 10 },
+                    callbacks: {
+                        title: function(context) {
+                            return `Giorno ${context[0].label}`;
+                        },
+                        label: function(context) {
+                            return `Incidenti: ${context.parsed.y}`;
+                        }
+                    }
+                },
+                datalabels: {
+                    display: true,              // ✅ ABILITATO (era false)
+                    align: 'top',               // ✅ NUOVO: posizione sopra i punti
+                    anchor: 'end',              // ✅ NUOVO: ancoraggio al punto
+                    offset: 4,                  // ✅ NUOVO: distanza dal punto
+                    color: '#f1f5f9',           // ✅ NUOVO: colore chiaro
+                    font: {                     // ✅ NUOVO: stile font
+                        weight: 'bold', 
+                        size: 9
+                    },
+                    formatter: (value) => value > 0 ? value : ''  // ✅ MOSTRA SOLO SE > 0
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { 
+                        color: '#f1f5f9',
+                        font: { size: 9 },
+                        maxRotation: 0
+                    },
+                    grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: { 
+                        color: '#f1f5f9',
+                        font: { size: 10 }
+                    },
+                    grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                }
             }
         }
     });
-    
-    const giorniMeseLabels = Array.from({length: 31}, (_, i) => i + 1);
-    const giorniMeseCounts = giorniMeseLabels.map(g => giorniMeseData[g]);
-    
-    const giorniMeseCanvas = document.getElementById('chart-giorni-mese');
-    if (giorniMeseCanvas) {
-        if (analyticsCharts.giorniMese) analyticsCharts.giorniMese.destroy();
-        analyticsCharts.giorniMese = new Chart(giorniMeseCanvas, {
-            type: 'line',
-            data: {
-                labels: giorniMeseLabels,
-                datasets: [{
-                    label: 'Incidenti',
-                    data: giorniMeseCounts,
-                    backgroundColor: 'rgba(139, 92, 246, 0.5)',
-                    borderColor: '#8b5cf6',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#8b5cf6',
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 1,
-                    pointRadius: 2,
-                    pointHoverRadius: 5
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                        padding: 12,
-                        titleFont: { size: 11, weight: 'bold' },
-                        bodyFont: { size: 10 },
-                        callbacks: {
-                            title: function(context) {
-                                return `Giorno ${context[0].label}`;
-                            },
-                            label: function(context) {
-                                return `Incidenti: ${context.parsed.y}`;
-                            }
-                        }
-                    },
-                    datalabels: {
-                        display: false
-                    }
-                },
-                scales: {
-                    x: {
-                        ticks: { 
-                            color: '#f1f5f9',
-                            font: { size: 9 },
-                            maxRotation: 0
-                        },
-                        grid: { color: 'rgba(148, 163, 184, 0.1)' }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        ticks: { 
-                            color: '#f1f5f9',
-                            font: { size: 10 }
-                        },
-                        grid: { color: 'rgba(148, 163, 184, 0.1)' }
-                    }
-                }
-            }
-        });
-    }
+}
     
 	// ========================================
 // GRAFICO 7: CALENDARIO HEATMAP CON FILTRO

@@ -2266,6 +2266,7 @@ select option {
     #analytics-side-panel {
         width: 400px;
         right: 5px;
+		    gap: 48px;
     }
     
     .section-header {
