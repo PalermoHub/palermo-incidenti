@@ -20,40 +20,9 @@ let customChartConfig = {
 // Inizializza subito gli event listener quando il DOM è pronto
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Chart Builder: DOM caricato');
-    
-    // Fix per mobile - previeni doppio evento
-    const triggerBtn = document.getElementById('chart-builder-trigger');
-    if (triggerBtn) {
-        // Rimuovi event listener esistenti
-        const newTrigger = triggerBtn.cloneNode(true);
-        triggerBtn.parentNode.replaceChild(newTrigger, triggerBtn);
-        
-        // Aggiungi event listener ottimizzato
-        newTrigger.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Controlla se un modale è già aperto
-            if (document.body.classList.contains('analytics-panel-open')) {
-                console.log('Analytics panel già aperto');
-                return;
-            }
-            
-            console.log('Chart Builder: Click sul pulsante trigger');
-            openChartBuilder();
-        });
-        
-        // Fix per iOS
-        newTrigger.addEventListener('touchstart', function(e) {
-            // Non prevenire default per permettere il tocco
-        });
-    }
-    
-    // Inizializza il resto quando disponibile
-    setTimeout(() => {
-        initChartBuilder();
-    }, 500);
+    initChartBuilderUI();
 });
+
 // Funzione per inizializzare solo l'UI (non richiede dati)
 function initChartBuilderUI() {
     console.log('Chart Builder: Inizializzazione UI...');
@@ -99,49 +68,7 @@ function initChartBuilderUI() {
         initChartBuilder();
     }, 500);
     
-	document.addEventListener('DOMContentLoaded', function() {
-    const triggerBtn = document.getElementById('chart-builder-trigger');
-    
-    if (triggerBtn) {
-        // Rimuovi event listener esistenti
-        triggerBtn.replaceWith(triggerBtn.cloneNode(true));
-        
-        // Aggiungi nuovo event listener
-        const newTrigger = document.getElementById('chart-builder-trigger');
-        newTrigger.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            openChartBuilder();
-        });
-        
-        // Fix per mobile
-        newTrigger.addEventListener('touchstart', function(e) {
-            e.preventDefault();
-            this.click();
-        });
-    }
-});
-	
     console.log('Chart Builder: UI inizializzata');
-}
-
-
-function openChartBuilder() {
-    const modal = document.getElementById('chart-builder-modal');
-    if (modal) {
-        modal.classList.add('show');
-        document.body.classList.add('modal-open'); // Aggiungi stato
-        console.log('Chart Builder aperto');
-    }
-}
-
-function closeChartBuilder() {
-    const modal = document.getElementById('chart-builder-modal');
-    if (modal) {
-        modal.classList.remove('show');
-        document.body.classList.remove('modal-open'); // Rimuovi stato
-        console.log('Chart Builder chiuso');
-    }
 }
 
 // ============================================

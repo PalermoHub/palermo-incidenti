@@ -201,8 +201,6 @@
             // Re-initialize tooltips when modal opens
             setTimeout(initializeTooltips, 100);
         }
-		
-		 document.body.classList.add('modal-open');
     }
     
     // Close Modal
@@ -234,8 +232,6 @@
             // Re-enable body scroll
             document.body.style.overflow = '';
         }
-		
-		document.body.classList.remove('modal-open');
     }
     
     // Switch Tab

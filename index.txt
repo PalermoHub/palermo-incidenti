@@ -786,7 +786,6 @@
 </button>
 
 <!-- Footer Modal Panel -->
-
 <div class="footer-modal" id="footer-modal">
     <div class="footer-modal-header">
         <h3><i class="fas fa-chart-bar"></i> Informazioni Dataset</h3>
@@ -1219,7 +1218,7 @@
 <!-- Posiziona PRIMA di </body> e PRIMA di tutti gli script -->
 <!-- ============================================ -->
 
-
+<!-- Chart Builder Modal -->
 <div class="chart-builder-modal" id="chart-builder-modal">
     <div class="chart-builder-content">
         <!-- Header -->

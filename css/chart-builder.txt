@@ -9,7 +9,7 @@
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 1499!important;
+    z-index: 1500;
     background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
     color: white;
     border: none;
@@ -42,30 +42,34 @@
 
 /* Chart Builder Modal */
 .chart-builder-modal {
+    display: none;
     position: fixed;
-    top: -100%; /* Parte dall'alto */
-    right: 0; /* Posizionato a destra */
-    width: calc(100vw - 320px); /* Stessa larghezza di analytics */
-    height: 100vh;
-    background: #ffffff;
-    box-shadow: -4px 0 30px rgba(0,0,0,0.6);
-    z-index: 2500; /* Stesso z-index di analytics */
-    transition: top 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden; /* Rimuovi scroll orizzontale */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 5000;
+    padding: 20px;
+    overflow-y: auto;
 }
 
 .chart-builder-modal.show {
-    top: 0; /* Scorrimento dall'alto verso il basso */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .chart-builder-content {
-    flex: 1;
+    background: #ffffff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 1400px;
+    max-height: 90vh;
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* Rimuovi max-height */
-    min-height: 0;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
 }
 
 /* Header */

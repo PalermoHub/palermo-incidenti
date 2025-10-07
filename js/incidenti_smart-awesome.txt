@@ -1,7 +1,13 @@
 // ==========================================
 // INCIDENTI PALERMO - DASHBOARD INTERATTIVA
-// File JavaScript CORRETTO - Clustering Funzionante
-// Versione: 2.1 - FIXED
+// File JavaScript Completo con Icone Font Awesome
+// Versione: 2.0 - Font Awesome Edition
+// Build: 2025-10-02T19:29:13Z
+// ==========================================
+
+
+// ==========================================
+// PARTE 1 - incidenti_part1
 // ==========================================
 
 // ==========================================
@@ -36,10 +42,12 @@ const MESI_ITALIANI = [
     'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
 ];
 
+// Dopo le altre costanti
 const MESI_ITALIANI_CAL = [
     'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
     'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
 ];
+
 
 const GIORNI_SETTIMANA = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
 const GIORNI_SETTIMANA_SHORT = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
@@ -52,7 +60,7 @@ Chart.defaults.set('plugins.datalabels', {
     display: false
 });
 
-// Color Map per tipologie
+// Color Map per tipologie (invariato)
 const colorMap = {
     'M': '#ef4444',  // Rosso - Mortale
     'R': '#a855f7',  // Viola - Riserva  
@@ -60,12 +68,12 @@ const colorMap = {
     'C': '#10b981'   // Verde - Cose
 };
 
-// Icone Font Awesome per tipologie
+// Icone Font Awesome per tipologie (AGGIORNATO)
 const tipologiaIcons = {
-    'M': '<i class="fas fa-skull"></i>',
-    'R': '<i class="fas fa-ambulance"></i>',
-    'F': '<i class="fas fa-user-injured"></i>',
-    'C': '<i class="fas fa-car-crash"></i>'
+    'M': '<i class="fas fa-skull"></i>',           // Mortale
+    'R': '<i class="fas fa-ambulance"></i>',       // Riserva
+    'F': '<i class="fas fa-user-injured"></i>',    // Feriti
+    'C': '<i class="fas fa-car-crash"></i>'        // Cose
 };
 
 // Nomi tipologie
@@ -76,13 +84,12 @@ const tipologiaNames = {
     'C': 'Cose'
 };
 
-// Basemap styles
-// ✅ Basemap styles SENZA glyphs (evita errori di caricamento font)
+// Basemap styles (invariato)
 const basemapStyles = {
     'carto-dark': {
         version: 8,
-		glyphs: 'https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=BZTlvCzEgnATtZxkip69', // ✅ Font gratuiti       
-	   sources: {
+        glyphs: 'https://api.mapbox.com/fonts/v1/mapbox/{fontstack}/{range}.pbf?access_token=eyJ1IjoiZ2J2aXRyYW5vIiwiYSI6ImNtNWpwMDloejBtN3ozM3F3NzJvZGh2ZG4ifQ.AXXkYYL7XY6RBVXpJ2IrBA',  // AGGIUNTO
+        sources: {
             'carto': {
                 type: 'raster',
                 tiles: ['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'],
@@ -98,7 +105,7 @@ const basemapStyles = {
     },
     'osm': {
         version: 8,
-		glyphs: 'https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=BZTlvCzEgnATtZxkip69', // ✅ Font gratuiti
+        glyphs: 'https://api.mapbox.com/fonts/v1/mapbox/{fontstack}/{range}.pbf?access_token=eyJ1IjoiZ2J2aXRyYW5vIiwiYSI6ImNtNWpwMDloejBtN3ozM3F3NzJvZGh2ZG4ifQ.AXXkYYL7XY6RBVXpJ2IrBA',  // AGGIUNTO
         sources: {
             'osm': {
                 type: 'raster',
@@ -115,7 +122,7 @@ const basemapStyles = {
     },
     'satellite': {
         version: 8,
-		glyphs: 'https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=BZTlvCzEgnATtZxkip69', // ✅ Font gratuiti
+        glyphs: 'https://api.mapbox.com/fonts/v1/mapbox/{fontstack}/{range}.pbf?access_token=eyJ1IjoiZ2J2aXRyYW5vIiwiYSI6ImNtNWpwMDloejBtN3ozM3F3NzJvZGh2ZG4ifQ.AXXkYYL7XY6RBVXpJ2IrBA',  // AGGIUNTO
         sources: {
             'satellite': {
                 type: 'raster',
@@ -132,7 +139,7 @@ const basemapStyles = {
     },
     'carto-light': {
         version: 8,
-		glyphs: 'https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=BZTlvCzEgnATtZxkip69', // ✅ Font gratuiti
+        glyphs: 'https://api.mapbox.com/fonts/v1/mapbox/{fontstack}/{range}.pbf?access_token=eyJ1IjoiZ2J2aXRyYW5vIiwiYSI6ImNtNWpwMDloejBtN3ozM3F3NzJvZGh2ZG4ifQ.AXXkYYL7XY6RBVXpJ2IrBA',  // AGGIUNTO
         sources: {
             'carto': {
                 type: 'raster',
@@ -171,7 +178,6 @@ const filterDependencies = {
     'filter-quartiere': ['filter-upl']
 };
 
-
 // ==========================================
 // PARTE 2 - incidenti_part2
 // ==========================================
@@ -181,13 +187,14 @@ const filterDependencies = {
 // ==========================================
 
 // Initialization
+
 async function init() {
     try {
         console.log('Inizio caricamento CSV...');
         document.getElementById('loading').innerHTML = '<div>Caricamento CSV...</div><small>Download in corso</small>';
         
         await loadCSV();
-        await loadSerieStoricaCSV();
+        await loadSerieStoricaCSV(); // AGGIUNGI QUESTA RIGA
         
         console.log('CSV caricato, inizializzazione mappa...');
         document.getElementById('loading').innerHTML = '<div>Creazione mappa...</div><small>Attendere</small>';
@@ -207,6 +214,7 @@ async function init() {
         }, 2000);
     }
 }
+
 
 // CSV Loading
 async function loadCSV() {
@@ -238,6 +246,7 @@ async function loadCSV() {
     });
 }
 
+
 // Carica CSV Serie Storica
 async function loadSerieStoricaCSV() {
     return new Promise((resolve, reject) => {
@@ -262,14 +271,11 @@ async function loadSerieStoricaCSV() {
         });
     });
 }
-
-// Toggle Heatmap
+// Toggle Heatmap (AGGIORNATO CON FONT AWESOME)
 function toggleHeatmap() {
     showHeatmap = !showHeatmap;
     const btn = document.getElementById('btn-toggle-heatmap');
     const btnMap = document.getElementById('btn-heatmap-map');
-    const pointsLegend = document.getElementById('points-legend');
-    const heatmapLegend = document.getElementById('heatmap-legend');
     
     if (showHeatmap) {
         map.setLayoutProperty('incidenti-heatmap', 'visibility', 'visible');
@@ -284,6 +290,8 @@ function toggleHeatmap() {
             btnMap.innerHTML = '<i class="fa-solid fa-power-off"></i> Heatmap - Off';
             btnMap.classList.add('active');
         }
+        const analyticsPanel = document.getElementById('analytics-side-panel');
+        const heatmapLegend = document.getElementById('heatmap-legend');
         if (pointsLegend) pointsLegend.classList.add('hidden');
         if (heatmapLegend) heatmapLegend.classList.remove('hidden');
     } else {
@@ -299,66 +307,63 @@ function toggleHeatmap() {
             btnMap.innerHTML = '<i class="fas fa-fire"></i> Heatmap';
             btnMap.classList.remove('active');
         }
+        const analyticsPanel = document.getElementById('analytics-side-panel');
+        const heatmapLegend = document.getElementById('heatmap-legend');
         if (pointsLegend) pointsLegend.classList.remove('hidden');
         if (heatmapLegend) heatmapLegend.classList.add('hidden');
     }
 }
 
-// Toggle Clustering - VERSIONE CORRETTA
 function toggleClustering() {
     showClustering = !showClustering;
     const btn = document.getElementById('btn-clustering-map');
+    const btnTopLuoghi = document.getElementById('btn-top-luoghi-map');
     
     if (showClustering) {
-        // Disattiva heatmap se attiva
         if (showHeatmap) {
             toggleHeatmap();
         }
         
-        // Nascondi i layer standard
         ['C', 'F', 'R', 'M'].forEach(tipo => {
             if (map.getLayer(`incidenti-${tipo}`)) {
                 map.setLayoutProperty(`incidenti-${tipo}`, 'visibility', 'none');
             }
         });
         
-        // Crea i layer clustering
         createClusteringLayers();
         
-        // Aggiorna pulsante
         if (btn) {
             btn.innerHTML = '<i class="fa-solid fa-power-off"></i> <span>Clustering - Off</span>';
             btn.classList.add('active');
         }
         
+        // RIMOSSO: Non gestiamo più display: block/none
+        // Il pulsante Top Luoghi è sempre visibile
+        
+       // calculateTopLuoghi();
+        
     } else {
-        // Rimuovi i layer clustering
         const layersToRemove = ['cluster-count', 'clusters', 'unclustered-point'];
         layersToRemove.forEach(layerId => {
             if (map.getLayer(layerId)) {
-                map.removeLayer(layerId);
+                map.setLayoutProperty(layerId, 'visibility', 'none');
             }
         });
         
-        // Rimuovi il source
-        if (map.getSource('incidenti-cluster')) {
-            map.removeSource('incidenti-cluster');
-        }
-        
-        // Mostra i layer standard
         ['C', 'F', 'R', 'M'].forEach(tipo => {
             if (map.getLayer(`incidenti-${tipo}`)) {
                 map.setLayoutProperty(`incidenti-${tipo}`, 'visibility', 'visible');
             }
         });
         
-        // Aggiorna pulsante
         if (btn) {
             btn.innerHTML = '<i class="fas fa-circle"></i> <span>Clustering</span>';
             btn.classList.remove('active');
         }
         
-        // Chiudi modale top luoghi se aperta
+        // RIMOSSO: Non nascondiamo più il pulsante
+        // btnTopLuoghi.style.display = 'none';
+        
         const modal = document.getElementById('top-luoghi-modal');
         if (modal && modal.classList.contains('show')) {
             closeTopLuoghiModal();
@@ -379,7 +384,7 @@ function toggleSection(sectionId) {
     if (toggle) toggle.classList.toggle('collapsed');
 }
 
-// ✅ FUNZIONE CORRETTA - Toggle Sidebar (con chiusura graffa)
+// Toggle Sidebar
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const toggle = document.getElementById('mobile-toggle');
@@ -397,7 +402,52 @@ function toggleSidebar() {
             overlay.classList.remove('show');
         }
     }
-} // ✅ CHIUSURA CORRETTA
+	
+	// Toggle Desktop Sidebar
+function toggleDesktopSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('sidebar-desktop-toggle');
+    const toggleIcon = toggleBtn?.querySelector('i');
+    
+    if (!sidebar) return;
+    
+    // Toggle collapsed state
+    sidebar.classList.toggle('collapsed');
+    
+    // Update icon
+    if (toggleIcon) {
+        if (sidebar.classList.contains('collapsed')) {
+            toggleIcon.className = 'fas fa-chevron-right';
+            toggleBtn.title = 'Apri pannello filtri';
+        } else {
+            toggleIcon.className = 'fas fa-chevron-left';
+            toggleBtn.title = 'Chiudi pannello filtri';
+        }
+    }
+    
+    // Salva stato in localStorage
+    localStorage.setItem('sidebarDesktopState', 
+        sidebar.classList.contains('collapsed') ? 'collapsed' : 'open'
+    );
+}
+
+// Ripristina stato sidebar al caricamento
+function restoreDesktopSidebarState() {
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('sidebar-desktop-toggle');
+    const toggleIcon = toggleBtn?.querySelector('i');
+    const savedState = localStorage.getItem('sidebarDesktopState');
+    
+    // Default: aperta (nessuna classe collapsed)
+    if (savedState === 'collapsed') {
+        sidebar?.classList.add('collapsed');
+        if (toggleIcon) {
+            toggleIcon.className = 'fas fa-chevron-right';
+            toggleBtn.title = 'Apri pannello filtri';
+        }
+    }
+}
+}
 
 function closeSidebar() {
     const sidebar = document.getElementById('sidebar');
@@ -409,7 +459,9 @@ function closeSidebar() {
     if (overlay) overlay.classList.remove('show');
 }
 
-// ✅ SINGOLA DEFINIZIONE - Toggle Desktop Sidebar
+// ===== AGGIUNGI QUESTE FUNZIONI QUI =====
+
+// Toggle Desktop Sidebar
 function toggleDesktopSidebar() {
     const sidebar = document.getElementById('sidebar');
     const toggleBtn = document.getElementById('sidebar-desktop-toggle');
@@ -417,8 +469,11 @@ function toggleDesktopSidebar() {
     
     if (!sidebar) return;
     
+    // Toggle collapsed state
     sidebar.classList.toggle('collapsed');
     
+
+    // Update icon
     if (toggleIcon) {
         if (sidebar.classList.contains('collapsed')) {
             toggleIcon.className = 'fas fa-chevron-right';
@@ -429,30 +484,32 @@ function toggleDesktopSidebar() {
         }
     }
     
+    // Salva stato in localStorage
     localStorage.setItem('sidebarDesktopState', 
         sidebar.classList.contains('collapsed') ? 'collapsed' : 'open'
     );
 }
 
 // Ripristina stato sidebar al caricamento
+// Ripristina stato sidebar al caricamento
 function restoreDesktopSidebarState() {
     const sidebar = document.getElementById('sidebar');
     const toggleBtn = document.getElementById('sidebar-desktop-toggle');
     const toggleIcon = toggleBtn?.querySelector('i');
     
-    sidebar?.classList.remove('collapsed');
+    // FORZA SEMPRE APERTO ALL'AVVIO
+    sidebar?.classList.remove('collapsed'); // Rimuovi classe collapsed se presente
     if (toggleIcon) {
         toggleIcon.className = 'fas fa-chevron-left';
         toggleBtn.title = 'Chiudi pannello filtri';
     }
     
+    // Opzionale: pulisci il localStorage per partire sempre da zero
     localStorage.removeItem('sidebarDesktopState');
+
 }
 
-
-
-
-
+// ===== FINE NUOVE FUNZIONI =====
 
 // ==========================================
 // PARTE 3 - incidenti_part3
@@ -846,8 +903,6 @@ function openAnalytics() {
     const panel = document.getElementById('analytics-panel');
     if (panel) {
         panel.classList.add('open');
-        document.body.classList.add('analytics-panel-open'); // Aggiungi classe al body
-        document.body.classList.add('modal-open'); // Aggiungi classe generica
         updateActiveFiltersDisplay();
         updateAnalytics();
     }
@@ -855,11 +910,7 @@ function openAnalytics() {
 
 function closeAnalytics() {
     const panel = document.getElementById('analytics-panel');
-    if (panel) {
-        panel.classList.remove('open');
-        document.body.classList.remove('analytics-panel-open'); // Rimuovi classe dal body
-        document.body.classList.remove('modal-open'); // Rimuovi classe generica
-    }
+    if (panel) panel.classList.remove('open');
 }
 
 function updateActiveFiltersDisplay() {
