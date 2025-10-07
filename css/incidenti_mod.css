@@ -4,6 +4,10 @@
 }
 @import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@700&display=swap');
 
+:root {
+  --panel-width: 340px; /* valore di fallback */
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -112,7 +116,7 @@ cubic-bezier(0.4, 0, 0.2, 1);
 #sidebar.collapsed {
     transform: translateX(-320px);
 }
-
+/*
 #sidebar::-webkit-scrollbar {
     width: 8px;
 }
@@ -128,7 +132,7 @@ cubic-bezier(0.4, 0, 0.2, 1);
 
 #sidebar::-webkit-scrollbar-thumb:hover {
     background: #9ca3af;
-}
+}*/
 
 /* Map */
 #map {
@@ -740,8 +744,8 @@ background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
     box-shadow: 0 8px 32px rgba(0,0,0,0.4);
     position: absolute;
     bottom: 20px;
-    right: 25.5vw;
-    z-index: 1000;
+    right:  calc(var(--panel-width) + 12px);
+    z-index: 2550;
     border: 1px solid rgba(148, 163, 184, 0.2);
     max-width: 200px;
 }
@@ -1597,23 +1601,44 @@ background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
     overflow-x: hidden;
 }
 
+::-webkit-scrollbar {
+  width: 6px; /* larghezza della scrollbar */
+}
+
+::-webkit-scrollbar-track {
+  background: #f9fafb; /* colore dello sfondo della track */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db; /* colore del "pollice" della scrollbar */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af; /* colore quando il mouse è sopra */
+  
+}
+
+
+/*
 #analytics-side-panel::-webkit-scrollbar {
     width: 8px;
 }
 
 #analytics-side-panel::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.6);
+    background: #f9fafb;
     border-radius: 4px;
 }
 
 #analytics-side-panel::-webkit-scrollbar-thumb {
-    background: rgba(59, 130, 246, 0.4);
+    background:#d1d5db;
     border-radius: 4px;
 }
 
 #analytics-side-panel::-webkit-scrollbar-thumb:hover {
-    background: rgba(59, 130, 246, 0.6);
-}
+    background: #9ca3af;
+}*/
 
 .panel-section:hover {
     border-color: rgba(59, 130, 246, 0.4);
