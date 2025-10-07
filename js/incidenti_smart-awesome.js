@@ -1015,7 +1015,6 @@ function updateActiveFiltersDisplay() {
     }
 }
 
-
 function switchAnalyticsTab(tabName) {
     document.querySelectorAll('.analytics-tab').forEach(tab => {
         tab.classList.remove('active');
@@ -1024,13 +1023,18 @@ function switchAnalyticsTab(tabName) {
         content.classList.remove('active');
     });
     
+    // ✅ AGGIUNGI 'serie-storica' alla lista
+    const validTabs = ['serie-storica', 'panoramica', 'temporale', 'oraria', 'insights'];
+    if (!validTabs.includes(tabName)) {
+        tabName = 'serie-storica'; // Fallback al primo tab valido
+    }
+    
     const selectedTab = document.querySelector(`[data-tab="${tabName}"]`);
     const selectedContent = document.getElementById(`tab-${tabName}`);
     
     if (selectedTab) selectedTab.classList.add('active');
     if (selectedContent) selectedContent.classList.add('active');
 }
-
 
 function updateAnalytics() {
     const filteredData = getFilteredData();
@@ -1534,28 +1538,6 @@ function wrapText(ctx, text, maxWidth, fontSize) {
     }
     lines.push(currentLine);
     return lines;
-}
-
-function switchAnalyticsTab(tabName) {
-    // Nascondi tutti i tab
-    document.querySelectorAll('.analytics-tab').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    document.querySelectorAll('.analytics-tab-content').forEach(content => {
-        content.classList.remove('active');
-    });
-    
-    // Mostra solo i tab desiderati (escludi condizioni)
-    const validTabs = ['panoramica', 'temporale', 'oraria', 'insights'];
-    if (!validTabs.includes(tabName)) {
-        tabName = 'panoramica'; // Fallback al primo tab valido
-    }
-    
-    const selectedTab = document.querySelector(`[data-tab="${tabName}"]`);
-    const selectedContent = document.getElementById(`tab-${tabName}`);
-    
-    if (selectedTab) selectedTab.classList.add('active');
-    if (selectedContent) selectedContent.classList.add('active');
 }
 
 // Data Table Functions
