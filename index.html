@@ -19,8 +19,8 @@
     <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
        <link rel="stylesheet" href="css/incidenti_mod.css">
 	   <link rel="stylesheet" href="css/dataviz_mod.css">
-	    <link rel="stylesheet" href="css/footer-modal-mod.css">
-    
+	  <link rel="stylesheet" href="css/footer-modal-mod.css">
+     <link rel="stylesheet" href="css/chart-builder.css">
     <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -1211,10 +1211,217 @@
         </div>
     </div>
 </div>
+<!-- Chart Builder Button -->
+<button class="chart-builder-trigger" id="chart-builder-trigger" 
+        title="Crea il tuo grafico personalizzato">
+    <i class="fas fa-chart-pie"></i>
+    <span>Crea Grafico</span>
+</button>
+<!-- ============================================ -->
+<!-- CHART BUILDER MODAL - COPIA QUESTO BLOCCO -->
+<!-- Posiziona PRIMA di </body> e PRIMA di tutti gli script -->
+<!-- ============================================ -->
+
+<!-- Chart Builder Modal -->
+<div class="chart-builder-modal" id="chart-builder-modal">
+    <div class="chart-builder-content">
+        <!-- Header -->
+        <div class="chart-builder-header">
+            <div class="chart-builder-title">
+                <i class="fas fa-chart-line"></i>
+                <h2>Crea il Tuo Grafico Personalizzato</h2>
+            </div>
+            <button class="chart-builder-close" id="chart-builder-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="chart-builder-body">
+            <!-- Left Panel - Configurazione -->
+            <div class="chart-builder-config">
+                <div class="config-section">
+                    <h3><i class="fas fa-sliders-h"></i> Configurazione Grafico</h3>
+                    
+                    <!-- Tipo di Grafico -->
+                    <div class="config-group">
+                        <label class="config-label">
+                            <i class="fas fa-chart-bar"></i> Tipo di Grafico
+                        </label>
+                        <div class="chart-type-grid" id="chart-type-grid">
+                            <button class="chart-type-btn active" data-type="bar">
+                                <i class="fas fa-chart-bar"></i>
+                                <span>Barre</span>
+                            </button>
+                            <button class="chart-type-btn" data-type="line">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Linea</span>
+                            </button>
+                            <button class="chart-type-btn" data-type="pie">
+                                <i class="fas fa-chart-pie"></i>
+                                <span>Torta</span>
+                            </button>
+                            <button class="chart-type-btn" data-type="doughnut">
+                                <i class="fas fa-circle-notch"></i>
+                                <span>Ciambella</span>
+                            </button>
+                            <button class="chart-type-btn" data-type="radar">
+                                <i class="fas fa-atom"></i>
+                                <span>Radar</span>
+                            </button>
+                            <button class="chart-type-btn" data-type="polarArea">
+                                <i class="fas fa-bullseye"></i>
+                                <span>Polare</span>
+                            </button>
+                            <button class="chart-type-btn" data-type="scatter">
+                                <i class="fas fa-braille"></i>
+                                <span>Scatter</span>
+                            </button>
+                            <button class="chart-type-btn" data-type="bubble">
+                                <i class="fas fa-circle"></i>
+                                <span>Bubble</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Dimensione Dati -->
+                    <div class="config-group">
+                        <label class="config-label">
+                            <i class="fas fa-database"></i> Dimensione Principale
+                        </label>
+                        <select id="dimension-select" class="config-select">
+                            <option value="">Seleziona dimensione...</option>
+                            <option value="Tipologia">Tipologia Incidente</option>
+                            <option value="Anno">Anno</option>
+                            <option value="Mese">Mese</option>
+                            <option value="Giorno settimana">Giorno Settimana</option>
+                            <option value="Stagione">Stagione</option>
+                            <option value="Feriale/Weekend">Feriale/Weekend</option>
+                            <option value="Giorno/Notte">Giorno/Notte</option>
+                            <option value="Circoscrizione">Circoscrizione</option>
+                            <option value="Quartiere">Quartiere</option>
+                            <option value="Fascia oraria (4 fasce)">Fascia Oraria (4)</option>
+                            <option value="Fascia oraria dettagliata (6 fasce)">Fascia Oraria (6)</option>
+                            <option value="Condizioni luce (Visibilità)">Condizioni Luce</option>
+                            <option value="Ora di punta (Picchi di traffico)">Ora di Punta</option>
+                        </select>
+                    </div>
+
+                    <!-- Metrica -->
+                    <div class="config-group">
+                        <label class="config-label">
+                            <i class="fas fa-calculator"></i> Metrica
+                        </label>
+                        <select id="metric-select" class="config-select">
+                            <option value="count">Conteggio Incidenti</option>
+                            <option value="tipologia">Raggruppa per Tipologia</option>
+                        </select>
+                    </div>
+
+                    <!-- Limita Risultati -->
+                    <div class="config-group">
+                        <label class="config-label">
+                            <i class="fas fa-list-ol"></i> Limita Risultati
+                        </label>
+                        <select id="limit-select" class="config-select">
+                            <option value="0">Tutti</option>
+                            <option value="5">Top 5</option>
+                            <option value="10" selected>Top 10</option>
+                            <option value="15">Top 15</option>
+                            <option value="20">Top 20</option>
+                            <option value="25">Top 25</option>
+                        </select>
+                    </div>
+
+                    <!-- Orientamento (solo per bar) -->
+                    <div class="config-group" id="orientation-group" style="display: none;">
+                        <label class="config-label">
+                            <i class="fas fa-arrows-alt-h"></i> Orientamento
+                        </label>
+                        <select id="orientation-select" class="config-select">
+                            <option value="vertical">Verticale</option>
+                            <option value="horizontal">Orizzontale</option>
+                        </select>
+                    </div>
+
+                    <!-- Filtri Attivi -->
+                    <div class="config-group">
+                        <label class="config-label">
+                            <i class="fas fa-filter"></i> Filtri Attivi
+                        </label>
+                        <div class="active-filters-box" id="custom-chart-filters">
+                            <span class="no-filters">Nessun filtro applicato</span>
+                        </div>
+                    </div>
+
+                    <!-- Pulsanti Azione -->
+                    <div class="config-actions">
+                        <button class="btn-generate" id="btn-generate-chart">
+                            <i class="fas fa-play"></i>
+                            Genera Grafico
+                        </button>
+                        <button class="btn-reset-builder" id="btn-reset-builder">
+                            <i class="fas fa-undo"></i>
+                            Reset
+                        </button>
+                    </div>
+
+                    <!-- Info Box -->
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <strong>Suggerimento:</strong> Seleziona una dimensione e clicca "Genera Grafico" per visualizzare i dati. I filtri applicati nella dashboard principale saranno utilizzati automaticamente.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Anteprima Grafico -->
+            <div class="chart-builder-preview">
+                <div class="preview-header">
+                    <h3>
+                        <i class="fas fa-eye"></i> Anteprima
+                    </h3>
+                    <button class="btn-download-chart" id="btn-download-custom-chart" title="Scarica grafico come PNG">
+                        <i class="fas fa-download"></i>
+                    </button>
+                </div>
+                <div class="preview-container" id="preview-container">
+                    <div class="preview-placeholder">
+                        <i class="fas fa-chart-area"></i>
+                        <p>Il tuo grafico apparirà qui</p>
+                        <small>Seleziona le opzioni e clicca "Genera Grafico"</small>
+                    </div>
+                    <div class="chart-wrapper-custom" id="chart-wrapper-custom" style="display: none;">
+                        <canvas id="custom-chart-canvas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer con statistiche -->
+        <div class="chart-builder-footer">
+            <div class="footer-stat">
+                <i class="fas fa-database"></i>
+                <span id="custom-chart-total">0 incidenti</span>
+            </div>
+            <div class="footer-stat">
+                <i class="fas fa-calendar"></i>
+                <span id="custom-chart-period">2015-2023</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- FINE MODALE -->
+<!-- ============================================ -->
+
 
 <div class="footer-modal-overlay" id="footer-modal-overlay"></div>
 <script src="js/incidenti_smart-awesome.js"></script>
 <script src="js/incidenti_final.js"></script>
 <script src="js/footer-modal.js"></script>
+<script src="js/chart-builder.js"></script>
 </body>
 </html>
