@@ -657,8 +657,8 @@ function show2019InfoPopup() {
             <h3 style="color: #3b82f6; margin: 0 0 16px 0; font-size: 20px; font-weight: 700;">
                 Anno 2019 - Dati Parziali
             </h3>
-            <p style="color: #cbd5e1; margin: 0 0 16px 0; font-size: 14px; line-height: 1.6;">
-                Il <strong style="color: #f1f5f9;">2019</strong> include <strong style="color: #3b82f6;">3.192 incidenti non mappati</strong> 
+            <p style="color: #1f2937c9; margin: 0 0 16px 0; font-size: 14px; line-height: 1.6;">
+                Il <strong style="color: #1f2937;">2019</strong> include <strong style="color: #3b82f6;">3.192 incidenti non mappati</strong> 
                 perché nel dataset non erano presenti le coordinate geografiche.
             </p>
             <p style="color: #94a3b8; margin: 0 0 20px 0; font-size: 13px; font-style: italic;">
@@ -736,8 +736,8 @@ function openTopLuoghiModal() {
         if (modalBody) {
             modalBody.insertAdjacentHTML('afterbegin', `
                 <div class="filters-info-top" style="margin-bottom: 16px; padding: 12px; background: rgba(59, 130, 246, 0.1); border-left: 3px solid #3b82f6; border-radius: 6px;">
-                    <strong style="color: #60a5fa;">Filtri applicati:</strong><br>
-                    <span style="color: #cbd5e1; font-size: 13px;">${activeFilters.join(' • ')}</span>
+                    <strong style="color: #1f2937;">Filtri applicati:</strong><br>
+                    <span style="color: #1f2937c9; font-size: 13px;">${activeFilters.join(' • ')}</span>
                 </div>
             `);
         }
@@ -757,7 +757,7 @@ function openTopLuoghiModal() {
                 <td style="text-align: center;">
                     <span class="rank-badge ${rankClass}">${rank}</span>
                 </td>
-                <td style="font-weight: 600; color: #f1f5f9;">${item.indirizzo}</td>
+                <td style="font-weight: 600; color: #1f2937;">${item.indirizzo}</td>
                 <td style="text-align: center; font-weight: 700; color: #3b82f6; font-size: 16px;">
                     ${item.total}
                 </td>
@@ -2835,7 +2835,7 @@ function updateLegendChart() {
     const chartTitle = document.getElementById('legend-chart-title');
     if (chartTitle) {
         if (activeFilters.length > 0) {
-            chartTitle.innerHTML = `Tipologia Incidenti<br><small style="font-size: 11px; font-weight: 600; color: #94a3b8;">${activeFilters.join(' • ')}</small>`;
+            chartTitle.innerHTML = `Tipologia Incidenti<br><small style="font-size: 11px; font-weight: 600; color: #1f2937cc;">${activeFilters.join(' • ')}</small>`;
         } else {
             chartTitle.textContent = 'Tipologia Incidenti';
         }
@@ -2943,7 +2943,7 @@ function updateLegendChart() {
                     color: function(context) {
                         const value = context.dataset.data[context.dataIndex];
                         const maxValue = Math.max(...context.dataset.data);
-                        return value > maxValue * 0.2 ? '#ffffff' : '#f1f5f9';
+                        return value > maxValue * 0.2 ? '#ffffff' : '#1f2937';
                     },
                     font: {
                         size: 10,
@@ -2969,7 +2969,7 @@ function updateLegendChart() {
                         display: false
                     },
                     ticks: {
-                        color: '#ffffff',
+                        color: '#1f2937',
                         font: {
                             size: 10,
                             weight: '500'
@@ -3100,7 +3100,7 @@ function updateMonthlyInjuriesChart() {
                     display: true,
                     position: 'bottom',
                     labels: {
-                        color: '#fff',
+                        color: '#1f2937',
                         font: { size: 10 },
                         padding: 8,
                         usePointStyle: true,
@@ -3135,7 +3135,7 @@ function updateMonthlyInjuriesChart() {
                 r: {
                     beginAtZero: true,
                     ticks: {
-                        color: '#fff',
+                        color: '#1f2937',
                         backdropColor: 'transparent',
                         font: { size: 8 }
                     },
@@ -3147,7 +3147,7 @@ function updateMonthlyInjuriesChart() {
                         lineWidth: 1
                     },
                     pointLabels: {
-                        color: '#fff',
+                        color: '#1f2937',
                         font: { 
                             size: 10,
                             weight: '600'
@@ -3255,7 +3255,7 @@ function updateMonthlyAreaChart() {
                     display: false,
                     position: 'bottom',
                     labels: {
-                        color: '#fff',
+                        color: '#1f2937',
                         font: { size: 9 },
                         padding: 6,
                         usePointStyle: true,
@@ -3327,7 +3327,7 @@ function updateMonthlyAreaChart() {
                 x: {
                     stacked: true,
                     ticks: {
-                        color: '#fff',
+                        color: '#1f2937',
                         font: { size: 9 }
                     },
                     grid: {
@@ -3338,7 +3338,7 @@ function updateMonthlyAreaChart() {
                     stacked: true,
                     beginAtZero: true,
                     ticks: {
-                        color: '#fff',
+                        color: '#1f2937',
                         font: { size: 9 }
                     },
                     grid: {
@@ -3779,7 +3779,7 @@ function updateSerieStoricaChart() {
                         display: true,
                         position: 'bottom',
                         labels: {
-                            color: '#fff',
+                            color: '#1f2937',
                             font: { size: 12 },
                             padding: 12,
                             usePointStyle: true,
@@ -3817,7 +3817,7 @@ function updateSerieStoricaChart() {
         size: 9
     },
     //backgroundColor: 'rgba(15, 23, 42, 0.8)',
-	color: '#fff',	
+	color: '#1f2937',	
     borderRadius: 3,
     padding: 2,
     formatter: (value) => value > 0 ? value.toLocaleString('it-IT') : ''
@@ -3826,7 +3826,7 @@ function updateSerieStoricaChart() {
                 scales: {
                     x: {
                         ticks: {
-                            color: '#fff',
+                            color: '#1f2937',
                             font: { size: 10 },
                             maxRotation: 45,
                             minRotation: 45
@@ -3838,7 +3838,7 @@ function updateSerieStoricaChart() {
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            color: '#fff',
+                            color: '#1f2937',
                             font: { size: 11 },
                             callback: function(value) {
                                 return value.toLocaleString('it-IT');
@@ -3911,7 +3911,7 @@ plugins: {
         display: true,
         position: 'bottom',
         labels: {
-            color: '#fff',
+            color: '#1f2937',
             font: { size: 12 },
             padding: 12,
             usePointStyle: true,
@@ -3944,12 +3944,12 @@ plugins: {
         align: 'top',
         anchor: 'end',
         offset: 4,
-        color: '#fff',
+        color: '#1f2937',
         font: {
             weight: 'bold',
             size: 10
         },
-        backgroundColor: 'rgba(15, 23, 42, 0.8)',
+        //backgroundColor: 'rgba(15, 23, 42, 0.8)',
         borderRadius: 3,
         padding: 2,
         formatter: (value) => value > 0 ? value.toLocaleString('it-IT') : ''
@@ -3959,7 +3959,7 @@ plugins: {
                 scales: {
                     x: {
                         ticks: {
-                            color: '#fff',
+                            color: '#1f2937',
                             font: { size: 10 },
                             maxRotation: 45,
                             minRotation: 45
@@ -3971,7 +3971,7 @@ plugins: {
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            color: '#fff',
+                            color: '#1f2937',
                             font: { size: 11 },
                             callback: function(value) {
                                 return value.toLocaleString('it-IT');
@@ -4106,7 +4106,7 @@ if (quartiereCanvas) {
                     anchor: 'end',
                     align: 'end',
                     offset: 8,
-                    color: '#f1f5f9',
+                    color: '#1f2937',
                     font: { 
                         weight: 'bold', 
                         size: 11 
@@ -4122,7 +4122,7 @@ if (quartiereCanvas) {
                 },
                 y: {
                     ticks: { 
-                        color: '#cbd5e1',
+                        color: '#1f2937',
                         font: { 
                             size: 11, 
                             weight: '500' 
@@ -4231,7 +4231,7 @@ if (stradeCanvas) {
                     anchor: 'end',
                     align: 'end',
                     offset: 8,
-                    color: '#f1f5f9',
+                    color: '#1f2937',
                     font: { 
                         weight: 'bold', 
                         size: 11 
@@ -4246,7 +4246,7 @@ if (stradeCanvas) {
                 },
                 y: {
                     ticks: { 
-                        color: '#cbd5e1',
+                        color: '#1f2937',
                         font: { 
                             size: 10, 
                             weight: '500' 
@@ -4319,7 +4319,7 @@ function updatePanoramicaCharts_continued(data) {
                     legend: { 
                         display: true,
                         labels: {
-                            color: '#f1f5f9',
+                            color: '#1f2937',
                             font: { size: 10 }
                         }
                     },
@@ -4567,7 +4567,7 @@ analyticsCharts[chartKey] = new Chart(canvas, {
                 display: true,  // ← CAMBIATO DA false
                 position: 'bottom',
                 labels: {
-                    color: '#f1f5f9',
+                    color: '#1f2937',
                     font: { size: 11 },
                     padding: 10,
                     usePointStyle: true,
@@ -4600,7 +4600,7 @@ analyticsCharts[chartKey] = new Chart(canvas, {
                 anchor: 'end',
                 align: 'top',
                 offset: 2,
-                color: '#f1f5f9',
+                color: '#1f2937',
                 font: { weight: 'bold', size: 9 },
                 formatter: (value) => value > 0 ? value : ''
             }
@@ -4608,7 +4608,7 @@ analyticsCharts[chartKey] = new Chart(canvas, {
         scales: {
             x: {
                 ticks: { 
-                    color: '#f1f5f9',
+                    color: '#1f2937',
                     font: { size: 9 }
                 },
                 grid: { display: false }
@@ -4616,7 +4616,7 @@ analyticsCharts[chartKey] = new Chart(canvas, {
             y: {
                 beginAtZero: true,
                 ticks: { 
-                    color: '#f1f5f9',
+                    color: '#1f2937',
                     font: { size: 9 }
                 },
                 grid: { color: 'rgba(148, 163, 184, 0.1)' }
@@ -4698,7 +4698,7 @@ analyticsCharts[chartKey] = new Chart(canvas, {
                         anchor: 'end',
                         align: 'top',
                         offset: 2,
-                        color: '#f1f5f9',
+                        color: '#1f2937',
                         font: { weight: 'bold', size: 10 },
                         formatter: (value) => value > 0 ? value.toLocaleString('it-IT') : ''
                     }
@@ -4706,7 +4706,7 @@ analyticsCharts[chartKey] = new Chart(canvas, {
                 scales: {
                     x: { 
                         ticks: { 
-                            color: '#f1f5f9',
+                            color: '#1f2937',
                             font: { size: 10 }
                         },
                         grid: { display: false }
@@ -4714,7 +4714,7 @@ analyticsCharts[chartKey] = new Chart(canvas, {
                     y: { 
                         beginAtZero: true,
                         ticks: { 
-                            color: '#f1f5f9',
+                            color: '#1f2937',
                             font: { size: 10 }
                         },
                         grid: { color: 'rgba(148, 163, 184, 0.1)' }
@@ -4800,7 +4800,7 @@ if (giorniMeseCanvas) {
                     align: 'top',               // ✅ NUOVO: posizione sopra i punti
                     anchor: 'end',              // ✅ NUOVO: ancoraggio al punto
                     offset: 4,                  // ✅ NUOVO: distanza dal punto
-                    color: '#f1f5f9',           // ✅ NUOVO: colore chiaro
+                    color: '#1f2937',           // ✅ NUOVO: colore chiaro
                     font: {                     // ✅ NUOVO: stile font
                         weight: 'bold', 
                         size: 9
@@ -4811,7 +4811,7 @@ if (giorniMeseCanvas) {
             scales: {
                 x: {
                     ticks: { 
-                        color: '#f1f5f9',
+                        color: '#1f2937',
                         font: { size: 9 },
                         maxRotation: 0
                     },
@@ -4820,7 +4820,7 @@ if (giorniMeseCanvas) {
                 y: {
                     beginAtZero: true,
                     ticks: { 
-                        color: '#f1f5f9',
+                        color: '#1f2937',
                         font: { size: 10 }
                     },
                     grid: { color: 'rgba(148, 163, 184, 0.1)' }
@@ -5197,7 +5197,7 @@ function updateOrariaCharts(data) {
                         anchor: 'end',
                         align: 'top',
                         offset: 4,
-                        color: '#f1f5f9',
+                        color: '#1f2937',
                         font: { 
                             weight: 'bold', 
                             size: 11 
@@ -5208,7 +5208,7 @@ function updateOrariaCharts(data) {
                 scales: {
                     x: {
                         ticks: { 
-                            color: '#f1f5f9',
+                            color: '#1f2937',
                             font: { size: 11, weight: '600' }
                         },
                         grid: { 
@@ -5219,7 +5219,7 @@ function updateOrariaCharts(data) {
                     y: {
                         beginAtZero: true,
                         ticks: { 
-                            color: '#f1f5f9',
+                            color: '#1f2937',
                             font: { size: 11 }
                         },
                         grid: { 
@@ -5319,7 +5319,7 @@ function updateOrariaCharts(data) {
                         anchor: 'end',
                         align: 'end',
                         offset: 8,
-                        color: '#f1f5f9',
+                        color: '#1f2937',
                         font: { 
                             weight: 'bold', 
                             size: 12 
@@ -5334,7 +5334,7 @@ function updateOrariaCharts(data) {
                     },
                     y: {
                         ticks: { 
-                            color: '#f1f5f9',
+                            color: '#1f2937',
                             font: { 
                                 size: 11, 
                                 weight: '600' 
@@ -5474,7 +5474,7 @@ function updateOrariaCharts(data) {
                         display: true,
                         position: 'bottom',
                         labels: {
-                            color: '#f1f5f9',
+                            color: '#1f2937',
                             font: { size: 11 },
                             padding: 10,
                             generateLabels: function() {
@@ -5528,7 +5528,7 @@ function updateOrariaCharts(data) {
                         anchor: 'end',
                         align: 'top',
                         offset: 4,
-                        color: '#f1f5f9',
+                        color: '#1f2937',
                         font: { 
                             weight: 'bold', 
                             size: 11 
@@ -5539,7 +5539,7 @@ function updateOrariaCharts(data) {
                 scales: {
                     x: {
                         ticks: { 
-                            color: '#f1f5f9',
+                            color: '#1f2937',
                             font: { size: 10, weight: '600' }
                         },
                         grid: { 
@@ -5550,7 +5550,7 @@ function updateOrariaCharts(data) {
                     y: {
                         beginAtZero: true,
                         ticks: { 
-                            color: '#f1f5f9',
+                            color: '#1f2937',
                             font: { size: 11 }
                         },
                         grid: { 
@@ -5654,7 +5654,7 @@ function updateOrariaCharts(data) {
                         anchor: 'end',
                         align: 'end',
                         offset: 8,
-                        color: '#f1f5f9',
+                        color: '#1f2937',
                         font: { 
                             weight: 'bold', 
                             size: 12 
@@ -5669,7 +5669,7 @@ function updateOrariaCharts(data) {
                     },
                     y: {
                         ticks: { 
-                            color: '#f1f5f9',
+                            color: '#1f2937',
                             font: { 
                                 size: 12, 
                                 weight: '600' 

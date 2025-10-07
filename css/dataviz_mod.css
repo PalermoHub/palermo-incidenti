@@ -9,7 +9,7 @@
     width: calc(100vw - 320px); /* Corretto da "white" a "width" */
     max-width: none; /* Rimosso il limite per occupare tutto lo spazio disponibile */
     height: 100vh;
-    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    background: #ffffff;
     box-shadow: -4px 0 30px rgba(0,0,0,0.6);
     z-index: 2500;
     transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -43,6 +43,7 @@
     font-size: 22px;
     font-weight: 700;
     margin: 0;
+	    color: #fff;
 }
 
 .analytics-filters-info {
@@ -97,17 +98,17 @@
     display: flex;
     gap: 8px;
     padding: 16px 32px;
-    background: rgba(30, 41, 59, 0.6);
+    background: #ffffff;
     border-bottom: 1px solid rgba(148, 163, 184, 0.2);
     overflow-x: auto;
 }
 
 .analytics-tab {
     padding: 12px 24px;
-    background: rgba(51, 65, 85, 0.6);
+    background: #f9fafb;
     border: none;
     border-radius: 4px;
-    color: #cbd5e1;
+    color: #1f2937;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -116,12 +117,12 @@
 }
 
 .analytics-tab:hover {
-    background: rgba(59, 130, 246, 0.3);
-    color: #f1f5f9;
+    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+    color: #1f2937;
 }
 
 .analytics-tab.active {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    background: #ff9900;
     color: white;
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
@@ -255,7 +256,7 @@
 }
 
 .chart-container h3 {
-    color: #f1f5f9;
+    color: #1f2937;
     font-size: 14px;
     font-weight: 700;
     margin-bottom: 12px;
