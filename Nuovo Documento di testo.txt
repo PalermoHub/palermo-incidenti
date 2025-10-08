@@ -1,1 +1,3 @@
 Per realizzare i grafici, i filtri degli anni e in generale tutti i filtri devono cambiare in tempo reale nel pannello 'chart-builde'
+
+nel 'analytics-filters' non vengono più visualizzati i filtri usati in tempo reale.

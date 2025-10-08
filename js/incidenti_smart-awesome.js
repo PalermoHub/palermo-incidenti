@@ -41,7 +41,7 @@ const MESI_ITALIANI_CAL = [
     'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
 ];
 
-const GIORNI_SETTIMANA = ['Lunedà¬', 'Martedà¬', 'Mercoledà¬', 'Giovedà¬', 'Venerdà¬', 'Sabato', 'Domenica'];
+const GIORNI_SETTIMANA = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
 const GIORNI_SETTIMANA_SHORT = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
 
 // Register Chart.js plugins globally
@@ -4575,7 +4575,7 @@ analyticsCharts[chartKey] = new Chart(canvas, {
         }
     });
     
-    const giorni = ['Lunedà¬', 'Martedà¬', 'Mercoledà¬', 'Giovedà¬', 'Venerdà¬', 'Sabato', 'Domenica'];
+    const giorni = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
     const giorniCounts = giorni.map(g => giornoData[g] || 0);
     
     const selectedGiorno = currentFilters['filter-giorno-settimana'];
@@ -5304,7 +5304,7 @@ function updateOrariaCharts(data) {
         }
     });
     
-    const giorni = ['Lunedà¬', 'Martedà¬', 'Mercoledà¬', 'Giovedà¬', 'Venerdà¬', 'Sabato', 'Domenica'];
+    const giorni = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
     const giorniCounts = giorni.map(g => giornoData[g] || 0);
     
     const selectedGiorno = currentFilters['filter-giorno-settimana'];
@@ -5326,7 +5326,7 @@ function updateOrariaCharts(data) {
                 
                 ctx.save();
                 
-                // Disegna area feriali (Lunedà¬-Venerdà¬, indici 0-4)
+                // Disegna area feriali (Lunedì-Venerdì, indici 0-4)
                 ctx.beginPath();
                 ctx.moveTo(left, bottom);
                 for (let i = 0; i <= 4; i++) {
@@ -5340,7 +5340,7 @@ function updateOrariaCharts(data) {
                 ctx.fillStyle = 'rgba(59, 130, 246, 0.6)';
                 ctx.fill();
                 
-                // Disegna area weekend (Venerdà¬-Domenica, indici 4-6)
+                // Disegna area weekend (Venerdì-Domenica, indici 4-6)
                 ctx.beginPath();
                 ctx.moveTo(meta.data[4].x, bottom);
                 for (let i = 4; i <= 6; i++) {
