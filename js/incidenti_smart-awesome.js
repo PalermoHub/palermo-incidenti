@@ -5857,14 +5857,64 @@ function setupEventListeners() {
         });
     });
     
-    const yearStatsGrid = document.getElementById('year-stats-grid');
+const yearStatsGrid = document.getElementById('year-stats-grid');
     if (yearStatsGrid) {
+        let touchStartTime = 0;
+        let touchMoved = false;
+        let touchTarget = null;
+        
+        yearStatsGrid.addEventListener('touchstart', (e) => {
+            const item = e.target.closest('.year-stat-item, .year-stat-item-all');
+            if (item) {
+                touchStartTime = Date.now();
+                touchMoved = false;
+                touchTarget = item;
+                item.style.opacity = '0.7';
+            }
+        }, { passive: true });
+        
+        yearStatsGrid.addEventListener('touchmove', (e) => {
+            touchMoved = true;
+            if (touchTarget) {
+                touchTarget.style.opacity = '';
+                touchTarget = null;
+            }
+        }, { passive: true });
+        
+        yearStatsGrid.addEventListener('touchend', (e) => {
+            const item = e.target.closest('.year-stat-item, .year-stat-item-all');
+            const touchDuration = Date.now() - touchStartTime;
+            
+            if (item && touchTarget === item) {
+                item.style.opacity = '';
+                
+                if (!touchMoved && touchDuration < 500) {
+                    e.preventDefault();
+                    
+                    const year = item.dataset.year;
+                    
+                    if (year === '2019') {
+                        show2019InfoPopup();
+                        setTimeout(() => filterByYear(year), 100);
+                    } else {
+                        filterByYear(year);
+                    }
+                }
+            }
+            
+            touchTarget = null;
+        });
+        
+        yearStatsGrid.addEventListener('touchcancel', (e) => {
+            if (touchTarget) {
+                touchTarget.style.opacity = '';
+                touchTarget = null;
+            }
+        }, { passive: true });
+        
         yearStatsGrid.addEventListener('click', (e) => {
             const item = e.target.closest('.year-stat-item, .year-stat-item-all');
             if (!item) return;
-            
-            e.preventDefault();
-            e.stopPropagation();
             
             const year = item.dataset.year;
             
@@ -5875,27 +5925,6 @@ function setupEventListeners() {
                 filterByYear(year);
             }
         });
-        
-        yearStatsGrid.addEventListener('touchstart', (e) => {
-            const item = e.target.closest('.year-stat-item, .year-stat-item-all');
-            if (item) {
-                item.style.opacity = '0.7';
-            }
-        }, { passive: true });
-        
-        yearStatsGrid.addEventListener('touchend', (e) => {
-            const item = e.target.closest('.year-stat-item, .year-stat-item-all');
-            if (item) {
-                item.style.opacity = '';
-            }
-        }, { passive: true });
-        
-        yearStatsGrid.addEventListener('touchcancel', (e) => {
-            const item = e.target.closest('.year-stat-item, .year-stat-item-all');
-            if (item) {
-                item.style.opacity = '';
-            }
-        }, { passive: true });
     }
     
     document.querySelectorAll('.legend-item').forEach(item => {
