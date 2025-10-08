@@ -680,7 +680,7 @@ function openTopLuoghiModal() {
             modalBody.insertAdjacentHTML('afterbegin', `
                 <div class="filters-info-top" style="margin-bottom: 16px; padding: 12px; background: rgba(59, 130, 246, 0.1); border-left: 3px solid #3b82f6; border-radius: 6px;">
                     <strong style="color: #1f2937;">Filtri applicati:</strong><br>
-                    <span style="color: #1f2937c9; font-size: 13px;">${activeFilters.join(' â€¢ ')}</span>
+                    <span style="color: #1f2937c9; font-size: 13px;">${activeFilters.join('  • ')}</span>
                 </div>
             `);
         }
@@ -952,9 +952,9 @@ function updateActiveFiltersDisplay() {
     let displayHTML = '';
     
     if (filterText.length === 0) {
-        displayHTML = `Tutti gli incidenti (2015-2023) â€¢ ${totalData.toLocaleString('it-IT')} incidenti totali`;
+        displayHTML = `Tutti gli incidenti (2015-2023)  • ${totalData.toLocaleString('it-IT')} incidenti totali`;
     } else {
-        displayHTML = `${filteredData.length.toLocaleString('it-IT')} di ${totalData.toLocaleString('it-IT')} incidenti â€¢ `;
+        displayHTML = `${filteredData.length.toLocaleString('it-IT')} di ${totalData.toLocaleString('it-IT')} incidenti  • `;
         displayHTML += filterText.map(f => `<span class="filter-badge">${f}</span>`).join('');
     }
     
@@ -2766,7 +2766,7 @@ function updateLegendChart() {
     const chartTitle = document.getElementById('legend-chart-title');
     if (chartTitle) {
         if (activeFilters.length > 0) {
-            chartTitle.innerHTML = `Tipologia Incidenti<br><small style="font-size: 11px; font-weight: 600; color: #1f2937cc;">${activeFilters.join(' â€¢ ')}</small>`;
+            chartTitle.innerHTML = `Tipologia Incidenti<br><small style="font-size: 11px; font-weight: 600; color: #1f2937cc;">${activeFilters.join('  • ')}</small>`;
         } else {
             chartTitle.textContent = 'Tipologia Incidenti';
         }
@@ -3621,7 +3621,7 @@ function updateCalendarSummary() {
         parts.push(`<strong>Giorno settimana:</strong> ${customCalendarState.selectedWeekday}`);
     }
     
-    summary.innerHTML = parts.length > 0 ? parts.join(' â€¢ ') : 'Nessun filtro temporale attivo';
+    summary.innerHTML = parts.length > 0 ? parts.join('  • ') : 'Nessun filtro temporale attivo';
 }
 
 // Verifica dati mese
