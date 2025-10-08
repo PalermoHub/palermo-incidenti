@@ -87,7 +87,7 @@ const basemapStyles = {
                 type: 'raster',
                 tiles: ['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'],
                 tileSize: 256,
-                attribution: 'Â© CARTO | <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" target="_blank">Fonte Dati: dati.gov.it</a> - Rielaborazione: <a href="https://www.linkedin.com/in/gbvitrano/" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" target="_blank">opendatasicilia.it</a>'
+                attribution: '© CARTO | <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" target="_blank">Fonte Dati: dati.gov.it</a> - Rielaborazione: <a href="https://www.linkedin.com/in/gbvitrano/" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" target="_blank">opendatasicilia.it</a>'
             }
         },
         layers: [{
@@ -104,7 +104,7 @@ const basemapStyles = {
                 type: 'raster',
                 tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
                 tileSize: 256,
-                attribution: 'Â© OpenStreetMap contributors | <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" target="_blank">Fonte Dati: dati.gov.it</a> - Rielaborazione: <a href="https://www.linkedin.com/in/gbvitrano/" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" target="_blank">opendatasicilia.it</a>'
+                attribution: '© OpenStreetMap contributors | <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" target="_blank">Fonte Dati: dati.gov.it</a> - Rielaborazione: <a href="https://www.linkedin.com/in/gbvitrano/" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" target="_blank">opendatasicilia.it</a>'
             }
         },
         layers: [{
@@ -121,7 +121,7 @@ const basemapStyles = {
                 type: 'raster',
                 tiles: ['https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'],
                 tileSize: 256,
-                attribution: 'Â© Google | <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" target="_blank">Fonte Dati: dati.gov.it</a> - Rielaborazione: <a href="https://www.linkedin.com/in/gbvitrano/" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" target="_blank">opendatasicilia.it</a>'
+                attribution: '© Google | <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" target="_blank">Fonte Dati: dati.gov.it</a> - Rielaborazione: <a href="https://www.linkedin.com/in/gbvitrano/" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" target="_blank">opendatasicilia.it</a>'
             }
         },
         layers: [{
@@ -138,7 +138,7 @@ const basemapStyles = {
                 type: 'raster',
                 tiles: ['https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'],
                 tileSize: 256,
-                attribution: 'Â© CARTO | <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" target="_blank">Fonte Dati: dati.gov.it</a> - Rielaborazione: <a href="https://www.linkedin.com/in/gbvitrano/" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" target="_blank">opendatasicilia.it</a>'
+                attribution: '© CARTO | <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" target="_blank">Fonte Dati: dati.gov.it</a> - Rielaborazione: <a href="https://www.linkedin.com/in/gbvitrano/" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" target="_blank">opendatasicilia.it</a>'
             }
         },
         layers: [{

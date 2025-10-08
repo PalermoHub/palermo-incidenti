@@ -547,9 +547,10 @@ h3 {
 /* Responsive */
 @media (max-width: 768px) {
     .footer-info-btn {
-        bottom: 15px;
+        bottom: 90px !important;
         padding: 12px 24px;
         font-size: 13px;
+		left: 122px !important;
     }
     
     .footer-modal {

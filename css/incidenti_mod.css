@@ -1979,6 +1979,7 @@ position: fixed;
 @media (max-width: 768px) {
     .mobile-toggle {
         display: flex;
+		z-index: 9001;
     }
     
     .sidebar-overlay {
@@ -1993,6 +1994,7 @@ position: fixed;
     #sidebar.open {
         left: 0;
         transform: none;
+		z-index: 9000;
     }
     
     #sidebar.collapsed {
