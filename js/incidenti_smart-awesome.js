@@ -988,12 +988,11 @@ function switchAnalyticsTab(tabName) {
 function updateAnalytics() {
     const filteredData = getFilteredData();
     
-    updateActiveFiltersDisplay();
+    updateActiveFiltersDisplay();  // ✅ SPOSTA/AGGIUNGI QUESTA RIGA ALL'INIZIO
     updateSerieStoricaChart();
     updatePanoramicaCharts(filteredData);
     updateTemporaleCharts(filteredData);
     updateOrariaCharts(filteredData);
-    // RIMOSSO: updateCondizioniCharts(filteredData);
     updateInsights(filteredData);
     
     // IMPORTANTE: Aumenta il timeout
@@ -2219,7 +2218,8 @@ function handleFilterChange(filterId, value) {
         updateActiveFiltersDisplay();
         updateAnalytics();
     }
-	window.dispatchEvent(new Event('filtersUpdated'));
+    
+    window.dispatchEvent(new Event('filtersUpdated')); // ✅ AGGIUNGI QUESTA RIGA
 }
 
 // Update All Filters
@@ -2590,11 +2590,12 @@ function filterByMonth(mese) {
     updateMonthlyInjuriesChart();
     updateMonthlyAreaChart();
     
-    const analyticsPanel = document.getElementById('analytics-panel');
+   const analyticsPanel = document.getElementById('analytics-panel');
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
         updateAnalytics();
     }
-	window.dispatchEvent(new Event('filtersUpdated'));
+    
+    window.dispatchEvent(new Event('filtersUpdated')); // ✅ AGGIUNGI QUESTA RIGA
 }
 
 // Reset Filters
@@ -2640,8 +2641,8 @@ function resetFilters() {
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
         updateAnalytics();
     }
-	
-	window.dispatchEvent(new Event('filtersUpdated'));
+    
+    window.dispatchEvent(new Event('filtersUpdated')); // ✅ AGGIUNGI QUESTA RIGA
 }
 
 // Reset Charts Filters
@@ -2671,9 +2672,9 @@ function resetChartsFilters() {
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
         updateAnalytics();
     }
-	window.dispatchEvent(new Event('filtersUpdated'));
+    
+    window.dispatchEvent(new Event('filtersUpdated')); // ✅ AGGIUNGI QUESTA RIGA
 }
-
 // Update Period Switches (Giorno/Notte)
 function updatePeriodSwitches() {
     const filteredData = getFilteredData();
