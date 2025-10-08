@@ -5,6 +5,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@700&display=swap');
 
 :root {
+  --sidebar-width: 320px;
   --panel-width: 340px; /* valore di fallback */
 }
 
@@ -2462,12 +2463,16 @@ body.modal-open .chart-builder-trigger {
     }
     
     .footer-info-btn {
-        bottom: 80px !important;
+        bottom: 40px !important;
     }
     
-    .chart-builder-trigger {
-        bottom: 20px !important;
+	    .footer-info-btn span {
+        display: none;
     }
+	
+  /*  .chart-builder-trigger {
+        bottom: 20px !important;
+    }*/
 }
 
 /* Fix per dispositivi touch */

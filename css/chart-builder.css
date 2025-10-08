@@ -45,7 +45,8 @@
     position: fixed;
     top: -100%; /* Parte dall'alto */
     right: 0; /* Posizionato a destra */
-    width: calc(100vw - 320px); /* Stessa larghezza di analytics */
+	width: calc(100vw - var(--sidebar-width));
+    /*width: calc(100vw - 320px);  Stessa larghezza di analytics */
     height: 100vh;
     background: #ffffff;
     box-shadow: -4px 0 30px rgba(0,0,0,0.6);
@@ -544,8 +545,9 @@
 
 @media (max-width: 768px) {
     .chart-builder-trigger {
-        padding: 10px 20px;
+        padding: 10px 24px;
         font-size: 13px;
+		height: 20px;
     }
     
     .chart-builder-trigger span {

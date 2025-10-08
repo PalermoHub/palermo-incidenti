@@ -6,8 +6,8 @@
     position: fixed;
     top: 0;
     right: -100%;
-    width: calc(100vw - 320px); /* Corretto da "white" a "width" */
-    max-width: none; /* Rimosso il limite per occupare tutto lo spazio disponibile */
+    width: calc(100vw - var(--sidebar-width));  /*Corretto da "white" a "width" */
+	max-width: none; /* Rimosso il limite per occupare tutto lo spazio disponibile */
     height: 100vh;
     background: #ffffff;
     box-shadow: -4px 0 30px rgba(0,0,0,0.6);
