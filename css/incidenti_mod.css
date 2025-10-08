@@ -2443,59 +2443,24 @@ position: fixed;
     opacity: 1;
 }
 
-/* Nascondi pulsanti quando un modale è aperto */
-body.modal-open .footer-info-btn,
-body.modal-open .chart-builder-trigger {
-    display: none !important;
-    z-index: 1 !important;
-}
+/* ============================================
+   FIX: Gestione corretta pulsanti footer
+   ============================================ */
 
-/* Z-index corretto per i pulsanti */
-.footer-info-btn,
-.chart-builder-trigger {
-    z-index: 1499 !important; /* Sotto i modali (z-index 1500+) */
-}
+/* RIMOSSO: Vecchia regola che nascondeva i pulsanti */
+/* body.modal-open .footer-info-btn,
+   body.modal-open .chart-builder-trigger {
+       display: none !important;
+   }
+*/
 
-@media (max-width: 768px) {
-    .footer-info-btn,
-    .chart-builder-trigger {
-        position: fixed;
-        bottom: 20px;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        width: auto !important;
-        z-index: 1499 !important;
-        touch-action: manipulation;
-        -webkit-tap-highlight-color: rgba(255, 153, 0, 0.5);
-    }
-    
-    .footer-info-btn {
-        bottom: 40px !important;
-    }
-    
-	    .footer-info-btn span {
-        display: none;
-    }
-	
-  /*  .chart-builder-trigger {
-        bottom: 20px !important;
-    }*/
-}
-
-/* Fix per dispositivi touch */
-@media (hover: none) and (pointer: coarse) {
-    .footer-info-btn,
-    .chart-builder-trigger {
-        min-height: 44px;
-        min-width: 44px;
-        padding: 12px 24px;
-        font-size: 16px;
-    }
-    
-    .chart-builder-modal,
-    .footer-modal {
-        -webkit-overflow-scrolling: touch;
-    }
+/* NUOVO: Nascondi SOLO quando altri modali sono aperti */
+body.other-modal-open .footer-info-btn,
+body.other-modal-open .chart-builder-trigger {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.8);
+    transition: all 0.3s ease;
 }
 
 /* Nascondi pulsanti quando analytics-panel è aperto */
@@ -2507,27 +2472,81 @@ body.analytics-panel-open .chart-builder-trigger {
     pointer-events: none !important;
 }
 
-/* Nascondi pulsanti quando qualsiasi modale è aperto */
-body.modal-open .footer-info-btn,
-body.modal-open .chart-builder-trigger {
-    z-index: 1 !important;
-    opacity: 0.3 !important;
-    pointer-events: none !important;
+/* Z-index corretto per i pulsanti */
+.footer-info-btn,
+.chart-builder-trigger {
+    z-index: 9998 !important; /* Sotto footer-modal (10000) ma sopra tutto il resto */
+    position: fixed;
 }
 
+/* Pulsante footer-info specifico */
+.footer-info-btn {
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    /* Aumenta area touch per mobile */
+    min-width: 44px;
+    min-height: 44px;
+    padding: 14px 28px;
+}
+
+/* Mobile specific */
 @media (max-width: 768px) {
-    /* Fix per pulsanti in mobile con modale aperto */
-    body.analytics-panel-open .footer-info-btn,
-    body.analytics-panel-open .chart-builder-trigger {
-        transform: translateX(-50%) scale(0.8) !important;
-        opacity: 0 !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    /* Assicura che i pulsanti siano sotto il modale */
     .footer-info-btn,
     .chart-builder-trigger {
-        will-change: transform, opacity;
+        position: fixed;
+        bottom: 20px;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: auto !important;
+        z-index: 9998 !important;
+        /* Ottimizzazione touch */
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: rgba(255, 153, 0, 0.5);
+    }
+    
+    .footer-info-btn {
+        bottom: 80px !important; /* Sposta sopra per evitare sovrapposizioni */
+    }
+    
+    /* Nascondi span in mobile per footer-info-btn */
+    .footer-info-btn span {
+        display: none;
     }
 }
 
+/* Fix per dispositivi touch */
+@media (hover: none) and (pointer: coarse) {
+    .footer-info-btn,
+    .chart-builder-trigger {
+        min-height: 48px; /* Aumenta area touch */
+        min-width: 48px;
+        padding: 12px 24px;
+        font-size: 16px;
+    }
+    
+    .chart-builder-modal,
+    .footer-modal {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* ============================================
+   FIX: Z-index footer modal
+   ============================================ */
+
+.footer-modal {
+    z-index: 10000 !important; /* Sopra tutto */
+}
+
+.footer-modal-overlay {
+    z-index: 9999 !important; /* Appena sotto il modal */
+}
+
+/* Assicura che il modal footer sia sempre visibile quando aperto */
+.footer-modal.open {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}

@@ -41,7 +41,7 @@ const MESI_ITALIANI_CAL = [
     'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
 ];
 
-const GIORNI_SETTIMANA = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
+const GIORNI_SETTIMANA = ['LunedÃ¬', 'MartedÃ¬', 'MercoledÃ¬', 'GiovedÃ¬', 'VenerdÃ¬', 'Sabato', 'Domenica'];
 const GIORNI_SETTIMANA_SHORT = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
 
 // Register Chart.js plugins globally
@@ -77,17 +77,17 @@ const tipologiaNames = {
 };
 
 // Basemap styles
-// ✅ Basemap styles SENZA glyphs (evita errori di caricamento font)
+// âœ… Basemap styles SENZA glyphs (evita errori di caricamento font)
 const basemapStyles = {
     'carto-dark': {
         version: 8,
-		glyphs: 'https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=BZTlvCzEgnATtZxkip69', // ✅ Font gratuiti       
+		glyphs: 'https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=BZTlvCzEgnATtZxkip69', // âœ… Font gratuiti       
 	   sources: {
             'carto': {
                 type: 'raster',
                 tiles: ['https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'],
                 tileSize: 256,
-                attribution: '© CARTO | <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" target="_blank">Fonte Dati: dati.gov.it</a> - Rielaborazione: <a href="https://www.linkedin.com/in/gbvitrano/" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" target="_blank">opendatasicilia.it</a>'
+                attribution: 'Â© CARTO | <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" target="_blank">Fonte Dati: dati.gov.it</a> - Rielaborazione: <a href="https://www.linkedin.com/in/gbvitrano/" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" target="_blank">opendatasicilia.it</a>'
             }
         },
         layers: [{
@@ -98,13 +98,13 @@ const basemapStyles = {
     },
     'osm': {
         version: 8,
-		glyphs: 'https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=BZTlvCzEgnATtZxkip69', // ✅ Font gratuiti
+		glyphs: 'https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=BZTlvCzEgnATtZxkip69', // âœ… Font gratuiti
         sources: {
             'osm': {
                 type: 'raster',
                 tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
                 tileSize: 256,
-                attribution: '© OpenStreetMap contributors | <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" target="_blank">Fonte Dati: dati.gov.it</a> - Rielaborazione: <a href="https://www.linkedin.com/in/gbvitrano/" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" target="_blank">opendatasicilia.it</a>'
+                attribution: 'Â© OpenStreetMap contributors | <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" target="_blank">Fonte Dati: dati.gov.it</a> - Rielaborazione: <a href="https://www.linkedin.com/in/gbvitrano/" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" target="_blank">opendatasicilia.it</a>'
             }
         },
         layers: [{
@@ -115,13 +115,13 @@ const basemapStyles = {
     },
     'satellite': {
         version: 8,
-		glyphs: 'https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=BZTlvCzEgnATtZxkip69', // ✅ Font gratuiti
+		glyphs: 'https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=BZTlvCzEgnATtZxkip69', // âœ… Font gratuiti
         sources: {
             'satellite': {
                 type: 'raster',
                 tiles: ['https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}'],
                 tileSize: 256,
-                attribution: '© Google | <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" target="_blank">Fonte Dati: dati.gov.it</a> - Rielaborazione: <a href="https://www.linkedin.com/in/gbvitrano/" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" target="_blank">opendatasicilia.it</a>'
+                attribution: 'Â© Google | <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" target="_blank">Fonte Dati: dati.gov.it</a> - Rielaborazione: <a href="https://www.linkedin.com/in/gbvitrano/" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" target="_blank">opendatasicilia.it</a>'
             }
         },
         layers: [{
@@ -132,13 +132,13 @@ const basemapStyles = {
     },
     'carto-light': {
         version: 8,
-		glyphs: 'https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=BZTlvCzEgnATtZxkip69', // ✅ Font gratuiti
+		glyphs: 'https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=BZTlvCzEgnATtZxkip69', // âœ… Font gratuiti
         sources: {
             'carto': {
                 type: 'raster',
                 tiles: ['https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'],
                 tileSize: 256,
-                attribution: '© CARTO | <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" target="_blank">Fonte Dati: dati.gov.it</a> - Rielaborazione: <a href="https://www.linkedin.com/in/gbvitrano/" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" target="_blank">opendatasicilia.it</a>'
+                attribution: 'Â© CARTO | <a href="https://www.dati.gov.it/view-dataset?Cerca=incidenti+palermo" target="_blank">Fonte Dati: dati.gov.it</a> - Rielaborazione: <a href="https://www.linkedin.com/in/gbvitrano/" target="_blank">@gbvitrano</a> - <a href="http://opendatasicilia.it/" target="_blank">opendatasicilia.it</a>'
             }
         },
         layers: [{
@@ -160,7 +160,7 @@ const filterConfig = {
     'filter-giorno-settimana': 'Giorno settimana',
     'filter-feriale-weekend': 'Feriale/Weekend',
     'filter-giorno-notte': 'Giorno/Notte',
-    'filter-condizioni-luce': 'Condizioni luce (Visibilità)',
+    'filter-condizioni-luce': 'Condizioni luce (VisibilitÃ )',
     'filter-fascia-4': 'Fascia oraria (4 fasce)',
     'filter-fascia-6': 'Fascia oraria dettagliata (6 fasce)',
     'filter-ora-punta': 'Ora di punta (Picchi di traffico)'
@@ -379,7 +379,7 @@ function toggleSection(sectionId) {
     if (toggle) toggle.classList.toggle('collapsed');
 }
 
-// ✅ FUNZIONE CORRETTA - Toggle Sidebar (con chiusura graffa)
+// âœ… FUNZIONE CORRETTA - Toggle Sidebar (con chiusura graffa)
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const toggle = document.getElementById('mobile-toggle');
@@ -397,7 +397,7 @@ function toggleSidebar() {
             overlay.classList.remove('show');
         }
     }
-} // ✅ CHIUSURA CORRETTA
+} // âœ… CHIUSURA CORRETTA
 
 function closeSidebar() {
     const sidebar = document.getElementById('sidebar');
@@ -409,7 +409,7 @@ function closeSidebar() {
     if (overlay) overlay.classList.remove('show');
 }
 
-// ✅ SINGOLA DEFINIZIONE - Toggle Desktop Sidebar
+// âœ… SINGOLA DEFINIZIONE - Toggle Desktop Sidebar
 function toggleDesktopSidebar() {
     const sidebar = document.getElementById('sidebar');
     const toggleBtn = document.getElementById('sidebar-desktop-toggle');
@@ -477,10 +477,10 @@ function openDetailPanel(properties) {
     
     let html = '';
     
-    // Sezione Tipologia e Gravità (ICONA AGGIORNATA)
+    // Sezione Tipologia e GravitÃ  (ICONA AGGIORNATA)
     html += `
         <div class="detail-section">
-            <h3><i class="fas fa-exclamation-triangle"></i> Tipologia e Gravità</h3>
+            <h3><i class="fas fa-exclamation-triangle"></i> Tipologia e GravitÃ </h3>
             <div class="detail-row">
                 <span class="detail-label">Tipo Incidente</span>
                 <span class="tipo-badge ${properties.Tipologia}">${properties.Tipologia} - ${tipologiaNames[properties.Tipologia]}</span>
@@ -489,7 +489,7 @@ function openDetailPanel(properties) {
     `;
     
     // Sezione Quando (ICONA AGGIORNATA)
-    html += '<div class="detail-section"><h3><i class="fas fa-calendar-alt"></i> Quando è Avvenuto</h3>';
+    html += '<div class="detail-section"><h3><i class="fas fa-calendar-alt"></i> Quando Ã¨ Avvenuto</h3>';
     const temporalFields = [
         { key: 'Data', label: 'Data' },
         { key: 'Anno', label: 'Anno' },
@@ -516,11 +516,11 @@ function openDetailPanel(properties) {
     html += '</div>';
     
     // Sezione Dove (ICONA AGGIORNATA)
-    html += '<div class="detail-section"><h3><i class="fas fa-map-marker-alt"></i> Dove è Avvenuto</h3>';
+    html += '<div class="detail-section"><h3><i class="fas fa-map-marker-alt"></i> Dove Ã¨ Avvenuto</h3>';
     const locationFields = [
         { key: 'Circoscrizione', label: 'Circoscrizione' },
         { key: 'Quartiere', label: 'Quartiere' },
-        { key: 'UPL', label: 'Unità di Primo Livello' }
+        { key: 'UPL', label: 'UnitÃ  di Primo Livello' }
     ];
     
     locationFields.forEach(field => {
@@ -551,11 +551,11 @@ function openDetailPanel(properties) {
     
     // Sezione Condizioni Ambientali (ICONA AGGIORNATA)
     html += '<div class="detail-section"><h3><i class="fas fa-cloud-sun"></i> Condizioni Ambientali</h3>';
-    if (properties['Condizioni luce (Visibilità)'] && properties['Condizioni luce (Visibilità)'] !== 'null') {
+    if (properties['Condizioni luce (VisibilitÃ )'] && properties['Condizioni luce (VisibilitÃ )'] !== 'null') {
         html += `
             <div class="detail-row">
                 <span class="detail-label">Condizioni Luce</span>
-                <span class="detail-value">${properties['Condizioni luce (Visibilità)']}</span>
+                <span class="detail-value">${properties['Condizioni luce (VisibilitÃ )']}</span>
             </div>
         `;
     }
@@ -602,7 +602,7 @@ function show2019InfoPopup() {
             </h3>
             <p style="color: #1f2937c9; margin: 0 0 16px 0; font-size: 14px; line-height: 1.6;">
                 Il <strong style="color: #1f2937;">2019</strong> include <strong style="color: #3b82f6;">3.192 incidenti non mappati</strong> 
-                perché nel dataset non erano presenti le coordinate geografiche.
+                perchÃ© nel dataset non erano presenti le coordinate geografiche.
             </p>
             <p style="color: #94a3b8; margin: 0 0 20px 0; font-size: 13px; font-style: italic;">
                 Questi incidenti sono conteggiati nelle statistiche ma non visualizzati sulla mappa.
@@ -650,7 +650,7 @@ function show2019InfoPopup() {
 function openTopLuoghiModal() {
     // RIMOSSO questo blocco:
     // if (!showClustering) {
-    //     alert('Attiva prima la modalità Clustering per visualizzare i Top Luoghi');
+    //     alert('Attiva prima la modalitÃ  Clustering per visualizzare i Top Luoghi');
     //     return;
     // }
     
@@ -680,7 +680,7 @@ function openTopLuoghiModal() {
             modalBody.insertAdjacentHTML('afterbegin', `
                 <div class="filters-info-top" style="margin-bottom: 16px; padding: 12px; background: rgba(59, 130, 246, 0.1); border-left: 3px solid #3b82f6; border-radius: 6px;">
                     <strong style="color: #1f2937;">Filtri applicati:</strong><br>
-                    <span style="color: #1f2937c9; font-size: 13px;">${activeFilters.join(' • ')}</span>
+                    <span style="color: #1f2937c9; font-size: 13px;">${activeFilters.join(' â€¢ ')}</span>
                 </div>
             `);
         }
@@ -952,9 +952,9 @@ function updateActiveFiltersDisplay() {
     let displayHTML = '';
     
     if (filterText.length === 0) {
-        displayHTML = `Tutti gli incidenti (2015-2023) • ${totalData.toLocaleString('it-IT')} incidenti totali`;
+        displayHTML = `Tutti gli incidenti (2015-2023) â€¢ ${totalData.toLocaleString('it-IT')} incidenti totali`;
     } else {
-        displayHTML = `${filteredData.length.toLocaleString('it-IT')} di ${totalData.toLocaleString('it-IT')} incidenti • `;
+        displayHTML = `${filteredData.length.toLocaleString('it-IT')} di ${totalData.toLocaleString('it-IT')} incidenti â€¢ `;
         displayHTML += filterText.map(f => `<span class="filter-badge">${f}</span>`).join('');
     }
     
@@ -972,7 +972,7 @@ function switchAnalyticsTab(tabName) {
         content.classList.remove('active');
     });
     
-    // ✅ AGGIUNGI 'serie-storica' alla lista
+    // âœ… AGGIUNGI 'serie-storica' alla lista
     const validTabs = ['serie-storica', 'panoramica', 'temporale', 'oraria', 'insights'];
     if (!validTabs.includes(tabName)) {
         tabName = 'serie-storica'; // Fallback al primo tab valido
@@ -1020,9 +1020,9 @@ function addChartDownloadButtons() {
             return;
         }
         
-        // Verifica se ha già il pulsante
+        // Verifica se ha giÃ  il pulsante
         if (container.querySelector('.chart-download-btn')) {
-            console.log('- Ha già il pulsante, skip');
+            console.log('- Ha giÃ  il pulsante, skip');
             return;
         }
         
@@ -1050,7 +1050,7 @@ function addChartDownloadButtons() {
         
         // Event listener con debug
         btn.onclick = (e) => {
-            console.log('\n🖱️ CLICK sul pulsante download!');
+            console.log('\nðŸ–±ï¸ CLICK sul pulsante download!');
             console.log('Chart ID:', chartId);
             console.log('Titolo:', chartTitle);
             
@@ -1076,7 +1076,7 @@ function addChartDownloadButtons() {
 // Download Chart as PNG
 
 async function downloadChartAsPNG(chartId, filename) {
-    console.log('\n🎨 === INIZIO downloadChartAsPNG ===');
+    console.log('\nðŸŽ¨ === INIZIO downloadChartAsPNG ===');
     
     if (chartId.includes('calendario-heatmap')) {
         alert('Download disabilitato per il calendario heatmap');
@@ -1324,7 +1324,7 @@ async function downloadChartAsPNG(chartId, filename) {
         }
         
         chartInstance.update('none');
-        console.log('✅ Download completato - risoluzione originale');
+        console.log('âœ… Download completato - risoluzione originale');
         
     } catch (error) {
         console.error('Errore download:', error);
@@ -1804,7 +1804,7 @@ map.addSource('incidenti-cluster', {
     type: 'geojson',
     data: geojson,
     cluster: true,
-    clusterMaxZoom: 15,        // zoom più alto
+    clusterMaxZoom: 15,        // zoom piÃ¹ alto
     clusterRadius: 40,         // raggio ridotto
     clusterMinPoints: 2        // minimo 2 punti per cluster
 });
@@ -1827,7 +1827,7 @@ paint: {
     'circle-radius': [
         'interpolate',
         ['linear'],
-        ['zoom'],                    // ← basato sullo zoom
+        ['zoom'],                    // â† basato sullo zoom
         10, ['interpolate', ['linear'], ['get', 'point_count'], 2, 6, 100, 25],
         16, ['interpolate', ['linear'], ['get', 'point_count'], 2, 12, 100, 40]
     ],
@@ -1897,7 +1897,7 @@ paint: {
         }
     });
 
-    console.log('✓ Tutti i layer cluster creati');
+    console.log('âœ“ Tutti i layer cluster creati');
 
     // Event handlers
     if (!map._clusterHandlersAdded) {
@@ -2445,7 +2445,7 @@ function filterByYear(year) {
     // AGGIUNGI/VERIFICA QUESTA PARTE
     const analyticsPanel = document.getElementById('analytics-panel');
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
-        updateAnalytics();  // Questa chiamata aggiornerà anche updateActiveFiltersDisplay()
+        updateAnalytics();  // Questa chiamata aggiornerÃ  anche updateActiveFiltersDisplay()
     }
 }
 
@@ -2734,7 +2734,7 @@ function updateLegendChart() {
         }
     });
     
-    // AGGIUNGI QUESTO BLOCCO QUI ↓
+    // AGGIUNGI QUESTO BLOCCO QUI â†“
     // Costruisci il titolo con i filtri attivi
     const activeFilters = [];
     
@@ -2766,7 +2766,7 @@ function updateLegendChart() {
     const chartTitle = document.getElementById('legend-chart-title');
     if (chartTitle) {
         if (activeFilters.length > 0) {
-            chartTitle.innerHTML = `Tipologia Incidenti<br><small style="font-size: 11px; font-weight: 600; color: #1f2937cc;">${activeFilters.join(' • ')}</small>`;
+            chartTitle.innerHTML = `Tipologia Incidenti<br><small style="font-size: 11px; font-weight: 600; color: #1f2937cc;">${activeFilters.join(' â€¢ ')}</small>`;
         } else {
             chartTitle.textContent = 'Tipologia Incidenti';
         }
@@ -3621,7 +3621,7 @@ function updateCalendarSummary() {
         parts.push(`<strong>Giorno settimana:</strong> ${customCalendarState.selectedWeekday}`);
     }
     
-    summary.innerHTML = parts.length > 0 ? parts.join(' • ') : 'Nessun filtro temporale attivo';
+    summary.innerHTML = parts.length > 0 ? parts.join(' â€¢ ') : 'Nessun filtro temporale attivo';
 }
 
 // Verifica dati mese
@@ -3787,7 +3787,7 @@ function updateSerieStoricaChart() {
             }
         });
         
-        console.log('✓ Grafico Incidenti/Feriti creato');
+        console.log('âœ“ Grafico Incidenti/Feriti creato');
     }
     
     // ========================================
@@ -3920,7 +3920,7 @@ plugins: {
             }
         });
         
-        console.log('✓ Grafico Incidenti Mortali/Morti creato');
+        console.log('âœ“ Grafico Incidenti Mortali/Morti creato');
     }
 }
 // Panoramica Charts
@@ -4495,7 +4495,7 @@ analyticsCharts[chartKey] = new Chart(canvas, {
         maintainAspectRatio: false,
         plugins: {
             legend: {
-                display: true,  // ← CAMBIATO DA false
+                display: true,  // â† CAMBIATO DA false
                 position: 'bottom',
                 labels: {
                     color: '#1f2937',
@@ -4575,7 +4575,7 @@ analyticsCharts[chartKey] = new Chart(canvas, {
         }
     });
     
-    const giorni = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
+    const giorni = ['LunedÃ¬', 'MartedÃ¬', 'MercoledÃ¬', 'GiovedÃ¬', 'VenerdÃ¬', 'Sabato', 'Domenica'];
     const giorniCounts = giorni.map(g => giornoData[g] || 0);
     
     const selectedGiorno = currentFilters['filter-giorno-settimana'];
@@ -4702,9 +4702,9 @@ if (giorniMeseCanvas) {
                 tension: 0.4,
                 pointBackgroundColor: '#ed7c89',
                 pointBorderColor: '#fff',
-                pointBorderWidth: 2,          // ✅ AUMENTATO da 1 a 2
-                pointRadius: 5,               // ✅ AUMENTATO da 2 a 5
-                pointHoverRadius: 7           // ✅ AUMENTATO da 5 a 7
+                pointBorderWidth: 2,          // âœ… AUMENTATO da 1 a 2
+                pointRadius: 5,               // âœ… AUMENTATO da 2 a 5
+                pointHoverRadius: 7           // âœ… AUMENTATO da 5 a 7
             }]
         },
         options: {
@@ -4727,16 +4727,16 @@ if (giorniMeseCanvas) {
                     }
                 },
                 datalabels: {
-                    display: true,              // ✅ ABILITATO (era false)
-                    align: 'top',               // ✅ NUOVO: posizione sopra i punti
-                    anchor: 'end',              // ✅ NUOVO: ancoraggio al punto
-                    offset: 4,                  // ✅ NUOVO: distanza dal punto
-                    color: '#1f2937',           // ✅ NUOVO: colore chiaro
-                    font: {                     // ✅ NUOVO: stile font
+                    display: true,              // âœ… ABILITATO (era false)
+                    align: 'top',               // âœ… NUOVO: posizione sopra i punti
+                    anchor: 'end',              // âœ… NUOVO: ancoraggio al punto
+                    offset: 4,                  // âœ… NUOVO: distanza dal punto
+                    color: '#1f2937',           // âœ… NUOVO: colore chiaro
+                    font: {                     // âœ… NUOVO: stile font
                         weight: 'bold', 
                         size: 9
                     },
-                    formatter: (value) => value > 0 ? value : ''  // ✅ MOSTRA SOLO SE > 0
+                    formatter: (value) => value > 0 ? value : ''  // âœ… MOSTRA SOLO SE > 0
                 }
             },
             scales: {
@@ -4830,7 +4830,7 @@ if (calendarioContainer) {
                 const dataCompleta = `${String(giorno).padStart(2, '0')}/${String(mese).padStart(2, '0')}`;
                 const title = count > 0 ? `${giorno} ${mesiCompleti[mese - 1]}: ${count} incidenti\nClicca per filtrare` : `${giorno} ${mesiCompleti[mese - 1]}`;
                 
-                // Verifica se questa cella è attiva
+                // Verifica se questa cella Ã¨ attiva
                 const isActive = currentFilters['filter-data-selezionata'] === dataCompleta + '/' + (currentFilters['filter-anno'] || '2023');
                 
                 html += `<div class="calendar-heatmap-cell ${intensityClass} ${isActive ? 'active' : ''}" 
@@ -4856,7 +4856,7 @@ if (calendarioContainer) {
             const count = parseInt(cell.dataset.count);
             const dataCompleta = cell.dataset.dataCompleta;
             
-            // Filtra anche se count è 0 (mostra che non ci sono incidenti quel giorno)
+            // Filtra anche se count Ã¨ 0 (mostra che non ci sono incidenti quel giorno)
             filterByCalendarioData(mese, giorno, dataCompleta);
         });
     });
@@ -4870,7 +4870,7 @@ function filterByCalendarioData(mese, giorno, dataCompleta) {
     const anno = currentFilters['filter-anno'] || '2023';
     const dataCompletaConAnno = `${dataCompleta}/${anno}`;
     
-    // Toggle: se già selezionato, deseleziona
+    // Toggle: se giÃ  selezionato, deseleziona
     if (currentFilters['filter-data-selezionata'] === dataCompletaConAnno) {
         delete currentFilters['filter-data-selezionata'];
         delete currentFilters['filter-mese'];
@@ -4993,7 +4993,7 @@ function filterByGiornoSettimana(giorno) {
 
 
 
-// Filter By Giorno Settimana (se non esiste già)
+// Filter By Giorno Settimana (se non esiste giÃ )
 function filterByGiornoSettimana(giorno) {
     const currentGiorno = currentFilters['filter-giorno-settimana'];
     
@@ -5304,7 +5304,7 @@ function updateOrariaCharts(data) {
         }
     });
     
-    const giorni = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
+    const giorni = ['LunedÃ¬', 'MartedÃ¬', 'MercoledÃ¬', 'GiovedÃ¬', 'VenerdÃ¬', 'Sabato', 'Domenica'];
     const giorniCounts = giorni.map(g => giornoData[g] || 0);
     
     const selectedGiorno = currentFilters['filter-giorno-settimana'];
@@ -5326,7 +5326,7 @@ function updateOrariaCharts(data) {
                 
                 ctx.save();
                 
-                // Disegna area feriali (Lunedì-Venerdì, indici 0-4)
+                // Disegna area feriali (LunedÃ¬-VenerdÃ¬, indici 0-4)
                 ctx.beginPath();
                 ctx.moveTo(left, bottom);
                 for (let i = 0; i <= 4; i++) {
@@ -5340,7 +5340,7 @@ function updateOrariaCharts(data) {
                 ctx.fillStyle = 'rgba(59, 130, 246, 0.6)';
                 ctx.fill();
                 
-                // Disegna area weekend (Venerdì-Domenica, indici 4-6)
+                // Disegna area weekend (VenerdÃ¬-Domenica, indici 4-6)
                 ctx.beginPath();
                 ctx.moveTo(meta.data[4].x, bottom);
                 for (let i = 4; i <= 6; i++) {
@@ -5380,7 +5380,7 @@ function updateOrariaCharts(data) {
                     pointHoverRadius: 8,
                     segment: {
     borderColor: (ctx) => {
-        // Segmento specifico tra venerdì (indice 4) e sabato (indice 5)
+        // Segmento specifico tra venerdÃ¬ (indice 4) e sabato (indice 5)
         if (ctx.p0DataIndex === 4 && ctx.p1DataIndex === 5) {
             return '#ed7c89'; // Colore per la transizione (es. giallo/arancione)
         }
@@ -5388,7 +5388,7 @@ function updateOrariaCharts(data) {
         return ctx.p0DataIndex < 5 ? '#0079c6' : '#ed7c89';
     },
     borderWidth: (ctx) => {
-        // Spessore maggiore per il segmento tra venerdì e sabato
+        // Spessore maggiore per il segmento tra venerdÃ¬ e sabato
         if (ctx.p0DataIndex === 4 && ctx.p1DataIndex === 5) {
             return 4; // Spessore aumentato
         }
@@ -5788,7 +5788,7 @@ function updateInsights(data) {
     
     const condizioneData = {};
     data.forEach(row => {
-        const cond = row['Condizioni luce (Visibilità)'];
+        const cond = row['Condizioni luce (VisibilitÃ )'];
         if (cond) {
             condizioneData[cond] = (condizioneData[cond] || 0) + 1;
         }

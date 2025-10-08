@@ -1,9 +1,8 @@
 // ============================================
-// CHART BUILDER - JAVASCRIPT LOGIC
-// Salva come: js/chart-builder.js
+// CHART BUILDER - JAVASCRIPT LOGIC FIXED
+// Versione Mobile-Compatible
 // ============================================
 
-// Variabili globali per Chart Builder
 let customChart = null;
 let customChartConfig = {
     type: 'bar',
@@ -14,173 +13,216 @@ let customChartConfig = {
 };
 
 // ============================================
-// INIZIALIZZAZIONE
+// GESTIONE MODALI GLOBALE
 // ============================================
-
-// Inizializza subito gli event listener quando il DOM è pronto
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Chart Builder: DOM caricato');
+const ModalManager = {
+    activeModals: new Set(),
     
-    // Fix per mobile - previeni doppio evento
-    const triggerBtn = document.getElementById('chart-builder-trigger');
-    if (triggerBtn) {
-        // Rimuovi event listener esistenti
-        const newTrigger = triggerBtn.cloneNode(true);
-        triggerBtn.parentNode.replaceChild(newTrigger, triggerBtn);
-        
-        // Aggiungi event listener ottimizzato
-        newTrigger.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Controlla se un modale è già aperto
-            if (document.body.classList.contains('analytics-panel-open')) {
-                console.log('Analytics panel già aperto');
-                return;
-            }
-            
-            console.log('Chart Builder: Click sul pulsante trigger');
-            openChartBuilder();
-        });
-        
-        // Fix per iOS
-        newTrigger.addEventListener('touchstart', function(e) {
-            // Non prevenire default per permettere il tocco
-        });
+    open(modalId) {
+        this.activeModals.add(modalId);
+        if (this.activeModals.size === 1) {
+            document.body.classList.add('modal-open');
+        }
+        console.log('ModalManager.open:', modalId, 'Totale modali:', this.activeModals.size);
+    },
+    
+    close(modalId) {
+        this.activeModals.delete(modalId);
+        if (this.activeModals.size === 0) {
+            document.body.classList.remove('modal-open');
+            document.body.classList.remove('analytics-panel-open');
+        }
+        console.log('ModalManager.close:', modalId, 'Totale modali:', this.activeModals.size);
+    },
+    
+    isAnyOpen() {
+        return this.activeModals.size > 0;
     }
+};
+
+// Rendi disponibile globalmente
+window.ModalManager = ModalManager;
+
+// ============================================
+// INIZIALIZZAZIONE UNICA
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Chart Builder: DOM caricato, inizializzazione...');
     
-    // Inizializza il resto quando disponibile
+    // Attendi che il DOM sia completamente caricato
     setTimeout(() => {
-        initChartBuilder();
-    }, 500);
+        initChartBuilderUI();
+    }, 300);
 });
-// Funzione per inizializzare solo l'UI (non richiede dati)
+
 function initChartBuilderUI() {
-    console.log('Chart Builder: Inizializzazione UI...');
-    
-    // Event Listeners base
     const triggerBtn = document.getElementById('chart-builder-trigger');
     const closeBtn = document.getElementById('chart-builder-close');
     const modal = document.getElementById('chart-builder-modal');
     
-    if (!triggerBtn) {
-        console.error('Chart Builder: Pulsante trigger non trovato!');
+    if (!triggerBtn || !modal) {
+        console.error('Chart Builder: Elementi DOM non trovati');
         return;
     }
     
-    console.log('Chart Builder: Pulsante trigger trovato');
+    console.log('Chart Builder: Elementi DOM trovati');
     
-    // Click sul pulsante principale
-    triggerBtn.addEventListener('click', function(e) {
+    // ========================================
+    // RIMUOVI TUTTI GLI EVENT LISTENER ESISTENTI
+    // ========================================
+    const newTrigger = triggerBtn.cloneNode(true);
+    triggerBtn.parentNode.replaceChild(newTrigger, triggerBtn);
+    
+    // ========================================
+    // GESTIONE CLICK DESKTOP
+    // ========================================
+    newTrigger.addEventListener('click', function(e) {
         e.preventDefault();
-        console.log('Chart Builder: Click sul pulsante trigger');
+        e.stopPropagation();
+        console.log('Chart Builder: Click desktop sul pulsante');
         openChartBuilder();
     });
     
-    // Click su chiudi
-    if (closeBtn) {
-        closeBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            closeChartBuilder();
-        });
-    }
+    // ========================================
+    // GESTIONE TOUCH MOBILE - OTTIMIZZATA
+    // ========================================
+    let touchStartTime = 0;
+    let touchMoved = false;
+    let touchStartY = 0;
     
-    // Chiudi cliccando fuori
-    if (modal) {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeChartBuilder();
-            }
-        });
-    }
+    newTrigger.addEventListener('touchstart', function(e) {
+        touchStartTime = Date.now();
+        touchMoved = false;
+        touchStartY = e.touches[0].clientY;
+        console.log('Chart Builder: Touch start');
+    }, { passive: true });
     
-    // Inizializza il resto quando disponibile
-    setTimeout(() => {
-        initChartBuilder();
-    }, 500);
+    newTrigger.addEventListener('touchmove', function(e) {
+        const touchCurrentY = e.touches[0].clientY;
+        if (Math.abs(touchCurrentY - touchStartY) > 10) {
+            touchMoved = true;
+        }
+    }, { passive: true });
     
-	document.addEventListener('DOMContentLoaded', function() {
-    const triggerBtn = document.getElementById('chart-builder-trigger');
-    
-    if (triggerBtn) {
-        // Rimuovi event listener esistenti
-        triggerBtn.replaceWith(triggerBtn.cloneNode(true));
+    newTrigger.addEventListener('touchend', function(e) {
+        const touchDuration = Date.now() - touchStartTime;
         
-        // Aggiungi nuovo event listener
-        const newTrigger = document.getElementById('chart-builder-trigger');
-        newTrigger.addEventListener('click', function(e) {
+        console.log('Chart Builder: Touch end - moved:', touchMoved, 'duration:', touchDuration);
+        
+        if (!touchMoved && touchDuration < 500) {
             e.preventDefault();
             e.stopPropagation();
+            console.log('Chart Builder: Touch end valido - apertura modale');
             openChartBuilder();
+        }
+    }, { passive: false });
+    
+    // ========================================
+    // PULSANTE CHIUSURA
+    // ========================================
+    if (closeBtn) {
+        const newCloseBtn = closeBtn.cloneNode(true);
+        closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+        
+        newCloseBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeChartBuilder();
         });
         
-        // Fix per mobile
-        newTrigger.addEventListener('touchstart', function(e) {
+        newCloseBtn.addEventListener('touchend', function(e) {
             e.preventDefault();
-            this.click();
-        });
+            e.stopPropagation();
+            closeChartBuilder();
+        }, { passive: false });
     }
-});
-	
-    console.log('Chart Builder: UI inizializzata');
+    
+    // ========================================
+    // CHIUDI CLICCANDO FUORI
+    // ========================================
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeChartBuilder();
+        }
+    });
+    
+    // ========================================
+    // INIZIALIZZA RESTO COMPONENTI
+    // ========================================
+    initChartBuilder();
+    
+    console.log('Chart Builder: Inizializzazione UI completata');
 }
 
-
 function openChartBuilder() {
+    console.log('Chart Builder: Tentativo apertura modale...');
+    
+    // Verifica se analytics panel è aperto
+    const analyticsPanel = document.getElementById('analytics-panel');
+    if (analyticsPanel && analyticsPanel.classList.contains('open')) {
+        console.log('Chart Builder: Analytics panel aperto, chiusura...');
+        if (typeof closeAnalytics === 'function') {
+            closeAnalytics();
+        }
+        // Attendi che si chiuda
+        setTimeout(() => {
+            continueOpenChartBuilder();
+        }, 100);
+    } else {
+        continueOpenChartBuilder();
+    }
+}
+
+function continueOpenChartBuilder() {
     const modal = document.getElementById('chart-builder-modal');
-    if (modal) {
-        modal.classList.add('show');
-        document.body.classList.add('modal-open'); // Aggiungi stato
-        console.log('Chart Builder aperto');
+    if (!modal) {
+        console.error('Chart Builder: Modale non trovata nel DOM!');
+        return;
+    }
+    
+    // Imposta z-index alto per essere sopra tutto
+    modal.style.zIndex = '10001';
+    
+    // Aggiungi classe show
+    modal.classList.add('show');
+    
+    // Registra nel ModalManager
+    ModalManager.open('chart-builder');
+    
+    console.log('Chart Builder: Modale aperta con successo');
+    console.log('Chart Builder: Classe show:', modal.classList.contains('show'));
+    console.log('Chart Builder: Display:', window.getComputedStyle(modal).display);
+    
+    // Aggiorna info se disponibili
+    try {
+        updateActiveFiltersDisplay();
+        updateFooterStats();
+    } catch (e) {
+        console.warn('Chart Builder: Errore aggiornamento dati:', e);
     }
 }
 
 function closeChartBuilder() {
+    console.log('Chart Builder: Chiusura modale...');
     const modal = document.getElementById('chart-builder-modal');
     if (modal) {
         modal.classList.remove('show');
-        document.body.classList.remove('modal-open'); // Rimuovi stato
-        console.log('Chart Builder chiuso');
+        ModalManager.close('chart-builder');
+        console.log('Chart Builder: Modale chiusa');
     }
 }
 
 // ============================================
-// INIZIALIZZAZIONE CHART BUILDER
+// INIZIALIZZAZIONE COMPONENTI
 // ============================================
 
 function initChartBuilder() {
-    console.log('Chart Builder: Inizializzazione...');
-    
-    // Event Listeners
-    const triggerBtn = document.getElementById('chart-builder-trigger');
-    const closeBtn = document.getElementById('chart-builder-close');
-    const modal = document.getElementById('chart-builder-modal');
-    
-    if (triggerBtn) {
-        triggerBtn.addEventListener('click', openChartBuilder);
-    }
-    
-    if (closeBtn) {
-        closeBtn.addEventListener('click', closeChartBuilder);
-    }
-    
-    // Chiudi cliccando fuori
-    if (modal) {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeChartBuilder();
-            }
-        });
-    }
-    
     // Chart Type Selection
     document.querySelectorAll('.chart-type-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.chart-type-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             customChartConfig.type = this.dataset.type;
-            
-            // Mostra/nascondi opzioni specifiche
             updateConfigOptions();
         });
     });
@@ -235,47 +277,11 @@ function initChartBuilder() {
         downloadBtn.addEventListener('click', downloadCustomChart);
     }
     
-    console.log('Chart Builder: Inizializzazione completata');
-}
-
-// ============================================
-// FUNZIONI UI
-// ============================================
-
-function openChartBuilder() {
-    console.log('Chart Builder: Apertura modale...');
-    const modal = document.getElementById('chart-builder-modal');
-    
-    if (!modal) {
-        console.error('Chart Builder: Modale non trovata nel DOM!');
-        return;
-    }
-    
-    modal.classList.add('show');
-    console.log('Chart Builder: Modale aperta');
-    
-    // Aggiorna info se disponibili
-    try {
-        updateActiveFiltersDisplay();
-        updateFooterStats();
-    } catch (e) {
-        console.warn('Chart Builder: Dati non ancora disponibili', e);
-    }
-}
-
-function closeChartBuilder() {
-    console.log('Chart Builder: Chiusura modale...');
-    const modal = document.getElementById('chart-builder-modal');
-    if (modal) {
-        modal.classList.remove('show');
-        console.log('Chart Builder: Modale chiusa');
-    }
+    console.log('Chart Builder: Componenti inizializzati');
 }
 
 function updateConfigOptions() {
     const orientationGroup = document.getElementById('orientation-group');
-    
-    // Mostra orientamento solo per grafici a barre
     if (orientationGroup) {
         if (customChartConfig.type === 'bar') {
             orientationGroup.style.display = 'block';
@@ -289,7 +295,6 @@ function updateActiveFiltersDisplay() {
     const container = document.getElementById('custom-chart-filters');
     if (!container) return;
     
-    // Usa i filtri globali dall'app principale
     const activeFilters = [];
     
     if (typeof currentFilters !== 'undefined') {
@@ -319,11 +324,9 @@ function updateFooterStats() {
     
     if (!totalEl || !periodEl) return;
     
-    // Usa getFilteredData dall'app principale
     const data = typeof getFilteredData !== 'undefined' ? getFilteredData() : [];
     totalEl.textContent = `${data.length.toLocaleString('it-IT')} incidenti`;
     
-    // Determina il periodo
     let period = '2015-2023';
     if (typeof currentFilters !== 'undefined' && currentFilters['filter-anno']) {
         period = currentFilters['filter-anno'];
@@ -342,13 +345,11 @@ function generateCustomChart() {
     console.log('Generazione grafico personalizzato...');
     console.log('Config:', customChartConfig);
     
-    // Validazione
     if (!customChartConfig.dimension) {
         alert('⚠️ Seleziona una dimensione per generare il grafico');
         return;
     }
     
-    // Ottieni dati filtrati
     const filteredData = typeof getFilteredData !== 'undefined' ? getFilteredData() : allIncidenti;
     
     if (filteredData.length === 0) {
@@ -356,10 +357,7 @@ function generateCustomChart() {
         return;
     }
     
-    // Prepara i dati in base alla configurazione
     const chartData = prepareChartData(filteredData);
-    
-    // Crea il grafico
     renderCustomChart(chartData);
 }
 
@@ -373,7 +371,6 @@ function prepareChartData(data) {
     let aggregatedData = {};
     
     if (metric === 'count') {
-        // Conteggio semplice
         data.forEach(row => {
             const value = row[dimension];
             if (value && value !== 'null') {
@@ -381,7 +378,6 @@ function prepareChartData(data) {
             }
         });
     } else if (metric === 'tipologia') {
-        // Raggruppa per tipologia
         const tipologie = ['M', 'R', 'F', 'C'];
         data.forEach(row => {
             const value = row[dimension];
@@ -395,13 +391,11 @@ function prepareChartData(data) {
         });
     }
     
-    // Converti in array e ordina
     let dataArray = Object.entries(aggregatedData).map(([key, value]) => ({
         label: key,
         value: value
     }));
     
-    // Ordina per valore (per count) o per totale (per tipologia)
     if (metric === 'count') {
         dataArray.sort((a, b) => b.value - a.value);
     } else {
@@ -412,12 +406,10 @@ function prepareChartData(data) {
         });
     }
     
-    // Applica limite
     if (limit > 0) {
         dataArray = dataArray.slice(0, limit);
     }
     
-    // Ordina in base alla dimensione se necessario
     dataArray = sortByDimension(dataArray, dimension);
     
     console.log('Dati preparati:', dataArray);
@@ -425,7 +417,6 @@ function prepareChartData(data) {
 }
 
 function sortByDimension(dataArray, dimension) {
-    // Ordinamenti speciali per alcune dimensioni
     const monthOrder = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 
                         'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
     const dayOrder = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
@@ -454,20 +445,16 @@ function renderCustomChart(data) {
     
     if (!canvas) return;
     
-    // Mostra canvas, nascondi placeholder
     if (wrapper) wrapper.style.display = 'block';
     if (placeholder) placeholder.style.display = 'none';
     
-    // Distruggi grafico precedente
     if (customChart) {
         customChart.destroy();
     }
     
-    // Prepara dataset
     const chartDatasets = prepareChartDatasets(data);
     const chartLabels = data.map(d => d.label);
     
-    // Configurazione grafico
     const config = {
         type: customChartConfig.type,
         data: {
@@ -477,7 +464,6 @@ function renderCustomChart(data) {
         options: getChartOptions()
     };
     
-    // Crea grafico
     customChart = new Chart(canvas, config);
     
     console.log('Grafico personalizzato creato');
@@ -488,10 +474,8 @@ function prepareChartDatasets(data) {
     const type = customChartConfig.type;
     
     if (metric === 'count') {
-        // Dataset singolo
         const values = data.map(d => d.value);
         
-        // Colori dinamici
         let colors;
         if (type === 'pie' || type === 'doughnut' || type === 'polarArea') {
             colors = generateColors(data.length);
@@ -509,7 +493,6 @@ function prepareChartDatasets(data) {
             tension: 0.4
         }];
     } else {
-        // Dataset multipli per tipologia
         const tipologieMap = {
             'M': { label: 'Mortali', color: '#ef4444' },
             'R': { label: 'Riserva', color: '#a855f7' },
@@ -579,7 +562,6 @@ function getChartOptions() {
         }
     };
     
-    // Opzioni specifiche per tipo
     if (type === 'bar') {
         baseOptions.indexAxis = orientation === 'horizontal' ? 'y' : 'x';
         baseOptions.scales = {
@@ -620,10 +602,6 @@ function getChartOptions() {
     return baseOptions;
 }
 
-// ============================================
-// UTILITY FUNCTIONS
-// ============================================
-
 function generateColors(count) {
     const baseColors = [
         '#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', 
@@ -647,7 +625,6 @@ function generateGradientColors(count) {
 }
 
 function resetChartBuilder() {
-    // Reset config
     customChartConfig = {
         type: 'bar',
         dimension: null,
@@ -656,7 +633,6 @@ function resetChartBuilder() {
         orientation: 'vertical'
     };
     
-    // Reset UI
     document.querySelectorAll('.chart-type-btn').forEach(btn => {
         btn.classList.remove('active');
         if (btn.dataset.type === 'bar') {
@@ -676,13 +652,11 @@ function resetChartBuilder() {
     const orientationSelect = document.getElementById('orientation-select');
     if (orientationSelect) orientationSelect.value = 'vertical';
     
-    // Distruggi grafico
     if (customChart) {
         customChart.destroy();
         customChart = null;
     }
     
-    // Mostra placeholder
     const wrapper = document.getElementById('chart-wrapper-custom');
     const placeholder = document.querySelector('.preview-placeholder');
     if (wrapper) wrapper.style.display = 'none';
@@ -690,10 +664,6 @@ function resetChartBuilder() {
     
     console.log('Chart Builder resettato');
 }
-
-// ============================================
-// DOWNLOAD GRAFICO
-// ============================================
 
 function downloadCustomChart() {
     if (!customChart) {
@@ -704,63 +674,10 @@ function downloadCustomChart() {
     const canvas = document.getElementById('custom-chart-canvas');
     if (!canvas) return;
     
-    // Crea un canvas temporaneo più grande
-    const tempCanvas = document.createElement('canvas');
-    const tempCtx = tempCanvas.getContext('2d');
-    
-    // Dimensioni finali
-    const width = 1200;
-    const height = 800;
-    tempCanvas.width = width;
-    tempCanvas.height = height;
-    
-    // Sfondo bianco
-    tempCtx.fillStyle = '#ffffff';
-    tempCtx.fillRect(0, 0, width, height);
-    
-    // Header
-    tempCtx.fillStyle = '#1f2937';
-    tempCtx.font = 'bold 24px Titillium Web';
-    tempCtx.textAlign = 'left';
-    tempCtx.fillText('Dashboard Incidenti Palermo - Grafico Personalizzato', 40, 45);
-    
-    // Info filtri
-    tempCtx.font = '14px Titillium Web';
-    tempCtx.fillStyle = '#6b7280';
-    const filterText = typeof currentFilters !== 'undefined' && Object.keys(currentFilters).length > 0 
-        ? 'Filtri applicati' 
-        : 'Tutti gli incidenti (2015-2023)';
-    tempCtx.fillText(filterText, 40, 70);
-    
-    // Linea separatrice
-    tempCtx.strokeStyle = '#e5e7eb';
-    tempCtx.lineWidth = 2;
-    tempCtx.beginPath();
-    tempCtx.moveTo(40, 85);
-    tempCtx.lineTo(width - 40, 85);
-    tempCtx.stroke();
-    
-    // Disegna il grafico
-    const chartHeight = height - 180;
-    tempCtx.drawImage(canvas, 40, 100, width - 80, chartHeight);
-    
-    // Footer
-    tempCtx.strokeStyle = '#e5e7eb';
-    tempCtx.beginPath();
-    tempCtx.moveTo(40, height - 70);
-    tempCtx.lineTo(width - 40, height - 70);
-    tempCtx.stroke();
-    
-    tempCtx.font = '12px Titillium Web';
-    tempCtx.fillStyle = '#6b7280';
-    tempCtx.fillText('Fonte: dati.gov.it - Rielaborazione: opendatasicilia.it', 40, height - 45);
-    tempCtx.fillText('https://opendatasicilia.github.io/incidenti_palermo/', 40, height - 25);
-    
-    // Download
     const link = document.createElement('a');
     const timestamp = new Date().getTime();
     link.download = `grafico_personalizzato_${timestamp}.png`;
-    link.href = tempCanvas.toDataURL('image/png');
+    link.href = canvas.toDataURL('image/png');
     link.click();
     
     console.log('Download grafico completato');

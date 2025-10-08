@@ -1,15 +1,3 @@
+In modalità mobile i filtri sugli anni delle statistiche non funzionano
 
-
-5) NEL TAB 'Oraria' dividi lo spazio in due colonne, a sinistra mantieni il grafico 'Distribuzione per Fascia Oraria' , convertilo ad aree tipo immagine allegata, a destra utilizzando gli stessi dati del grafico 'Distribuzione per Fascia Oraria' crea un grafico o barre orizontali, e sostituisci il nome nelle fasce con le ore, come da tabbella 
-Notte: 0:00 - 5:00 e 22:00 - 00:00
-Alba: 5:00 - 7:00
-Mattina: 7:00 - 12:00
-Pranzo: 12:00 - 14:00
-Pomeriggio: 14:00 - 18:00
-Sera: 18:00 - 22:00
-Mostra in tutti i grafici le etichette e non mettere background sotto le etichette. I grafici devo funzionare da filtri ed essere interconnessi con tutti gli altri filtri.
-
-6) Elimina tab e grafici 'Condizioni '
-
-7) quando si esporta un grafico in png le dimensioni devono essere 1027x 768 px 
-aggiungi il titolo del grafio e tutti i filtri usati. in basso a destra inserici il logo ods che trovi nella cartella 'img/pa_hub_new.png' non inserire la possibilità del donwload del png nel grafico a calendario della sezione 'Temporale'
+analizza in dettaglio i file e verifica se ci sono conflitti che impediscono di fare aprire in mobile i modali di 'chart-builder' e 'footer-modal'
