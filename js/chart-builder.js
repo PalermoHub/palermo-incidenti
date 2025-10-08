@@ -1,6 +1,6 @@
 // ============================================
-// CHART BUILDER - JAVASCRIPT LOGIC FIXED
-// Versione Mobile-Compatible
+// CHART BUILDER - JAVASCRIPT COMPLETO
+// Versione: 2.1 - Con Totale e Colore Testo
 // ============================================
 
 let customChart = null;
@@ -8,8 +8,34 @@ let customChartConfig = {
     type: 'bar',
     dimension: null,
     metric: 'count',
+    tipologieSelezionate: [],
     limit: 10,
-    orientation: 'vertical'
+    orientation: 'vertical',
+    colors: {
+        mode: 'auto',
+        primary: '#3b82f6',
+        secondary: '#8b5cf6',
+        text: '#1f2937'
+    },
+    style: {
+        borderWidth: 2,
+        opacity: 0.8,
+        fontSize: 12,
+        titleSize: 16,
+        legendSize: 12,
+        gridOpacity: 0.1,
+        showGrid: true,
+        showLegend: true,
+        tension: 0.4,
+        pointRadius: 3,
+        fill: true
+    },
+    variant: {
+        stacked: false,
+        horizontal: false,
+        showValues: true,
+        animation: true
+    }
 };
 
 // ============================================
@@ -23,7 +49,6 @@ const ModalManager = {
         if (this.activeModals.size === 1) {
             document.body.classList.add('modal-open');
         }
-        console.log('ModalManager.open:', modalId, 'Totale modali:', this.activeModals.size);
     },
     
     close(modalId) {
@@ -32,24 +57,15 @@ const ModalManager = {
             document.body.classList.remove('modal-open');
             document.body.classList.remove('analytics-panel-open');
         }
-        console.log('ModalManager.close:', modalId, 'Totale modali:', this.activeModals.size);
-    },
-    
-    isAnyOpen() {
-        return this.activeModals.size > 0;
     }
 };
 
-// Rendi disponibile globalmente
 window.ModalManager = ModalManager;
 
 // ============================================
-// INIZIALIZZAZIONE UNICA
+// INIZIALIZZAZIONE
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Chart Builder: DOM caricato, inizializzazione...');
-    
-    // Attendi che il DOM sia completamente caricato
     setTimeout(() => {
         initChartBuilderUI();
     }, 300);
@@ -60,114 +76,70 @@ function initChartBuilderUI() {
     const closeBtn = document.getElementById('chart-builder-close');
     const modal = document.getElementById('chart-builder-modal');
     
-    if (!triggerBtn || !modal) {
-        console.error('Chart Builder: Elementi DOM non trovati');
-        return;
-    }
+    if (!triggerBtn || !modal) return;
     
-    console.log('Chart Builder: Elementi DOM trovati');
-    
-    // ========================================
-    // RIMUOVI TUTTI GLI EVENT LISTENER ESISTENTI
-    // ========================================
+    // Rimuovi listener esistenti
     const newTrigger = triggerBtn.cloneNode(true);
     triggerBtn.parentNode.replaceChild(newTrigger, triggerBtn);
     
-    // ========================================
-    // GESTIONE CLICK DESKTOP
-    // ========================================
+    // Click desktop
     newTrigger.addEventListener('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        console.log('Chart Builder: Click desktop sul pulsante');
         openChartBuilder();
     });
     
-    // ========================================
-    // GESTIONE TOUCH MOBILE - OTTIMIZZATA
-    // ========================================
+    // Touch mobile
     let touchStartTime = 0;
     let touchMoved = false;
-    let touchStartY = 0;
     
     newTrigger.addEventListener('touchstart', function(e) {
         touchStartTime = Date.now();
         touchMoved = false;
-        touchStartY = e.touches[0].clientY;
-        console.log('Chart Builder: Touch start');
     }, { passive: true });
     
-    newTrigger.addEventListener('touchmove', function(e) {
-        const touchCurrentY = e.touches[0].clientY;
-        if (Math.abs(touchCurrentY - touchStartY) > 10) {
-            touchMoved = true;
-        }
+    newTrigger.addEventListener('touchmove', function() {
+        touchMoved = true;
     }, { passive: true });
     
     newTrigger.addEventListener('touchend', function(e) {
         const touchDuration = Date.now() - touchStartTime;
-        
-        console.log('Chart Builder: Touch end - moved:', touchMoved, 'duration:', touchDuration);
-        
         if (!touchMoved && touchDuration < 500) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('Chart Builder: Touch end valido - apertura modale');
             openChartBuilder();
         }
     }, { passive: false });
     
-    // ========================================
-    // PULSANTE CHIUSURA
-    // ========================================
+    // Pulsante chiusura
     if (closeBtn) {
         const newCloseBtn = closeBtn.cloneNode(true);
         closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
         
-        newCloseBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            closeChartBuilder();
-        });
-        
+        newCloseBtn.addEventListener('click', closeChartBuilder);
         newCloseBtn.addEventListener('touchend', function(e) {
             e.preventDefault();
-            e.stopPropagation();
             closeChartBuilder();
         }, { passive: false });
     }
     
-    // ========================================
-    // CHIUDI CLICCANDO FUORI
-    // ========================================
+    // Chiudi cliccando fuori
     modal.addEventListener('click', function(e) {
         if (e.target === modal) {
             closeChartBuilder();
         }
     });
     
-    // ========================================
-    // INIZIALIZZA RESTO COMPONENTI
-    // ========================================
     initChartBuilder();
-    
-    console.log('Chart Builder: Inizializzazione UI completata');
 }
 
 function openChartBuilder() {
-    console.log('Chart Builder: Tentativo apertura modale...');
-    
-    // Verifica se analytics panel è aperto
     const analyticsPanel = document.getElementById('analytics-panel');
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
-        console.log('Chart Builder: Analytics panel aperto, chiusura...');
         if (typeof closeAnalytics === 'function') {
             closeAnalytics();
         }
-        // Attendi che si chiuda
-        setTimeout(() => {
-            continueOpenChartBuilder();
-        }, 100);
+        setTimeout(continueOpenChartBuilder, 100);
     } else {
         continueOpenChartBuilder();
     }
@@ -175,47 +147,31 @@ function openChartBuilder() {
 
 function continueOpenChartBuilder() {
     const modal = document.getElementById('chart-builder-modal');
-    if (!modal) {
-        console.error('Chart Builder: Modale non trovata nel DOM!');
-        return;
-    }
+    if (!modal) return;
     
-    // Imposta z-index alto per essere sopra tutto
     modal.style.zIndex = '10001';
-    
-    // Aggiungi classe show
     modal.classList.add('show');
-    
-    // Registra nel ModalManager
     ModalManager.open('chart-builder');
     
-    console.log('Chart Builder: Modale aperta con successo');
-    console.log('Chart Builder: Classe show:', modal.classList.contains('show'));
-    console.log('Chart Builder: Display:', window.getComputedStyle(modal).display);
-    
-    // Aggiorna info se disponibili
     try {
         updateActiveFiltersDisplay();
         updateFooterStats();
     } catch (e) {
-        console.warn('Chart Builder: Errore aggiornamento dati:', e);
+        console.warn('Errore aggiornamento dati:', e);
     }
 }
 
 function closeChartBuilder() {
-    console.log('Chart Builder: Chiusura modale...');
     const modal = document.getElementById('chart-builder-modal');
     if (modal) {
         modal.classList.remove('show');
         ModalManager.close('chart-builder');
-        console.log('Chart Builder: Modale chiusa');
     }
 }
 
 // ============================================
 // INIZIALIZZAZIONE COMPONENTI
 // ============================================
-
 function initChartBuilder() {
     // Chart Type Selection
     document.querySelectorAll('.chart-type-btn').forEach(btn => {
@@ -240,8 +196,12 @@ function initChartBuilder() {
     if (metricSelect) {
         metricSelect.addEventListener('change', (e) => {
             customChartConfig.metric = e.target.value;
+            updateTipologieVisibility();
         });
     }
+    
+    // Tipologie Checkboxes
+    initTipologieCheckboxes();
     
     // Limit Select
     const limitSelect = document.getElementById('limit-select');
@@ -259,38 +219,334 @@ function initChartBuilder() {
         });
     }
     
-    // Generate Button
+    // Color Mode
+    const colorModeSelect = document.getElementById('color-mode-select');
+    if (colorModeSelect) {
+        colorModeSelect.addEventListener('change', (e) => {
+            customChartConfig.colors.mode = e.target.value;
+            updateColorControls();
+        });
+    }
+    
+    // Color Pickers
+    initColorPickers();
+    
+    // Range Controls
+    initRangeControls();
+    
+    // Variant Checkboxes
+    initVariantCheckboxes();
+    
+    // Action Buttons
     const generateBtn = document.getElementById('btn-generate-chart');
     if (generateBtn) {
         generateBtn.addEventListener('click', generateCustomChart);
     }
     
-    // Reset Button
     const resetBtn = document.getElementById('btn-reset-builder');
     if (resetBtn) {
         resetBtn.addEventListener('click', resetChartBuilder);
     }
     
-    // Download Button
     const downloadBtn = document.getElementById('btn-download-custom-chart');
     if (downloadBtn) {
         downloadBtn.addEventListener('click', downloadCustomChart);
     }
     
-    console.log('Chart Builder: Componenti inizializzati');
+    // Preset Buttons
+    document.querySelectorAll('.apply-preset').forEach(btn => {
+        btn.addEventListener('click', function() {
+            applyStylePreset(this.dataset.preset);
+        });
+    });
+    
+    // Listener per aggiornamento filtri
+    window.addEventListener('filtersUpdated', () => {
+        if (document.getElementById('chart-builder-modal').classList.contains('show')) {
+            updateActiveFiltersDisplay();
+            updateFooterStats();
+        }
+    });
 }
 
-function updateConfigOptions() {
-    const orientationGroup = document.getElementById('orientation-group');
-    if (orientationGroup) {
-        if (customChartConfig.type === 'bar') {
-            orientationGroup.style.display = 'block';
-        } else {
-            orientationGroup.style.display = 'none';
-        }
+// ============================================
+// TIPOLOGIE CHECKBOXES
+// ============================================
+function initTipologieCheckboxes() {
+    const checkboxes = document.querySelectorAll('.tipologia-checkbox input[type="checkbox"]');
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', function() {
+            const tipo = this.value;
+            const parent = this.closest('.tipologia-checkbox');
+            
+            if (this.checked) {
+                customChartConfig.tipologieSelezionate.push(tipo);
+                parent.classList.add('checked');
+            } else {
+                customChartConfig.tipologieSelezionate = customChartConfig.tipologieSelezionate.filter(t => t !== tipo);
+                parent.classList.remove('checked');
+            }
+        });
+    });
+}
+
+function updateTipologieVisibility() {
+    const tipologieGroup = document.getElementById('tipologie-group');
+    if (tipologieGroup) {
+        tipologieGroup.style.display = customChartConfig.metric === 'tipologia' ? 'block' : 'none';
     }
 }
 
+// ============================================
+// COLOR CONTROLS
+// ============================================
+function initColorPickers() {
+    const primaryColor = document.getElementById('primary-color');
+    if (primaryColor) {
+        primaryColor.addEventListener('input', (e) => {
+            customChartConfig.colors.primary = e.target.value;
+        });
+    }
+    
+    const primaryGradient = document.getElementById('primary-color-gradient');
+    if (primaryGradient) {
+        primaryGradient.addEventListener('input', (e) => {
+            customChartConfig.colors.primary = e.target.value;
+        });
+    }
+    
+    const secondaryColor = document.getElementById('secondary-color');
+    if (secondaryColor) {
+        secondaryColor.addEventListener('input', (e) => {
+            customChartConfig.colors.secondary = e.target.value;
+        });
+    }
+    
+    // Color Picker per testo con aggiornamento automatico
+    const textColor = document.getElementById('text-color');
+    if (textColor) {
+        textColor.addEventListener('input', (e) => {
+            customChartConfig.colors.text = e.target.value;
+            // Aggiorna automaticamente se il grafico esiste
+            if (customChart) {
+                updateChartColors();
+            }
+        });
+    }
+}
+
+function updateColorControls() {
+    const mode = customChartConfig.colors.mode;
+    const singleGroup = document.getElementById('single-color-group');
+    const gradientGroup = document.getElementById('gradient-color-group');
+    
+    if (singleGroup) singleGroup.style.display = mode === 'single' ? 'block' : 'none';
+    if (gradientGroup) gradientGroup.style.display = mode === 'gradient' ? 'block' : 'none';
+}
+
+// ============================================
+// RANGE CONTROLS
+// ============================================
+function initRangeControls() {
+    initRangeControl('border-width', 'border-width-value', (val) => {
+        customChartConfig.style.borderWidth = parseFloat(val);
+    });
+    
+    initRangeControl('opacity', 'opacity-value', (val) => {
+        customChartConfig.style.opacity = parseFloat(val);
+    });
+    
+    initRangeControl('font-size', 'font-size-value', (val) => {
+        customChartConfig.style.fontSize = parseInt(val);
+    }, 'px');
+    
+    initRangeControl('title-size', 'title-size-value', (val) => {
+        customChartConfig.style.titleSize = parseInt(val);
+    }, 'px');
+    
+    initRangeControl('legend-size', 'legend-size-value', (val) => {
+        customChartConfig.style.legendSize = parseInt(val);
+    }, 'px');
+    
+    initRangeControl('grid-opacity', 'grid-opacity-value', (val) => {
+        customChartConfig.style.gridOpacity = parseFloat(val);
+    });
+    
+    initRangeControl('tension', 'tension-value', (val) => {
+        customChartConfig.style.tension = parseFloat(val);
+    });
+    
+    initRangeControl('point-radius', 'point-radius-value', (val) => {
+        customChartConfig.style.pointRadius = parseInt(val);
+    }, 'px');
+}
+
+function initRangeControl(inputId, displayId, callback, suffix = '') {
+    const input = document.getElementById(inputId);
+    const display = document.getElementById(displayId);
+    
+    if (input && display) {
+        input.addEventListener('input', (e) => {
+            const value = e.target.value;
+            display.textContent = value + suffix;
+            callback(value);
+        });
+    }
+}
+
+// ============================================
+// VARIANT CHECKBOXES
+// ============================================
+function initVariantCheckboxes() {
+    const stackedCb = document.getElementById('stacked-variant');
+    if (stackedCb) {
+        stackedCb.addEventListener('change', (e) => {
+            customChartConfig.variant.stacked = e.target.checked;
+        });
+    }
+    
+    const horizontalCb = document.getElementById('horizontal-variant');
+    if (horizontalCb) {
+        horizontalCb.addEventListener('change', (e) => {
+            customChartConfig.variant.horizontal = e.target.checked;
+        });
+    }
+    
+    const showValuesCb = document.getElementById('show-values');
+    if (showValuesCb) {
+        showValuesCb.addEventListener('change', (e) => {
+            customChartConfig.variant.showValues = e.target.checked;
+        });
+    }
+    
+    const showGridCb = document.getElementById('show-grid');
+    if (showGridCb) {
+        showGridCb.addEventListener('change', (e) => {
+            customChartConfig.style.showGrid = e.target.checked;
+        });
+    }
+    
+    const showLegendCb = document.getElementById('show-legend');
+    if (showLegendCb) {
+        showLegendCb.addEventListener('change', (e) => {
+            customChartConfig.style.showLegend = e.target.checked;
+        });
+    }
+    
+    const fillAreaCb = document.getElementById('fill-area');
+    if (fillAreaCb) {
+        fillAreaCb.addEventListener('change', (e) => {
+            customChartConfig.style.fill = e.target.checked;
+        });
+    }
+    
+    const animationCb = document.getElementById('animation');
+    if (animationCb) {
+        animationCb.addEventListener('change', (e) => {
+            customChartConfig.variant.animation = e.target.checked;
+        });
+    }
+}
+
+// ============================================
+// CONFIG OPTIONS UPDATE
+// ============================================
+function updateConfigOptions() {
+    const type = customChartConfig.type;
+    
+    const orientationGroup = document.getElementById('orientation-group');
+    if (orientationGroup) {
+        orientationGroup.style.display = type === 'bar' ? 'block' : 'none';
+    }
+    
+    const stackedGroup = document.getElementById('stacked-group');
+    if (stackedGroup) {
+        stackedGroup.style.display = ['bar', 'line'].includes(type) ? 'block' : 'none';
+    }
+    
+    const horizontalGroup = document.getElementById('horizontal-group');
+    if (horizontalGroup) {
+        horizontalGroup.style.display = type === 'bar' ? 'block' : 'none';
+    }
+    
+    const fillGroup = document.getElementById('fill-group');
+    if (fillGroup) {
+        fillGroup.style.display = type === 'line' ? 'block' : 'none';
+    }
+    
+    const tensionGroup = document.getElementById('tension-group');
+    if (tensionGroup) {
+        tensionGroup.style.display = ['line', 'radar'].includes(type) ? 'block' : 'none';
+    }
+    
+    const pointGroup = document.getElementById('point-group');
+    if (pointGroup) {
+        pointGroup.style.display = ['line', 'scatter'].includes(type) ? 'block' : 'none';
+    }
+}
+
+// ============================================
+// PRESET STYLES
+// ============================================
+function applyStylePreset(preset) {
+    const presets = {
+        minimal: {
+            borderWidth: 1,
+            opacity: 0.6,
+            fontSize: 10,
+            titleSize: 14,
+            legendSize: 10,
+            gridOpacity: 0.05
+        },
+        default: {
+            borderWidth: 2,
+            opacity: 0.8,
+            fontSize: 12,
+            titleSize: 16,
+            legendSize: 12,
+            gridOpacity: 0.1
+        },
+        bold: {
+            borderWidth: 4,
+            opacity: 1,
+            fontSize: 14,
+            titleSize: 20,
+            legendSize: 14,
+            gridOpacity: 0.2
+        },
+        clean: {
+            borderWidth: 0,
+            opacity: 0.9,
+            fontSize: 11,
+            titleSize: 18,
+            legendSize: 11,
+            gridOpacity: 0
+        }
+    };
+    
+    if (presets[preset]) {
+        Object.assign(customChartConfig.style, presets[preset]);
+        
+        // Update UI
+        const updateInput = (id, value, displayId, suffix = '') => {
+            const input = document.getElementById(id);
+            const display = document.getElementById(displayId);
+            if (input) input.value = value;
+            if (display) display.textContent = value + suffix;
+        };
+        
+        updateInput('border-width', presets[preset].borderWidth, 'border-width-value');
+        updateInput('opacity', presets[preset].opacity, 'opacity-value');
+        updateInput('font-size', presets[preset].fontSize, 'font-size-value', 'px');
+        updateInput('title-size', presets[preset].titleSize, 'title-size-value', 'px');
+        updateInput('legend-size', presets[preset].legendSize, 'legend-size-value', 'px');
+        updateInput('grid-opacity', presets[preset].gridOpacity, 'grid-opacity-value');
+    }
+}
+
+// ============================================
+// FILTERS DISPLAY
+// ============================================
 function updateActiveFiltersDisplay() {
     const container = document.getElementById('custom-chart-filters');
     if (!container) return;
@@ -300,8 +556,23 @@ function updateActiveFiltersDisplay() {
     if (typeof currentFilters !== 'undefined') {
         Object.entries(currentFilters).forEach(([key, value]) => {
             if (value && value !== '') {
-                const label = key.replace('filter-', '').replace(/-/g, ' ');
-                activeFilters.push({ label: label, value: value });
+                let label = key.replace('filter-', '').replace(/-/g, ' ');
+                
+                // Nomi più friendly
+                const friendlyNames = {
+                    'data selezionata': 'Data',
+                    'anno': 'Anno',
+                    'mese': 'Mese',
+                    'giorno settimana': 'Giorno',
+                    'tipologia': 'Tipo',
+                    'circoscrizione': 'Circoscrizione',
+                    'quartiere': 'Quartiere',
+                    'giorno notte': 'Periodo',
+                    'feriale weekend': 'Tipo Giorno'
+                };
+                
+                label = friendlyNames[label] || label;
+                activeFilters.push({ label, value });
             }
         });
     }
@@ -338,19 +609,15 @@ function updateFooterStats() {
 }
 
 // ============================================
-// GENERAZIONE GRAFICO
+// CHART GENERATION
 // ============================================
-
 function generateCustomChart() {
-    console.log('Generazione grafico personalizzato...');
-    console.log('Config:', customChartConfig);
-    
     if (!customChartConfig.dimension) {
         alert('⚠️ Seleziona una dimensione per generare il grafico');
         return;
     }
     
-    const filteredData = typeof getFilteredData !== 'undefined' ? getFilteredData() : allIncidenti;
+    const filteredData = typeof getFilteredData !== 'undefined' ? getFilteredData() : [];
     
     if (filteredData.length === 0) {
         alert('⚠️ Nessun dato disponibile con i filtri attuali');
@@ -366,8 +633,6 @@ function prepareChartData(data) {
     const metric = customChartConfig.metric;
     const limit = customChartConfig.limit;
     
-    console.log('Preparazione dati per dimensione:', dimension);
-    
     let aggregatedData = {};
     
     if (metric === 'count') {
@@ -378,15 +643,23 @@ function prepareChartData(data) {
             }
         });
     } else if (metric === 'tipologia') {
-        const tipologie = ['M', 'R', 'F', 'C'];
+        const tipiDaUsare = customChartConfig.tipologieSelezionate.length > 0 
+            ? customChartConfig.tipologieSelezionate 
+            : ['M', 'R', 'F', 'C', 'TOTAL'];
+        
         data.forEach(row => {
             const value = row[dimension];
             const tipo = row['Tipologia'];
-            if (value && value !== 'null' && tipo) {
+            if (value && value !== 'null') {
                 if (!aggregatedData[value]) {
-                    aggregatedData[value] = { M: 0, R: 0, F: 0, C: 0 };
+                    aggregatedData[value] = { M: 0, R: 0, F: 0, C: 0, TOTAL: 0 };
                 }
-                aggregatedData[value][tipo]++;
+                // Incrementa la tipologia specifica
+                if (tipo && ['M', 'R', 'F', 'C'].includes(tipo)) {
+                    aggregatedData[value][tipo]++;
+                }
+                // Incrementa sempre il totale
+                aggregatedData[value].TOTAL++;
             }
         });
     }
@@ -412,7 +685,6 @@ function prepareChartData(data) {
     
     dataArray = sortByDimension(dataArray, dimension);
     
-    console.log('Dati preparati:', dataArray);
     return dataArray;
 }
 
@@ -421,7 +693,7 @@ function sortByDimension(dataArray, dimension) {
                         'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
     const dayOrder = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
     const seasonOrder = ['Primavera', 'Estate', 'Autunno', 'Inverno'];
-    const timeOrder = ['Alba', 'Mattina', 'Pranzo', 'Pomeriggio', 'Sera', 'Notte'];
+    const timeOrder = ['Notte', 'Alba', 'Mattina', 'Pranzo', 'Pomeriggio', 'Sera'];
     
     if (dimension === 'Mese') {
         return dataArray.sort((a, b) => monthOrder.indexOf(a.label) - monthOrder.indexOf(b.label));
@@ -438,6 +710,9 @@ function sortByDimension(dataArray, dimension) {
     return dataArray;
 }
 
+// ============================================
+// CHART RENDERING
+// ============================================
 function renderCustomChart(data) {
     const canvas = document.getElementById('custom-chart-canvas');
     const wrapper = document.getElementById('chart-wrapper-custom');
@@ -445,7 +720,10 @@ function renderCustomChart(data) {
     
     if (!canvas) return;
     
-    if (wrapper) wrapper.style.display = 'block';
+    if (wrapper) {
+        wrapper.style.display = 'block';
+        wrapper.classList.add('active');
+    }
     if (placeholder) placeholder.style.display = 'none';
     
     if (customChart) {
@@ -465,136 +743,282 @@ function renderCustomChart(data) {
     };
     
     customChart = new Chart(canvas, config);
-    
-    console.log('Grafico personalizzato creato');
 }
 
 function prepareChartDatasets(data) {
     const metric = customChartConfig.metric;
     const type = customChartConfig.type;
+    const style = customChartConfig.style;
+    const colors = customChartConfig.colors;
     
     if (metric === 'count') {
         const values = data.map(d => d.value);
+        let bgColors, borderColors;
         
-        let colors;
-        if (type === 'pie' || type === 'doughnut' || type === 'polarArea') {
-            colors = generateColors(data.length);
+        if (colors.mode === 'single') {
+            bgColors = values.map(() => hexToRgba(colors.primary, style.opacity));
+            borderColors = values.map(() => colors.primary);
+        } else if (colors.mode === 'gradient') {
+            bgColors = generateGradientColors(data.length, colors.primary, colors.secondary, style.opacity);
+            borderColors = bgColors.map(c => c.replace(/[\d.]+\)$/g, '1)'));
         } else {
-            colors = generateGradientColors(data.length);
+            // Usa colori di default come analytics
+            if (['pie', 'doughnut', 'polarArea'].includes(type)) {
+                const baseColors = generateColors(data.length);
+                bgColors = baseColors.map(c => hexToRgba(c, style.opacity));
+                borderColors = baseColors;
+            } else {
+                bgColors = generateGradientColors(data.length, '#3b82f6', '#8b5cf6', style.opacity);
+                borderColors = bgColors.map(c => c.replace(/[\d.]+\)$/g, '1)'));
+            }
         }
         
         return [{
             label: 'Incidenti',
             data: values,
-            backgroundColor: colors,
-            borderColor: type === 'line' ? '#8b5cf6' : colors,
-            borderWidth: type === 'line' ? 3 : 1,
-            fill: type === 'line' ? false : true,
-            tension: 0.4
+            backgroundColor: bgColors,
+            borderColor: borderColors,
+            borderWidth: style.borderWidth,
+            fill: type === 'line' ? style.fill : true,
+            tension: style.tension,
+            pointRadius: style.pointRadius,
+            pointHoverRadius: style.pointRadius + 2,
+            pointBackgroundColor: borderColors,
+            pointBorderColor: '#fff',
+            pointBorderWidth: 1
         }];
     } else {
+        // Metric tipologia
         const tipologieMap = {
             'M': { label: 'Mortali', color: '#ef4444' },
             'R': { label: 'Riserva', color: '#a855f7' },
             'F': { label: 'Feriti', color: '#f59e0b' },
-            'C': { label: 'Cose', color: '#10b981' }
+            'C': { label: 'Cose', color: '#10b981' },
+            'TOTAL': { label: 'Totale', color: '#3b82f6' }
         };
         
-        return ['M', 'R', 'F', 'C'].map(tipo => ({
+        const tipiDaVisualizzare = customChartConfig.tipologieSelezionate.length > 0 
+            ? customChartConfig.tipologieSelezionate 
+            : ['M', 'R', 'F', 'C', 'TOTAL'];
+        
+        return tipiDaVisualizzare.map(tipo => ({
             label: tipologieMap[tipo].label,
             data: data.map(d => d.value[tipo] || 0),
-            backgroundColor: tipologieMap[tipo].color + (type === 'line' ? '33' : 'CC'),
+            backgroundColor: hexToRgba(tipologieMap[tipo].color, style.opacity),
             borderColor: tipologieMap[tipo].color,
-            borderWidth: type === 'line' ? 2 : 1,
-            fill: type === 'line' ? false : true,
-            tension: 0.4
+            borderWidth: style.borderWidth,
+            fill: type === 'line' ? style.fill : true,
+            tension: style.tension,
+            pointRadius: style.pointRadius,
+            pointBackgroundColor: tipologieMap[tipo].color,
+            pointBorderColor: '#fff',
+            pointBorderWidth: 1
         }));
     }
 }
 
 function getChartOptions() {
     const type = customChartConfig.type;
-    const orientation = customChartConfig.orientation;
+    const style = customChartConfig.style;
+    const variant = customChartConfig.variant;
+    const dimension = customChartConfig.dimension;
+    const textColor = customChartConfig.colors.text;
+    
+    // Costruisci titolo con filtri
+    let titleText = dimension;
+    if (typeof currentFilters !== 'undefined') {
+        const filters = [];
+        if (currentFilters['filter-anno']) filters.push(currentFilters['filter-anno']);
+        if (currentFilters['filter-mese']) filters.push(currentFilters['filter-mese']);
+        if (currentFilters['filter-giorno-settimana']) filters.push(currentFilters['filter-giorno-settimana']);
+        if (currentFilters['filter-tipologia']) {
+            const tipoNames = { M: 'Mortali', R: 'Riserva', F: 'Feriti', C: 'Cose' };
+            filters.push(tipoNames[currentFilters['filter-tipologia']]);
+        }
+        if (filters.length > 0) {
+            titleText += ' - ' + filters.join(' • ');
+        }
+    }
     
     const baseOptions = {
         responsive: true,
         maintainAspectRatio: false,
+        animation: variant.animation ? { duration: 750 } : false,
         plugins: {
             legend: {
-                display: true,
+                display: style.showLegend,
                 position: 'bottom',
                 labels: {
-                    color: '#1f2937',
-                    font: { size: 12, family: 'Titillium Web' },
+                    color: textColor,
+                    font: { size: style.legendSize, family: 'Titillium Web' },
                     padding: 15,
                     usePointStyle: true
                 }
             },
             title: {
                 display: true,
-                text: `${customChartConfig.dimension} - Analisi Incidenti`,
-                color: '#1f2937',
-                font: { size: 16, weight: 'bold', family: 'Titillium Web' },
+                text: titleText,
+                color: textColor,
+                font: { size: style.titleSize, weight: 'bold', family: 'Titillium Web' },
                 padding: 20
             },
             tooltip: {
                 backgroundColor: 'rgba(15, 23, 42, 0.95)',
                 padding: 12,
-                titleFont: { size: 13, weight: 'bold' },
-                bodyFont: { size: 12 },
-                callbacks: {
-                    label: function(context) {
-                        let label = context.dataset.label || '';
-                        if (label) {
-                            label += ': ';
-                        }
-                        label += context.parsed.y || context.parsed.r || context.parsed;
-                        return label;
-                    }
-                }
+                titleFont: { size: style.fontSize + 1, weight: 'bold' },
+                bodyFont: { size: style.fontSize },
+                titleColor: '#fff',
+                bodyColor: '#fff'
             },
             datalabels: {
-                display: type !== 'line' && type !== 'scatter' && type !== 'bubble',
-                color: type === 'pie' || type === 'doughnut' ? '#ffffff' : '#1f2937',
-                font: { weight: 'bold', size: 11 },
-                formatter: (value) => value > 0 ? value : ''
-            }
+    // Mostra datalabels per tutti i tipi tranne line, scatter, bubble
+    display: function(context) {
+        // Non mostrare per line, scatter, bubble
+        if (['line', 'scatter', 'bubble'].includes(type)) {
+            return false;
         }
+        // Mostra solo se l'opzione è attiva
+        return variant.showValues;
+    },
+    // SEMPRE usa il colore del testo configurato (default #1f2937)
+    color: textColor,
+    anchor: function(context) {
+        // Per grafici circolari, centra le etichette
+        if (['pie', 'doughnut', 'polarArea'].includes(type)) {
+            return 'end';
+        }
+        // Per radar, verso l'esterno
+        if (type === 'radar') {
+            return 'end';
+        }
+        // Per grafici a barre, logica intelligente
+        const value = context.dataset.data[context.dataIndex];
+        const max = Math.max(...context.dataset.data);
+        return value > max * 0.2 ? 'center' : 'end';
+    },
+    align: function(context) {
+        if (['pie', 'doughnut', 'polarArea'].includes(type)) {
+            return 'end';
+        }
+        if (type === 'radar') {
+            return 'end';
+        }
+        const value = context.dataset.data[context.dataIndex];
+        const max = Math.max(...context.dataset.data);
+        return value > max * 0.2 ? 'center' : 'end';
+    },
+    offset: function(context) {
+        // Offset per grafici circolari e radar
+        if (['pie', 'doughnut', 'polarArea'].includes(type)) {
+            return 10;
+        }
+        if (type === 'radar') {
+            return 10;
+        }
+        // Per grafici a barre
+        const value = context.dataset.data[context.dataIndex];
+        const max = Math.max(...context.dataset.data);
+        return value > max * 0.2 ? 0 : 4;
+    },
+    font: { 
+        weight: 'bold', 
+        size: style.fontSize - 1,
+        family: 'Titillium Web'
+    },
+  //  formatter: (value) => value > 0 ? value : '',
+    // Background bianco semi-trasparente per migliore leggibilità
+  //  backgroundColor: function(context) {
+        // Aggiungi background per tutti i tipi per migliore contrasto
+     //   return 'rgba(255, 255, 255, 0.85)';
+  //  },
+    borderRadius: 4,
+    padding: { top: 3, right: 5, bottom: 3, left: 5 }
+}
+		
+		}
     };
     
     if (type === 'bar') {
-        baseOptions.indexAxis = orientation === 'horizontal' ? 'y' : 'x';
+        baseOptions.indexAxis = variant.horizontal || customChartConfig.orientation === 'horizontal' ? 'y' : 'x';
         baseOptions.scales = {
             x: {
-                ticks: { color: '#1f2937', font: { size: 11 } },
-                grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                stacked: variant.stacked,
+                ticks: { 
+                    color: textColor, 
+                    font: { size: style.fontSize } 
+                },
+                grid: { 
+                    display: style.showGrid, 
+                    color: `rgba(148, 163, 184, ${style.gridOpacity})` 
+                }
             },
             y: {
+                stacked: variant.stacked,
                 beginAtZero: true,
-                ticks: { color: '#1f2937', font: { size: 11 } },
-                grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                ticks: { 
+                    color: textColor, 
+                    font: { size: style.fontSize } 
+                },
+                grid: { 
+                    display: style.showGrid, 
+                    color: `rgba(148, 163, 184, ${style.gridOpacity})` 
+                }
             }
         };
     } else if (type === 'line') {
         baseOptions.scales = {
             x: {
-                ticks: { color: '#1f2937', font: { size: 11 } },
-                grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                ticks: { 
+                    color: textColor, 
+                    font: { size: style.fontSize } 
+                },
+                grid: { 
+                    display: style.showGrid, 
+                    color: `rgba(148, 163, 184, ${style.gridOpacity})` 
+                }
             },
             y: {
+                stacked: variant.stacked,
                 beginAtZero: true,
-                ticks: { color: '#1f2937', font: { size: 11 } },
-                grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                ticks: { 
+                    color: textColor, 
+                    font: { size: style.fontSize } 
+                },
+                grid: { 
+                    display: style.showGrid, 
+                    color: `rgba(148, 163, 184, ${style.gridOpacity})` 
+                }
             }
         };
     } else if (type === 'radar') {
         baseOptions.scales = {
             r: {
                 beginAtZero: true,
-                ticks: { color: '#1f2937', backdropColor: 'transparent' },
-                grid: { color: 'rgba(148, 163, 184, 0.3)' },
-                angleLines: { color: 'rgba(148, 163, 184, 0.3)' },
-                pointLabels: { color: '#1f2937', font: { size: 11, weight: '600' } }
+                ticks: { 
+                    color: textColor, 
+                    backdropColor: 'transparent',
+                    font: { size: style.fontSize },
+                    showLabelBackdrop: false
+                },
+                grid: { color: `rgba(148, 163, 184, ${style.gridOpacity * 3})` },
+                angleLines: { color: `rgba(148, 163, 184, ${style.gridOpacity * 3})` },
+                pointLabels: { 
+                    color: textColor, 
+                    font: { size: style.fontSize, weight: '600' } 
+                }
+            }
+        };
+    } else if (type === 'polarArea') {
+        baseOptions.scales = {
+            r: {
+                beginAtZero: true,
+                ticks: { 
+                    color: textColor, 
+                    backdropColor: 'transparent',
+                    font: { size: style.fontSize },
+                    showLabelBackdrop: false
+                },
+                grid: { color: `rgba(148, 163, 184, ${style.gridOpacity * 3})` }
             }
         };
     }
@@ -602,55 +1026,116 @@ function getChartOptions() {
     return baseOptions;
 }
 
+// ============================================
+// COLOR UTILITIES
+// ============================================
 function generateColors(count) {
     const baseColors = [
         '#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', 
         '#ef4444', '#ec4899', '#06b6d4', '#84cc16'
     ];
+    return baseColors.slice(0, count);
+}
+
+function generateGradientColors(count, startColor, endColor, opacity = 1) {
+    const start = hexToRgb(startColor);
+    const end = hexToRgb(endColor);
+    const colors = [];
     
-    const colors = [];
     for (let i = 0; i < count; i++) {
-        colors.push(baseColors[i % baseColors.length]);
+        const ratio = count > 1 ? i / (count - 1) : 0;
+        const r = Math.round(start.r + (end.r - start.r) * ratio);
+        const g = Math.round(start.g + (end.g - start.g) * ratio);
+        const b = Math.round(start.b + (end.b - start.b) * ratio);
+        colors.push(`rgba(${r}, ${g}, ${b}, ${opacity})`);
     }
+    
     return colors;
 }
 
-function generateGradientColors(count) {
-    const colors = [];
-    for (let i = 0; i < count; i++) {
-        const hue = (i * 360 / count) % 360;
-        colors.push(`hsl(${hue}, 70%, 60%)`);
-    }
-    return colors;
+function hexToRgb(hex) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : { r: 59, g: 130, b: 246 };
 }
 
+function hexToRgba(hex, alpha) {
+    const rgb = hexToRgb(hex);
+    return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
+}
+
+// ============================================
+// RESET & DOWNLOAD
+// ============================================
 function resetChartBuilder() {
     customChartConfig = {
         type: 'bar',
         dimension: null,
         metric: 'count',
+        tipologieSelezionate: [],
         limit: 10,
-        orientation: 'vertical'
+        orientation: 'vertical',
+        colors: {
+            mode: 'auto',
+            primary: '#3b82f6',
+            secondary: '#8b5cf6',
+            text: '#1f2937'
+        },
+        style: {
+            borderWidth: 2,
+            opacity: 0.8,
+            fontSize: 12,
+            titleSize: 16,
+            legendSize: 12,
+            gridOpacity: 0.1,
+            showGrid: true,
+            showLegend: true,
+            tension: 0.4,
+            pointRadius: 3,
+            fill: true
+        },
+        variant: {
+            stacked: false,
+            horizontal: false,
+            showValues: true,
+            animation: true
+        }
     };
     
+    // Reset UI
     document.querySelectorAll('.chart-type-btn').forEach(btn => {
         btn.classList.remove('active');
-        if (btn.dataset.type === 'bar') {
-            btn.classList.add('active');
-        }
+        if (btn.dataset.type === 'bar') btn.classList.add('active');
     });
     
-    const dimensionSelect = document.getElementById('dimension-select');
-    if (dimensionSelect) dimensionSelect.value = '';
+    const selects = ['dimension-select', 'metric-select', 'limit-select', 'orientation-select', 'color-mode-select'];
+    selects.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.selectedIndex = 0;
+    });
     
-    const metricSelect = document.getElementById('metric-select');
-    if (metricSelect) metricSelect.value = 'count';
+    document.querySelectorAll('.tipologia-checkbox input[type="checkbox"]').forEach(cb => {
+        cb.checked = false;
+        cb.closest('.tipologia-checkbox').classList.remove('checked');
+    });
     
-    const limitSelect = document.getElementById('limit-select');
-    if (limitSelect) limitSelect.value = '10';
+    // Reset color pickers
+    const primaryColor = document.getElementById('primary-color');
+    if (primaryColor) primaryColor.value = '#3b82f6';
     
-    const orientationSelect = document.getElementById('orientation-select');
-    if (orientationSelect) orientationSelect.value = 'vertical';
+    const primaryGradient = document.getElementById('primary-color-gradient');
+    if (primaryGradient) primaryGradient.value = '#3b82f6';
+    
+    const secondaryColor = document.getElementById('secondary-color');
+    if (secondaryColor) secondaryColor.value = '#8b5cf6';
+    
+    const textColor = document.getElementById('text-color');
+    if (textColor) textColor.value = '#1f2937';
+    
+    applyStylePreset('default');
     
     if (customChart) {
         customChart.destroy();
@@ -660,12 +1145,10 @@ function resetChartBuilder() {
     const wrapper = document.getElementById('chart-wrapper-custom');
     const placeholder = document.querySelector('.preview-placeholder');
     if (wrapper) wrapper.style.display = 'none';
-    if (placeholder) placeholder.style.display = 'block';
-    
-    console.log('Chart Builder resettato');
+    if (placeholder) placeholder.style.display = 'flex';
 }
 
-function downloadCustomChart() {
+async function downloadCustomChart() {
     if (!customChart) {
         alert('⚠️ Genera prima un grafico da scaricare');
         return;
@@ -674,13 +1157,142 @@ function downloadCustomChart() {
     const canvas = document.getElementById('custom-chart-canvas');
     if (!canvas) return;
     
-    const link = document.createElement('a');
-    const timestamp = new Date().getTime();
-    link.download = `grafico_personalizzato_${timestamp}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
+    const targetWidth = 800;
+    const originalRatio = canvas.height / canvas.width;
+    const targetHeight = Math.max(Math.round(targetWidth * originalRatio), 600);
     
-    console.log('Download grafico completato');
+    const headerHeight = 100;
+    const footerHeight = 70;
+    const chartAreaHeight = targetHeight - headerHeight - footerHeight;
+    
+    // Canvas finale
+    const finalCanvas = document.createElement('canvas');
+    const ctx = finalCanvas.getContext('2d');
+    
+    finalCanvas.width = targetWidth;
+    finalCanvas.height = targetHeight;
+    
+    // Sfondo bianco
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, targetWidth, targetHeight);
+    
+    // HEADER - USA IL COLORE DEL TESTO PERSONALIZZATO
+    const textColor = customChartConfig.colors.text;
+    ctx.fillStyle = textColor;
+    ctx.font = 'bold 22px Titillium Web, Arial, sans-serif';
+    ctx.textAlign = 'left';
+    
+    const chartTitle = customChartConfig.dimension || 'Grafico Analytics';
+    let titleWithFilters = chartTitle;
+    
+    if (typeof currentFilters !== 'undefined') {
+        const filters = [];
+        if (currentFilters['filter-anno']) filters.push(currentFilters['filter-anno']);
+        if (currentFilters['filter-mese']) filters.push(currentFilters['filter-mese']);
+        if (currentFilters['filter-giorno-settimana']) filters.push(currentFilters['filter-giorno-settimana']);
+        if (filters.length > 0) {
+            titleWithFilters += ' - ' + filters.join(' • ');
+        }
+    }
+    
+    ctx.fillText(titleWithFilters, 40, 35);
+    
+    // Filtri
+    ctx.font = '13px Titillium Web, Arial, sans-serif';
+    const activeFilters = document.getElementById('custom-chart-filters');
+    let filtersText = 'Chart Builder - Grafico Personalizzato';
+    
+    if (activeFilters) {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = activeFilters.innerHTML;
+        filtersText = tempDiv.textContent || tempDiv.innerText || '';
+        filtersText = filtersText.replace(/\(\d+\.?\d*\)/g, '').trim();
+    }
+    
+    const lines = wrapText(ctx, filtersText, targetWidth - 80, 13);
+    lines.forEach((line, index) => {
+        ctx.fillText(line, 40, 60 + (index * 18));
+    });
+    
+    ctx.strokeStyle = '#d1d5db';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(40, headerHeight - 15);
+    ctx.lineTo(targetWidth - 40, headerHeight - 15);
+    ctx.stroke();
+    
+    // GRAFICO
+    const chartCanvas = document.createElement('canvas');
+    const chartWidth = targetWidth - 80;
+    const chartHeight = chartAreaHeight;
+    
+    chartCanvas.width = chartWidth;
+    chartCanvas.height = chartHeight;
+    
+    const chartCtx = chartCanvas.getContext('2d');
+    chartCtx.fillStyle = '#FFFFFF';
+    chartCtx.fillRect(0, 0, chartWidth, chartHeight);
+    chartCtx.drawImage(canvas, 0, 0, chartWidth, chartHeight);
+    
+    ctx.drawImage(chartCanvas, 40, headerHeight);
+    
+    // FOOTER - USA IL COLORE DEL TESTO PERSONALIZZATO
+    ctx.strokeStyle = '#d1d5db';
+    ctx.beginPath();
+    ctx.moveTo(40, targetHeight - footerHeight + 10);
+    ctx.lineTo(targetWidth - 40, targetHeight - footerHeight + 10);
+    ctx.stroke();
+    
+    ctx.font = '11px Titillium Web, Arial, sans-serif';
+    ctx.fillStyle = textColor;
+    ctx.fillText('Fonte: dati.gov.it - Rielaborazione: opendatasicilia.it', 40, targetHeight - 40);
+    ctx.fillText('https://opendatasicilia.github.io/incidenti_palermo/', 40, targetHeight - 20);
+    
+    // Logo
+    try {
+        const logo = new Image();
+        logo.crossOrigin = 'anonymous';
+        await new Promise((resolve) => {
+            logo.onload = resolve;
+            logo.onerror = resolve;
+            logo.src = 'img/pa_hub_new.png';
+        });
+        
+        if (logo.complete && logo.naturalWidth > 0) {
+            const logoWidth = 100;
+            const logoHeight = (logoWidth * logo.naturalHeight) / logo.naturalWidth;
+            ctx.drawImage(logo, targetWidth - logoWidth - 40, targetHeight - footerHeight + 15, logoWidth, logoHeight);
+        }
+    } catch (e) {}
+    
+    // Download
+    const dataURL = finalCanvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    const safeFilename = (customChartConfig.dimension || 'grafico').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    link.download = `${safeFilename}_${targetWidth}x${targetHeight}.png`;
+    link.href = dataURL;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
-console.log('Chart Builder script caricato');
+function wrapText(ctx, text, maxWidth, fontSize) {
+    const words = text.split(' ');
+    const lines = [];
+    let currentLine = words[0];
+    
+    ctx.font = `${fontSize}px Titillium Web`;
+    
+    for (let i = 1; i < words.length; i++) {
+        const word = words[i];
+        const width = ctx.measureText(currentLine + " " + word).width;
+        if (width < maxWidth) {
+            currentLine += " " + word;
+        } else {
+            lines.push(currentLine);
+            currentLine = word;
+        }
+    }
+    lines.push(currentLine);
+    return lines;
+}

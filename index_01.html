@@ -1214,10 +1214,10 @@
 <!-- Chart Builder Button -->
 <button class="chart-builder-trigger" id="chart-builder-trigger" title="Crea il tuo grafico personalizzato"> <span class="pulse-ring1"></span> <i class="fas fa-chart-pie"></i> <span>Crea il tuo DataViz</span> </button>
 <!-- ============================================ -->
-<!-- CHART BUILDER MODAL - VERSIONE COMPLETA -->
-<!-- Sostituisce il blocco esistente in index.html -->
-<!-- Posiziona PRIMA di </body> -->
+<!-- CHART BUILDER MODAL - COPIA QUESTO BLOCCO -->
+<!-- Posiziona PRIMA di </body> e PRIMA di tutti gli script -->
 <!-- ============================================ -->
+
 
 <div class="chart-builder-modal" id="chart-builder-modal">
     <div class="chart-builder-content">
@@ -1234,58 +1234,56 @@
 
         <!-- Body -->
         <div class="chart-builder-body">
-            
-            <!-- ====================================== -->
-            <!-- LEFT PANEL - Configurazione -->
-            <!-- ====================================== -->
+            <!-- Left Panel - Configurazione -->
             <div class="chart-builder-config">
-                
-                <!-- SEZIONE 1: Tipo di Grafico -->
                 <div class="config-section">
-                    <h3><i class="fas fa-chart-bar"></i> Tipo di Grafico</h3>
-                    <div class="chart-type-grid">
-                        <button class="chart-type-btn active" data-type="bar">
-                            <i class="fas fa-chart-bar"></i>
-                            <span>Barre</span>
-                        </button>
-                        <button class="chart-type-btn" data-type="line">
-                            <i class="fas fa-chart-line"></i>
-                            <span>Linea</span>
-                        </button>
-                        <button class="chart-type-btn" data-type="pie">
-                            <i class="fas fa-chart-pie"></i>
-                            <span>Torta</span>
-                        </button>
-                        <button class="chart-type-btn" data-type="doughnut">
-                            <i class="fas fa-circle-notch"></i>
-                            <span>Ciambella</span>
-                        </button>
-                        <button class="chart-type-btn" data-type="radar">
-                            <i class="fas fa-atom"></i>
-                            <span>Radar</span>
-                        </button>
-                        <button class="chart-type-btn" data-type="polarArea">
-                            <i class="fas fa-bullseye"></i>
-                            <span>Polare</span>
-                        </button>
-                        <button class="chart-type-btn" data-type="scatter">
-                            <i class="fas fa-braille"></i>
-                            <span>Scatter</span>
-                        </button>
-                        <button class="chart-type-btn" data-type="bubble">
-                            <i class="fas fa-circle"></i>
-                            <span>Bubble</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- SEZIONE 2: Configurazione Dati -->
-                <div class="config-section">
-                    <h3><i class="fas fa-database"></i> Configurazione Dati</h3>
+                    <h3><i class="fas fa-sliders-h"></i> Configurazione Grafico</h3>
                     
+                    <!-- Tipo di Grafico -->
                     <div class="config-group">
                         <label class="config-label">
-                            <i class="fas fa-chart-bar"></i> Dimensione Principale
+                            <i class="fas fa-chart-bar"></i> Tipo di Grafico
+                        </label>
+                        <div class="chart-type-grid" id="chart-type-grid">
+                            <button class="chart-type-btn active" data-type="bar">
+                                <i class="fas fa-chart-bar"></i>
+                                <span>Barre</span>
+                            </button>
+                            <button class="chart-type-btn" data-type="line">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Linea</span>
+                            </button>
+                            <button class="chart-type-btn" data-type="pie">
+                                <i class="fas fa-chart-pie"></i>
+                                <span>Torta</span>
+                            </button>
+                            <button class="chart-type-btn" data-type="doughnut">
+                                <i class="fas fa-circle-notch"></i>
+                                <span>Ciambella</span>
+                            </button>
+                            <button class="chart-type-btn" data-type="radar">
+                                <i class="fas fa-atom"></i>
+                                <span>Radar</span>
+                            </button>
+                            <button class="chart-type-btn" data-type="polarArea">
+                                <i class="fas fa-bullseye"></i>
+                                <span>Polare</span>
+                            </button>
+                            <button class="chart-type-btn" data-type="scatter">
+                                <i class="fas fa-braille"></i>
+                                <span>Scatter</span>
+                            </button>
+                            <button class="chart-type-btn" data-type="bubble">
+                                <i class="fas fa-circle"></i>
+                                <span>Bubble</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Dimensione Dati -->
+                    <div class="config-group">
+                        <label class="config-label">
+                            <i class="fas fa-database"></i> Dimensione Principale
                         </label>
                         <select id="dimension-select" class="config-select">
                             <option value="">Seleziona dimensione...</option>
@@ -1305,6 +1303,7 @@
                         </select>
                     </div>
 
+                    <!-- Metrica -->
                     <div class="config-group">
                         <label class="config-label">
                             <i class="fas fa-calculator"></i> Metrica
@@ -1315,55 +1314,7 @@
                         </select>
                     </div>
 
-                    <!-- Tipologie Checkbox (visibile solo con metric=tipologia) -->
-                    <div class="config-group" id="tipologie-group" style="display: none;">
-                        <label class="config-label">
-                            <i class="fas fa-check-square"></i> Seleziona Tipologie
-                        </label>
-                        <div class="tipologie-checkboxes">
-                            <div class="tipologia-checkbox">
-                                <input type="checkbox" id="tipo-m" value="M">
-                                <label for="tipo-m">
-                                    <span class="tipologia-icon" style="color: #ef4444;">●</span>
-                                    Mortali
-                                </label>
-                            </div>
-                            <div class="tipologia-checkbox">
-                                <input type="checkbox" id="tipo-r" value="R">
-                                <label for="tipo-r">
-                                    <span class="tipologia-icon" style="color: #a855f7;">●</span>
-                                    Riserva
-                                </label>
-                            </div>
-                            <div class="tipologia-checkbox">
-                                <input type="checkbox" id="tipo-f" value="F">
-                                <label for="tipo-f">
-                                    <span class="tipologia-icon" style="color: #f59e0b;">●</span>
-                                    Feriti
-                                </label>
-                            </div>
-                            <div class="tipologia-checkbox">
-                                <input type="checkbox" id="tipo-c" value="C">
-                                <label for="tipo-c">
-                                    <span class="tipologia-icon" style="color: #10b981;">●</span>
-                                    Cose
-                                </label>
-                            </div>
-        <!-- NUOVA CHECKBOX TOTALE -->
-        <div class="tipologia-checkbox">
-            <input type="checkbox" id="tipo-total" value="TOTAL">
-            <label for="tipo-total">
-                <span class="tipologia-icon" style="color: #3b82f6;">●</span>
-                Totale
-            </label>
-        </div>
-    </div>
-    <div class="info-box" style="margin-top: 10px; padding: 8px 10px; font-size: 10px;">
-        <i class="fas fa-info-circle"></i>
-        <span>Se nessuna tipologia è selezionata, verranno mostrate tutte (incluso totale)</span>
-    </div>
-</div>
-
+                    <!-- Limita Risultati -->
                     <div class="config-group">
                         <label class="config-label">
                             <i class="fas fa-list-ol"></i> Limita Risultati
@@ -1378,6 +1329,7 @@
                         </select>
                     </div>
 
+                    <!-- Orientamento (solo per bar) -->
                     <div class="config-group" id="orientation-group" style="display: none;">
                         <label class="config-label">
                             <i class="fas fa-arrows-alt-h"></i> Orientamento
@@ -1387,265 +1339,56 @@
                             <option value="horizontal">Orizzontale</option>
                         </select>
                     </div>
-                </div>
 
-                <!-- SEZIONE 3: Colori Avanzati -->
-                <div class="config-section">
-                    <h3><i class="fas fa-palette"></i> Colori</h3>
-                    
-                    <div class="config-group color-mode-group">
+                    <!-- Filtri Attivi -->
+                    <div class="config-group">
                         <label class="config-label">
-                            <i class="fas fa-swatchbook"></i> Modalità Colore
+                            <i class="fas fa-filter"></i> Filtri Attivi
                         </label>
-                        <select id="color-mode-select" class="config-select">
-                            <option value="auto">Automatico</option>
-                            <option value="single">Colore Singolo</option>
-                            <option value="gradient">Gradiente</option>
-                        </select>
-                    </div>
-
-                    <div id="single-color-group" style="display: none;">
-                        <div class="color-input-wrapper">
-                            <label>Colore Primario</label>
-                            <input type="color" id="primary-color" value="#3b82f6">
+                        <div class="active-filters-box" id="custom-chart-filters">
+                            <span class="no-filters">Nessun filtro applicato</span>
                         </div>
                     </div>
 
-                    <div id="gradient-color-group" style="display: none;">
-                        <div class="color-picker-grid">
-                            <div class="color-input-wrapper">
-                                <label>Inizio</label>
-                                <input type="color" id="primary-color-gradient" value="#3b82f6">
-                            </div>
-                            <div class="color-input-wrapper">
-                                <label>Fine</label>
-                                <input type="color" id="secondary-color" value="#8b5cf6">
-                            </div>
-                        </div>
-                    </div>
-
- <!-- NUOVO: Colore Testo -->
-    <div class="divider"></div>
-    
-    <div class="config-group">
-        <label class="config-label">
-            <i class="fas fa-font"></i> Colore Testo e Assi
-        </label>
-        <div class="color-input-wrapper">
-            <label>Colore Etichette, Assi e Titoli</label>
-            <input type="color" id="text-color" value="#1f2937">
-        </div>
-        <div class="info-box" style="margin-top: 8px; padding: 6px 8px; font-size: 10px;">
-            <i class="fas fa-info-circle"></i>
-            <span>Cambia il colore di: titolo, assi, etichette, legenda</span>
-        </div>
-    </div>
-
-    <div class="info-box" style="margin-top: 12px;">
-        <i class="fas fa-info-circle"></i>
-        <span><strong>Automatico:</strong> usa i colori predefiniti come Analytics Panel</span>
-    </div>
-</div>
-
-                <!-- SEZIONE 4: Stile e Dimensioni -->
-                <div class="config-section">
-                    <h3><i class="fas fa-paint-brush"></i> Stile e Dimensioni</h3>
-                    
-                    <!-- Border Width -->
-                    <div class="range-group">
-                        <div class="range-label">
-                            <span class="range-label-text">Spessore Bordi</span>
-                            <span class="range-value" id="border-width-value">2</span>
-                        </div>
-                        <input type="range" id="border-width" min="0" max="10" step="0.5" value="2">
-                    </div>
-
-                    <!-- Opacity -->
-                    <div class="range-group">
-                        <div class="range-label">
-                            <span class="range-label-text">Opacità</span>
-                            <span class="range-value" id="opacity-value">0.8</span>
-                        </div>
-                        <input type="range" id="opacity" min="0" max="1" step="0.05" value="0.8">
-                    </div>
-
-                    <!-- Font Size -->
-                    <div class="range-group">
-                        <div class="range-label">
-                            <span class="range-label-text">Dimensione Testo</span>
-                            <span class="range-value" id="font-size-value">12px</span>
-                        </div>
-                        <input type="range" id="font-size" min="8" max="20" step="1" value="12">
-                    </div>
-
-                    <!-- Title Size -->
-                    <div class="range-group">
-                        <div class="range-label">
-                            <span class="range-label-text">Dimensione Titolo</span>
-                            <span class="range-value" id="title-size-value">16px</span>
-                        </div>
-                        <input type="range" id="title-size" min="12" max="32" step="1" value="16">
-                    </div>
-
-                    <!-- Legend Size -->
-                    <div class="range-group">
-                        <div class="range-label">
-                            <span class="range-label-text">Dimensione Legenda</span>
-                            <span class="range-value" id="legend-size-value">12px</span>
-                        </div>
-                        <input type="range" id="legend-size" min="8" max="18" step="1" value="12">
-                    </div>
-
-                    <!-- Grid Opacity -->
-                    <div class="range-group">
-                        <div class="range-label">
-                            <span class="range-label-text">Opacità Griglia</span>
-                            <span class="range-value" id="grid-opacity-value">0.1</span>
-                        </div>
-                        <input type="range" id="grid-opacity" min="0" max="1" step="0.05" value="0.1">
-                    </div>
-
-                    <div class="divider"></div>
-
-                    <!-- Tension (Line Charts) -->
-                    <div class="range-group" id="tension-group" style="display: none;">
-                        <div class="range-label">
-                            <span class="range-label-text">Curvatura Linee</span>
-                            <span class="range-value" id="tension-value">0.4</span>
-                        </div>
-                        <input type="range" id="tension" min="0" max="1" step="0.1" value="0.4">
-                    </div>
-
-                    <!-- Point Radius -->
-                    <div class="range-group" id="point-group" style="display: none;">
-                        <div class="range-label">
-                            <span class="range-label-text">Dimensione Punti</span>
-                            <span class="range-value" id="point-radius-value">3px</span>
-                        </div>
-                        <input type="range" id="point-radius" min="0" max="10" step="1" value="3">
-                    </div>
-
-                    <div class="divider"></div>
-
-                    <!-- Preset Buttons -->
-                    <label class="config-label">
-                        <i class="fas fa-magic"></i> Preset Rapidi
-                    </label>
-                    <div class="preset-buttons">
-                        <button class="preset-btn apply-preset" data-preset="minimal">
-                            <i class="fas fa-compress"></i> Minimal
+                    <!-- Pulsanti Azione -->
+                    <div class="config-actions">
+                        <button class="btn-generate" id="btn-generate-chart">
+                            <i class="fas fa-play"></i>
+                            Genera Grafico
                         </button>
-                        <button class="preset-btn apply-preset" data-preset="default">
-                            <i class="fas fa-check"></i> Default
-                        </button>
-                        <button class="preset-btn apply-preset" data-preset="bold">
-                            <i class="fas fa-bold"></i> Bold
-                        </button>
-                        <button class="preset-btn apply-preset" data-preset="clean">
-                            <i class="fas fa-eraser"></i> Clean
+                        <button class="btn-reset-builder" id="btn-reset-builder">
+                            <i class="fas fa-undo"></i>
+                            Reset
                         </button>
                     </div>
-                </div>
 
-                <!-- SEZIONE 5: Varianti e Opzioni -->
-                <div class="config-section">
-                    <h3><i class="fas fa-sliders-h"></i> Varianti e Opzioni</h3>
-                    
-                    <div id="stacked-group" style="display: none;">
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="stacked-variant">
-                            <label for="stacked-variant">Grafico Impilato (Stacked)</label>
+                    <!-- Info Box -->
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <strong>Suggerimento:</strong> Seleziona una dimensione e clicca "Genera Grafico" per visualizzare i dati. I filtri applicati nella dashboard principale saranno utilizzati automaticamente.
                         </div>
                     </div>
-
-                    <div id="horizontal-group" style="display: none;">
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="horizontal-variant">
-                            <label for="horizontal-variant">Orientamento Orizzontale</label>
-                        </div>
-                    </div>
-
-                    <div id="fill-group" style="display: none;">
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="fill-area" checked>
-                            <label for="fill-area">Riempi Area sotto la Linea</label>
-                        </div>
-                    </div>
-
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="show-values" checked>
-                        <label for="show-values">Mostra Valori sul Grafico</label>
-                    </div>
-
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="show-grid" checked>
-                        <label for="show-grid">Mostra Griglia</label>
-                    </div>
-
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="show-legend" checked>
-                        <label for="show-legend">Mostra Legenda</label>
-                    </div>
-
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="animation" checked>
-                        <label for="animation">Abilita Animazioni</label>
-                    </div>
                 </div>
-
-                <!-- Filtri Attivi -->
-                <div class="config-section">
-                    <h3><i class="fas fa-filter"></i> Filtri Attivi</h3>
-                    <div class="active-filters-box" id="custom-chart-filters">
-                        <span class="no-filters">Nessun filtro applicato</span>
-                    </div>
-                </div>
-
-                <!-- Pulsanti Azione -->
-                <div class="config-actions">
-                    <button class="btn-generate" id="btn-generate-chart">
-                        <i class="fas fa-magic"></i>
-                        Genera Grafico
-                    </button>
-					
-                    <button class="btn-reset-builder" id="btn-reset-builder">
-                        <i class="fas fa-undo"></i>
-                        Reset
-                    </button>
-                </div>
-
-                <!-- Info Box -->
-                <div class="info-box">
-                    <i class="fas fa-info-circle"></i>
-                    <div>
-                        <strong>Suggerimento:</strong> Seleziona una dimensione e clicca "Genera Grafico". 
-                        I filtri applicati nella dashboard saranno utilizzati automaticamente. 
-                        Le etichette si posizionano intelligentemente dentro/fuori in base allo spazio.
-                    </div>
-                </div>
-
             </div>
 
-            <!-- ====================================== -->
-            <!-- RIGHT PANEL - Anteprima Grafico -->
-            <!-- ====================================== -->
+            <!-- Right Panel - Anteprima Grafico -->
             <div class="chart-builder-preview">
                 <div class="preview-header">
                     <h3>
                         <i class="fas fa-eye"></i> Anteprima
                     </h3>
-                    <button class="btn-download-chart" id="btn-download-custom-chart" title="Scarica grafico come PNG 800x600">
-                        <i class="fas fa-download"></i> PNG
+                    <button class="btn-download-chart" id="btn-download-custom-chart" title="Scarica grafico come PNG">
+                        <i class="fas fa-download"></i>
                     </button>
                 </div>
-                
                 <div class="preview-container" id="preview-container">
                     <div class="preview-placeholder">
                         <i class="fas fa-chart-area"></i>
                         <p>Il tuo grafico apparirà qui</p>
                         <small>Seleziona le opzioni e clicca "Genera Grafico"</small>
                     </div>
-                    <div class="chart-wrapper-custom" id="chart-wrapper-custom">
+                    <div class="chart-wrapper-custom" id="chart-wrapper-custom" style="display: none;">
                         <canvas id="custom-chart-canvas"></canvas>
                     </div>
                 </div>
@@ -1666,6 +1409,11 @@
     </div>
 </div>
 
+
+
+<!-- ============================================ -->
+<!-- FINE MODALE -->
+<!-- ============================================ -->
 
 
 <div class="footer-modal-overlay" id="footer-modal-overlay"></div>

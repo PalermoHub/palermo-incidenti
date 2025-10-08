@@ -2219,6 +2219,7 @@ function handleFilterChange(filterId, value) {
         updateActiveFiltersDisplay();
         updateAnalytics();
     }
+	window.dispatchEvent(new Event('filtersUpdated'));
 }
 
 // Update All Filters
@@ -2447,6 +2448,8 @@ function filterByYear(year) {
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
         updateAnalytics();  // Questa chiamata aggiornerà  anche updateActiveFiltersDisplay()
     }
+	
+	 window.dispatchEvent(new Event('filtersUpdated'));
 }
 
 
@@ -2481,6 +2484,7 @@ function filterByTipologia(tipo) {
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
         updateAnalytics();  // Aggiorna anche il testo dei filtri
     }
+	window.dispatchEvent(new Event('filtersUpdated'));
 }
 
 
@@ -2518,6 +2522,7 @@ function filterByQuartiere(quartiere) {
         updateActiveFiltersDisplay();
         updateAnalytics();
     }
+	 window.dispatchEvent(new Event('filtersUpdated'));
 }
 
 // Filter By Day/Night
@@ -2548,6 +2553,7 @@ function filterByDayNight(periodo) {
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
         updateAnalytics();
     }
+	window.dispatchEvent(new Event('filtersUpdated'));
 }
 
 // Filter By Month
@@ -2588,6 +2594,7 @@ function filterByMonth(mese) {
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
         updateAnalytics();
     }
+	window.dispatchEvent(new Event('filtersUpdated'));
 }
 
 // Reset Filters
@@ -2633,6 +2640,8 @@ function resetFilters() {
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
         updateAnalytics();
     }
+	
+	window.dispatchEvent(new Event('filtersUpdated'));
 }
 
 // Reset Charts Filters
@@ -2662,6 +2671,7 @@ function resetChartsFilters() {
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
         updateAnalytics();
     }
+	window.dispatchEvent(new Event('filtersUpdated'));
 }
 
 // Update Period Switches (Giorno/Notte)
@@ -4920,6 +4930,7 @@ function filterByCalendarioData(mese, giorno, dataCompleta) {
     if (window.innerWidth <= 768) {
         closeAnalytics();
     }
+	window.dispatchEvent(new Event('filtersUpdated'));
 }
 
 
@@ -4956,6 +4967,7 @@ function filterByStagione(stagione) {
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
         updateAnalytics();
     }
+	window.dispatchEvent(new Event('filtersUpdated'));
 }
 
 // Filter By Giorno Settimana
@@ -4988,7 +5000,8 @@ function filterByGiornoSettimana(giorno) {
     const analyticsPanel = document.getElementById('analytics-panel');
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
         updateAnalytics();
-    }
+   }
+   window.dispatchEvent(new Event('filtersUpdated'));
 }
 
 
@@ -5024,6 +5037,7 @@ function filterByGiornoSettimana(giorno) {
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
         updateAnalytics();
     }
+	window.dispatchEvent(new Event('filtersUpdated'));
 }
 
 
@@ -5693,6 +5707,8 @@ function filterByFerialeWeekend(tipo) {
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
         updateAnalytics();
     }
+	
+	window.dispatchEvent(new Event('filtersUpdated'));
 }
 
 
@@ -5727,6 +5743,7 @@ function filterByFasciaOraria(fascia) {
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
         updateAnalytics();
     }
+	window.dispatchEvent(new Event('filtersUpdated'));
 }
 
 
@@ -5802,6 +5819,14 @@ function updateInsights(data) {
 
 // Setup Event Listeners
 function setupEventListeners() {
+    // ✅ LISTENER GLOBALE per aggiornare i filtri in Analytics
+    window.addEventListener('filtersUpdated', () => {
+        const analyticsPanel = document.getElementById('analytics-panel');
+        if (analyticsPanel && analyticsPanel.classList.contains('open')) {
+            updateActiveFiltersDisplay();
+        }
+    });
+    
     function addTouchClickListener(element, handler) {
         if (!element) return;
         
@@ -6036,6 +6061,8 @@ if (btnResetAnalytics) {
     addTouchClickListener(btnResetAnalytics, resetFilters);
 }
 }
+
+
 
 // Initialize App
 init();

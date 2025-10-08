@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart Builder - Configurazione Completa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* SIDEBAR CONTROLLI */
+        .controls-sidebar {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+        }
+
+        .control-section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        .control-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-section h3 i {
+            font-size: 1em;
+        }
+
+        /* CHART TYPES */
+        .chart-types-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .chart-type-btn {
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .chart-type-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .chart-type-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .chart-type-btn i {
+            display: block;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .chart-type-btn span {
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* FORM CONTROLS */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* RANGE SLIDERS */
+        .range-group {
+            margin-bottom: 15px;
+        }
+
+        .range-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .range-label-text {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .range-value {
+            background: #667eea;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            min-width: 45px;
+            text-align: center;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 5px;
+            background: #dee2e6;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: #764ba2;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* COLOR PICKER */
+        .color-picker-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .color-input-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .color-input-wrapper label {
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        input[type="color"] {
+            width: 100%;
+            height: 45px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            cursor: pointer;
+            padding: 3px;
+        }
+
+        /* CHECKBOXES */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .checkbox-group label {
+            cursor: pointer;
+            font-size: 0.9em;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        /* PRESET BUTTONS */
+        .preset-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .preset-btn {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .preset-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        /* ACTION BUTTONS */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.95em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+            grid-column: span 2;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        /* CHART PREVIEW AREA */
+        .chart-preview-area {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e9ecef;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .preview-header h2 {
+            color: #667eea;
+            font-size: 1.5em;
+        }
+
+        .download-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .download-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 500px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            display: none;
+        }
+
+        .chart-wrapper.active {
+            display: block;
+        }
+
+        .preview-placeholder {
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            border: 3px dashed #dee2e6;
+        }
+
+        .preview-placeholder i {
+            font-size: 80px;
+            color: #adb5bd;
+            margin-bottom: 20px;
+        }
+
+        .preview-placeholder p {
+            color: #6c757d;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        /* FILTERS DISPLAY */
+        .filters-info {
+            background: #e7f3ff;
+            border-left: 4px solid #0066cc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .filters-info h4 {
+            color: #0066cc;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        .filter-badge {
+            display: inline-block;
+            background: #0066cc;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            margin-right: 8px;
+            margin-bottom: 5px;
+        }
+
+        .no-filters {
+            color: #6c757d;
+            font-style: italic;
+            font-size: 0.9em;
+        }
+
+        /* STATS FOOTER */
+        .stats-footer {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card label {
+            display: block;
+            font-size: 0.85em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .value {
+            font-size: 1.3em;
+            font-weight: 700;
+        }
+
+        /* SCROLLBAR CUSTOM */
+        .controls-sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .controls-sidebar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .controls-sidebar::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .controls-sidebar::-webkit-scrollbar-thumb:hover {
+            background: #764ba2;
+        }
+
+        /* DIVIDER */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #dee2e6, transparent);
+            margin: 20px 0;
+        }
+
+        /* BADGE INFO */
+        .info-badge {
+            background: #e7f3ff;
+            color: #0066cc;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-badge i {
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-chart-pie"></i> Chart Builder Pro</h1>
+        <p class="subtitle">Sistema avanzato di creazione grafici personalizzati con controlli completi</p>
+
+        <div class="main-grid">
+            <!-- ================================================= -->
+            <!-- SIDEBAR CONTROLLI -->
+            <!-- ================================================= -->
+            <div class="controls-sidebar">
+                
+                <!-- SEZIONE 1: TIPO DI GRAFICO -->
+                <div class="control-section">
+                    <h3><i class="fas fa-chart-bar"></i> Tipo di Grafico</h3>
+                    <div class="chart-types-grid">
+                        <button class="chart-type-btn active" data-type="bar">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Bar</span>
+                        </button>
+                        <button class="chart-type-btn" data-type="line">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Line</span>
+                        </button>
+                        <button class="chart-type-btn" data-type="pie">
+                            <i class="fas fa-chart-pie"></i>
+                            <span>Pie</span>
+                        </button>
+                        <button class="chart-type-btn" data-type="doughnut">
+                            <i class="fas fa-circle-notch"></i>
+                            <span>Doughnut</span>
+                        </button>
+                        <button class="chart-type-btn" data-type="polarArea">
+                            <i class="fas fa-compass"></i>
+                            <span>Polar</span>
+                        </button>
+                        <button class="chart-type-btn" data-type="radar">
+                            <i class="fas fa-spider"></i>
+                            <span>Radar</span>
+                        </button>
+                        <button class="chart-type-btn" data-type="scatter">
+                            <i class="fas fa-braille"></i>
+                            <span>Scatter</span>
+                        </button>
+                        <button class="chart-type-btn" data-type="bubble">
+                            <i class="fas fa-circle"></i>
+                            <span>Bubble</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SEZIONE 2: CONFIGURAZIONE DATI -->
+                <div class="control-section">
+                    <h3><i class="fas fa-database"></i> Configurazione Dati</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Dimensione (Asse X)</label>
+                        <select id="dimension-select" class="form-control">
+                            <option value="">Seleziona dimensione...</option>
+                            <option value="Anno">Anno</option>
+                            <option value="Mese">Mese</option>
+                            <option value="Giorno settimana">Giorno settimana</option>
+                            <option value="Stagione">Stagione</option>
+                            <option value="Fascia oraria dettagliata (6 fasce)">Fascia oraria</option>
+                            <option value="Provincia">Provincia</option>
+                            <option value="Tipologia">Tipologia</option>
+                            <option value="Causa presunta">Causa presunta</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Metrica</label>
+                        <select id="metric-select" class="form-control">
+                            <option value="count">Conteggio incidenti</option>
+                            <option value="tipologia">Per tipologia (M/R/F/C)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Limite risultati</label>
+                        <select id="limit-select" class="form-control">
+                            <option value="5">Top 5</option>
+                            <option value="10" selected>Top 10</option>
+                            <option value="15">Top 15</option>
+                            <option value="20">Top 20</option>
+                            <option value="0">Tutti</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="orientation-group">
+                        <label class="form-label">Orientamento</label>
+                        <select id="orientation-select" class="form-control">
+                            <option value="vertical">Verticale</option>
+                            <option value="horizontal">Orizzontale</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- SEZIONE 3: COLORI -->
+                <div class="control-section">
+                    <h3><i class="fas fa-palette"></i> Colori</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Modalità Colore</label>
+                        <select id="color-mode-select" class="form-control">
+                            <option value="auto">Automatico</option>
+                            <option value="single">Colore Singolo</option>
+                            <option value="gradient">Gradiente</option>
+                        </select>
+                    </div>
+
+                    <div id="single-color-group" style="display: none;">
+                        <div class="color-input-wrapper">
+                            <label>Colore Primario</label>
+                            <input type="color" id="primary-color" value="#8b5cf6">
+                        </div>
+                    </div>
+
+                    <div id="gradient-color-group" style="display: none;">
+                        <div class="color-picker-group">
+                            <div class="color-input-wrapper">
+                                <label>Inizio</label>
+                                <input type="color" id="primary-color-gradient" value="#8b5cf6">
+                            </div>
+                            <div class="color-input-wrapper">
+                                <label>Fine</label>
+                                <input type="color" id="secondary-color" value="#3b82f6">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-badge">
+                        <i class="fas fa-info-circle"></i>
+                        <span>I colori cambiano in base al tipo di grafico selezionato</span>
+                    </div>
+                </div>
+
+                <!-- SEZIONE 4: STILE E DIMENSIONI -->
+                <div class="control-section">
+                    <h3><i class="fas fa-paint-brush"></i> Stile e Dimensioni</h3>
+                    
+                    <!-- Border Width -->
+                    <div class="range-group">
+                        <div class="range-label">
+                            <span class="range-label-text">Spessore Bordi</span>
+                            <span class="range-value" id="border-width-value">2</span>
+                        </div>
+                        <input type="range" id="border-width" min="0" max="10" step="0.5" value="2">
+                    </div>
+
+                    <!-- Opacity -->
+                    <div class="range-group">
+                        <div class="range-label">
+                            <span class="range-label-text">Opacità</span>
+                            <span class="range-value" id="opacity-value">0.8</span>
+                        </div>
+                        <input type="range" id="opacity" min="0" max="1" step="0.05" value="0.8">
+                    </div>
+
+                    <!-- Font Size -->
+                    <div class="range-group">
+                        <div class="range-label">
+                            <span class="range-label-text">Dimensione Testo</span>
+                            <span class="range-value" id="font-size-value">12px</span>
+                        </div>
+                        <input type="range" id="font-size" min="8" max="20" step="1" value="12">
+                    </div>
+
+                    <!-- Title Size -->
+                    <div class="range-group">
+                        <div class="range-label">
+                            <span class="range-label-text">Dimensione Titolo</span>
+                            <span class="range-value" id="title-size-value">16px</span>
+                        </div>
+                        <input type="range" id="title-size" min="12" max="32" step="1" value="16">
+                    </div>
+
+                    <!-- Legend Size -->
+                    <div class="range-group">
+                        <div class="range-label">
+                            <span class="range-label-text">Dimensione Legenda</span>
+                            <span class="range-value" id="legend-size-value">12px</span>
+                        </div>
+                        <input type="range" id="legend-size" min="8" max="18" step="1" value="12">
+                    </div>
+
+                    <!-- Grid Opacity -->
+                    <div class="range-group">
+                        <div class="range-label">
+                            <span class="range-label-text">Opacità Griglia</span>
+                            <span class="range-value" id="grid-opacity-value">0.1</span>
+                        </div>
+                        <input type="range" id="grid-opacity" min="0" max="1" step="0.05" value="0.1">
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <!-- Tension (Line Charts) -->
+                    <div class="range-group" id="tension-group">
+                        <div class="range-label">
+                            <span class="range-label-text">Curvatura Linee</span>
+                            <span class="range-value" id="tension-value">0.4</span>
+                        </div>
+                        <input type="range" id="tension" min="0" max="1" step="0.1" value="0.4">
+                    </div>
+
+                    <!-- Point Radius -->
+                    <div class="range-group" id="point-group">
+                        <div class="range-label">
+                            <span class="range-label-text">Dimensione Punti</span>
+                            <span class="range-value" id="point-radius-value">3px</span>
+                        </div>
+                        <input type="range" id="point-radius" min="0" max="10" step="1" value="3">
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <!-- Preset Buttons -->
+                    <label class="form-label">Preset Rapidi</label>
+                    <div class="preset-buttons">
+                        <button class="preset-btn apply-preset" data-preset="minimal">
+                            <i class="fas fa-compress"></i> Minimal
+                        </button>
+                        <button class="preset-btn apply-preset" data-preset="default">
+                            <i class="fas fa-check"></i> Default
+                        </button>
+                        <button class="preset-btn apply-preset" data-preset="bold">
+                            <i class="fas fa-bold"></i> Bold
+                        </button>
+                        <button class="preset-btn apply-preset" data-preset="clean">
+                            <i class="fas fa-eraser"></i> Clean
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SEZIONE 5: VARIANTI E OPZIONI -->
+                <div class="control-section">
+                    <h3><i class="fas fa-sliders-h"></i> Varianti e Opzioni</h3>
+                    
+                    <div id="stacked-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="stacked-variant">
+                            <label for="stacked-variant">Grafico Impilato (Stacked)</label>
+                        </div>
+                    </div>
+
+                    <div id="horizontal-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="horizontal-variant">
+                            <label for="horizontal-variant">Orientamento Orizzontale</label>
+                        </div>
+                    </div>
+
+                    <div id="fill-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="fill-area" checked>
+                            <label for="fill-area">Riempi Area sotto la Linea</label>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="show-values" checked>
+                        <label for="show-values">Mostra Valori sul Grafico</label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="show-grid" checked>
+                        <label for="show-grid">Mostra Griglia</label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="show-legend" checked>
+                        <label for="show-legend">Mostra Legenda</label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="animation" checked>
+                        <label for="animation">Abilita Animazioni</label>
+                    </div>
+                </div>
+
+                <!-- PULSANTI AZIONE -->
+                <div class="action-buttons">
+                    <button class="btn btn-success" id="btn-generate-chart">
+                        <i class="fas fa-magic"></i>
+                        Genera Grafico
+                    </button>
+                    <button class="btn btn-secondary" id="btn-reset-builder">
+                        <i class="fas fa-undo"></i>
+                        Reset
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- ================================================= -->
+            <!-- AREA PREVIEW GRAFICO -->
+            <!-- ================================================= -->
+            <div class="chart-preview-area">
+                
+                <!-- Header Preview -->
+                <div class="preview-header">
+                    <h2><i class="fas fa-eye"></i> Anteprima Grafico</h2>
+                    <button class="download-btn" id="btn-download-custom-chart">
+                        <i class="fas fa-download"></i>
+                        Scarica PNG
+                    </button>
+                </div>
+
+                <!-- Filtri Attivi -->
+                <div class="filters-info">
+                    <h4><i class="fas fa-filter"></i> Filtri Attivi</h4>
+                    <div id="custom-chart-filters">
+                        <span class="no-filters">Nessun filtro applicato</span>
+                    </div>
+                </div>
+
+                <!-- Canvas Grafico -->
+                <div id="chart-wrapper-custom" class="chart-wrapper">
+                    <canvas id="custom-chart-canvas"></canvas>
+                </div>
+
+                <!-- Placeholder -->
+                <div class="preview-placeholder">
+                    <i class="fas fa-chart-area"></i>
+                    <p>Configura i parametri e genera il tuo grafico personalizzato</p>
+                </div>
+
+                <!-- Stats Footer -->
+                <div class="stats-footer">
+                    <div class="stat-card">
+                        <label>Totale Dati</label>
+                        <div class="value" id="custom-chart-total">0 incidenti</div>
+                    </div>
+                    <div class="stat-card">
+                        <label>Periodo</label>
+                        <div class="value" id="custom-chart-period">2015-2023</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    
+    <script>
+        // ============================================
+        // CHART BUILDER - JAVASCRIPT COMPLETO
+        // ============================================
+        
+        let customChart = null;
+        let customChartConfig = {
+            type: 'bar',
+            dimension: null,
+            metric: 'count',
+            limit: 10,
+            orientation: 'vertical',
+            colors: {
+                mode: 'auto',
+                primary: '#8b5cf6',
+                secondary: '#3b82f6'
+            },
+            style: {
+                borderWidth: 2,
+                opacity: 0.8,
+                fontSize: 12,
+                titleSize: 16,
+                legendSize: 12,
+                gridOpacity: 0.1,
+                showGrid: true,
+                showLegend: true,
+                tension: 0.4,
+                pointRadius: 3,
+                fill: true
+            },
+            variant: {
+                stacked: false,
+                horizontal: false,
+                showValues: true,
+                animation: true
+            }
+        };
+
+        // ============================================
+        // INIZIALIZZAZIONE
+        // ============================================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            initChartBuilder();
+            updateColorControls();
+            updateVariantOptions();
+        });
+
+        function initChartBuilder() {
+            // Chart Type Selection
+            document.querySelectorAll('.chart-type-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.chart-type-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    customChartConfig.type = this.dataset.type;
+                    updateVariantOptions();
+                });
+            });
+            
+            // Data Configuration
+            document.getElementById('dimension-select').addEventListener('change', (e) => {
+                customChartConfig.dimension = e.target.value;
+            });
+            
+            document.getElementById('metric-select').addEventListener('change', (e) => {
+                customChartConfig.metric = e.target.value;
+            });
+            
+            document.getElementById('limit-select').addEventListener('change', (e) => {
+                customChartConfig.limit = parseInt(e.target.value);
+            });
+            
+            document.getElementById('orientation-select').addEventListener('change', (e) => {
+                customChartConfig.orientation = e.target.value;
+            });
+            
+            // Color Controls
+            document.getElementById('color-mode-select').addEventListener('change', (e) => {
+                customChartConfig.colors.mode = e.target.value;
+                updateColorControls();
+            });
+            
+            document.getElementById('primary-color').addEventListener('input', (e) => {
+                customChartConfig.colors.primary = e.target.value;
+            });
+            
+            const primaryGradient = document.getElementById('primary-color-gradient');
+            if (primaryGradient) {
+                primaryGradient.addEventListener('input', (e) => {
+                    customChartConfig.colors.primary = e.target.value;
+                });
+            }
+            
+            document.getElementById('secondary-color').addEventListener('input', (e) => {
+                customChartConfig.colors.secondary = e.target.value;
+            });
+            
+            // Style Controls with Real-time Display
+            initRangeControl('border-width', 'border-width-value', (val) => {
+                customChartConfig.style.borderWidth = parseFloat(val);
+            });
+            
+            initRangeControl('opacity', 'opacity-value', (val) => {
+                customChartConfig.style.opacity = parseFloat(val);
+            });
+            
+            initRangeControl('font-size', 'font-size-value', (val) => {
+                customChartConfig.style.fontSize = parseInt(val);
+            }, 'px');
+            
+            initRangeControl('title-size', 'title-size-value', (val) => {
+                customChartConfig.style.titleSize = parseInt(val);
+            }, 'px');
+            
+            initRangeControl('legend-size', 'legend-size-value', (val) => {
+                customChartConfig.style.legendSize = parseInt(val);
+            }, 'px');
+            
+            initRangeControl('grid-opacity', 'grid-opacity-value', (val) => {
+                customChartConfig.style.gridOpacity = parseFloat(val);
+            });
+            
+            initRangeControl('tension', 'tension-value', (val) => {
+                customChartConfig.style.tension = parseFloat(val);
+            });
+            
+            initRangeControl('point-radius', 'point-radius-value', (val) => {
+                customChartConfig.style.pointRadius = parseInt(val);
+            }, 'px');
+            
+            // Variant Checkboxes
+            document.getElementById('stacked-variant').addEventListener('change', (e) => {
+                customChartConfig.variant.stacked = e.target.checked;
+            });
+            
+            document.getElementById('horizontal-variant').addEventListener('change', (e) => {
+                customChartConfig.variant.horizontal = e.target.checked;
+            });
+            
+            document.getElementById('show-values').addEventListener('change', (e) => {
+                customChartConfig.variant.showValues = e.target.checked;
+            });
+            
+            document.getElementById('show-grid').addEventListener('change', (e) => {
+                customChartConfig.style.showGrid = e.target.checked;
+            });
+            
+            document.getElementById('show-legend').addEventListener('change', (e) => {
+                customChartConfig.style.showLegend = e.target.checked;
+            });
+            
+            document.getElementById('fill-area').addEventListener('change', (e) => {
+                customChartConfig.style.fill = e.target.checked;
+            });
+            
+            document.getElementById('animation').addEventListener('change', (e) => {
+                customChartConfig.variant.animation = e.target.checked;
+            });
+            
+            // Action Buttons
+            document.getElementById('btn-generate-chart').addEventListener('click', generateCustomChart);
+            document.getElementById('btn-reset-builder').addEventListener('click', resetChartBuilder);
+            document.getElementById('btn-download-custom-chart').addEventListener('click', downloadCustomChart);
+            
+            // Preset Buttons
+            document.querySelectorAll('.apply-preset').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    applyStylePreset(this.dataset.preset);
+                });
+            });
+        }
+
+        // ============================================
+        // HELPER FUNCTIONS
+        // ============================================
+        
+        function initRangeControl(inputId, displayId, callback, suffix = '') {
+            const input = document.getElementById(inputId);
+            const display = document.getElementById(displayId);
+            
+            input.addEventListener('input', (e) => {
+                const value = e.target.value;
+                display.textContent = value + suffix;
+                callback(value);
+            });
+        }
+
+        function updateColorControls() {
+            const mode = customChartConfig.colors.mode;
+            const singleGroup = document.getElementById('single-color-group');
+            const gradientGroup = document.getElementById('gradient-color-group');
+            
+            singleGroup.style.display = mode === 'single' ? 'block' : 'none';
+            gradientGroup.style.display = mode === 'gradient' ? 'block' : 'none';
+        }
+
+        function updateVariantOptions() {
+            const type = customChartConfig.type;
+            
+            const stackedGroup = document.getElementById('stacked-group');
+            const horizontalGroup = document.getElementById('horizontal-group');
+            const fillGroup = document.getElementById('fill-group');
+            const tensionGroup = document.getElementById('tension-group');
+            const pointGroup = document.getElementById('point-group');
+            
+            if (stackedGroup) {
+                stackedGroup.style.display = ['bar', 'line'].includes(type) ? 'block' : 'none';
+            }
+            
+            if (horizontalGroup) {
+                horizontalGroup.style.display = type === 'bar' ? 'block' : 'none';
+            }
+            
+            if (fillGroup) {
+                fillGroup.style.display = type === 'line' ? 'block' : 'none';
+            }
+            
+            if (tensionGroup) {
+                tensionGroup.style.display = ['line', 'radar'].includes(type) ? 'block' : 'none';
+            }
+            
+            if (pointGroup) {
+                pointGroup.style.display = ['line', 'scatter'].includes(type) ? 'block' : 'none';
+            }
+        }
+
+        function applyStylePreset(preset) {
+            const presets = {
+                minimal: {
+                    borderWidth: 1,
+                    opacity: 0.6,
+                    fontSize: 10,
+                    titleSize: 14,
+                    legendSize: 10,
+                    gridOpacity: 0.05
+                },
+                default: {
+                    borderWidth: 2,
+                    opacity: 0.8,
+                    fontSize: 12,
+                    titleSize: 16,
+                    legendSize: 12,
+                    gridOpacity: 0.1
+                },
+                bold: {
+                    borderWidth: 4,
+                    opacity: 1,
+                    fontSize: 14,
+                    titleSize: 20,
+                    legendSize: 14,
+                    gridOpacity: 0.2
+                },
+                clean: {
+                    borderWidth: 0,
+                    opacity: 0.9,
+                    fontSize: 11,
+                    titleSize: 18,
+                    legendSize: 11,
+                    gridOpacity: 0
+                }
+            };
+            
+            if (presets[preset]) {
+                Object.assign(customChartConfig.style, presets[preset]);
+                
+                // Update UI
+                document.getElementById('border-width').value = presets[preset].borderWidth;
+                document.getElementById('opacity').value = presets[preset].opacity;
+                document.getElementById('font-size').value = presets[preset].fontSize;
+                document.getElementById('title-size').value = presets[preset].titleSize;
+                document.getElementById('legend-size').value = presets[preset].legendSize;
+                document.getElementById('grid-opacity').value = presets[preset].gridOpacity;
+                
+                // Update displays
+                document.getElementById('border-width-value').textContent = presets[preset].borderWidth;
+                document.getElementById('opacity-value').textContent = presets[preset].opacity;
+                document.getElementById('font-size-value').textContent = presets[preset].fontSize + 'px';
+                document.getElementById('title-size-value').textContent = presets[preset].titleSize + 'px';
+                document.getElementById('legend-size-value').textContent = presets[preset].legendSize + 'px';
+                document.getElementById('grid-opacity-value').textContent = presets[preset].gridOpacity;
+                
+                alert('✓ Preset "' + preset + '" applicato con successo!');
+            }
+        }
+
+        // ============================================
+        // CHART GENERATION
+        // ============================================
+        
+        function generateCustomChart() {
+            if (!customChartConfig.dimension) {
+                alert('⚠️ Seleziona una dimensione per generare il grafico');
+                return;
+            }
+            
+            // Dati di esempio
+            const sampleData = generateSampleData();
+            renderCustomChart(sampleData);
+        }
+
+        function generateSampleData() {
+            const dimension = customChartConfig.dimension;
+            const dataMap = {
+                'Anno': ['2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
+                'Mese': ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre'],
+                'Giorno settimana': ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'],
+                'Stagione': ['Primavera', 'Estate', 'Autunno', 'Inverno'],
+                'Provincia': ['Roma', 'Milano', 'Napoli', 'Torino', 'Palermo', 'Genova', 'Bologna', 'Firenze'],
+                'Tipologia': ['Mortali', 'Riserva', 'Feriti', 'Cose']
+            };
+            
+            const labels = dataMap[dimension] || ['A', 'B', 'C', 'D', 'E'];
+            const limit = customChartConfig.limit > 0 ? customChartConfig.limit : labels.length;
+            const limitedLabels = labels.slice(0, limit);
+            
+            return limitedLabels.map(label => ({
+                label: label,
+                value: customChartConfig.metric === 'count' 
+                    ? Math.floor(Math.random() * 500) + 50
+                    : { M: Math.floor(Math.random() * 50), R: Math.floor(Math.random() * 30), 
+                        F: Math.floor(Math.random() * 100), C: Math.floor(Math.random() * 80) }
+            }));
+        }
+
+        function renderCustomChart(data) {
+            const canvas = document.getElementById('custom-chart-canvas');
+            const wrapper = document.getElementById('chart-wrapper-custom');
+            const placeholder = document.querySelector('.preview-placeholder');
+            
+            wrapper.classList.add('active');
+            placeholder.style.display = 'none';
+            
+            if (customChart) {
+                customChart.destroy();
+            }
+            
+            const chartDatasets = prepareChartDatasets(data);
+            const chartLabels = data.map(d => d.label);
+            
+            const config = {
+                type: customChartConfig.type,
+                data: {
+                    labels: chartLabels,
+                    datasets: chartDatasets
+                },
+                options: getChartOptions()
+            };
+            
+            customChart = new Chart(canvas, config);
+            
+            // Update stats
+            document.getElementById('custom-chart-total').textContent = 
+                data.reduce((sum, d) => sum + (typeof d.value === 'number' ? d.value : Object.values(d.value).reduce((a,b) => a+b, 0)), 0) + ' incidenti';
+        }
+
+        function prepareChartDatasets(data) {
+            const metric = customChartConfig.metric;
+            const type = customChartConfig.type;
+            const style = customChartConfig.style;
+            const colors = customChartConfig.colors;
+            
+            if (metric === 'count') {
+                const values = data.map(d => d.value);
+                let bgColors, borderColors;
+                
+                if (colors.mode === 'single') {
+                    bgColors = hexToRgba(colors.primary, style.opacity);
+                    borderColors = colors.primary;
+                } else if (colors.mode === 'gradient') {
+                    bgColors = generateGradientColors(data.length, colors.primary, colors.secondary, style.opacity);
+                    borderColors = bgColors.map(c => c.replace(/[\d.]+\)$/g, '1)'));
+                } else {
+                    if (['pie', 'doughnut', 'polarArea'].includes(type)) {
+                        const baseColors = generateColors(data.length);
+                        bgColors = baseColors.map(c => hexToRgba(c, style.opacity));
+                        borderColors = baseColors;
+                    } else {
+                        bgColors = generateGradientColors(data.length, '#8b5cf6', '#3b82f6', style.opacity);
+                        borderColors = bgColors.map(c => c.replace(/[\d.]+\)$/g, '1)'));
+                    }
+                }
+                
+                return [{
+                    label: 'Incidenti',
+                    data: values,
+                    backgroundColor: bgColors,
+                    borderColor: borderColors,
+                    borderWidth: style.borderWidth,
+                    fill: type === 'line' ? style.fill : true,
+                    tension: style.tension,
+                    pointRadius: style.pointRadius,
+                    pointHoverRadius: style.pointRadius + 2
+                }];
+            } else {
+                const tipologieMap = {
+                    'M': { label: 'Mortali', color: '#ef4444' },
+                    'R': { label: 'Riserva', color: '#a855f7' },
+                    'F': { label: 'Feriti', color: '#f59e0b' },
+                    'C': { label: 'Cose', color: '#10b981' }
+                };
+                
+                return ['M', 'R', 'F', 'C'].map(tipo => ({
+                    label: tipologieMap[tipo].label,
+                    data: data.map(d => d.value[tipo] || 0),
+                    backgroundColor: hexToRgba(tipologieMap[tipo].color, style.opacity),
+                    borderColor: tipologieMap[tipo].color,
+                    borderWidth: style.borderWidth,
+                    fill: type === 'line' ? style.fill : true,
+                    tension: style.tension,
+                    pointRadius: style.pointRadius
+                }));
+            }
+        }
+
+        function getChartOptions() {
+            const type = customChartConfig.type;
+            const style = customChartConfig.style;
+            const variant = customChartConfig.variant;
+            
+            const baseOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: variant.animation ? { duration: 750 } : false,
+                plugins: {
+                    legend: {
+                        display: style.showLegend,
+                        position: 'bottom',
+                        labels: {
+                            color: '#1f2937',
+                            font: { size: style.legendSize },
+                            padding: 15,
+                            usePointStyle: true
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: customChartConfig.dimension + ' - Analisi Incidenti',
+                        color: '#1f2937',
+                        font: { size: style.titleSize, weight: 'bold' },
+                        padding: 20
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        padding: 12,
+                        titleFont: { size: style.fontSize + 1, weight: 'bold' },
+                        bodyFont: { size: style.fontSize }
+                    },
+                    datalabels: {
+                        display: variant.showValues && !['line', 'scatter', 'bubble'].includes(type),
+                        color: ['pie', 'doughnut'].includes(type) ? '#ffffff' : '#1f2937',
+                        font: { weight: 'bold', size: style.fontSize - 1 },
+                        formatter: (value) => value > 0 ? value : ''
+                    }
+                }
+            };
+            
+            if (type === 'bar') {
+                baseOptions.indexAxis = variant.horizontal ? 'y' : 'x';
+                baseOptions.scales = {
+                    x: {
+                        stacked: variant.stacked,
+                        ticks: { color: '#1f2937', font: { size: style.fontSize } },
+                        grid: { display: style.showGrid, color: `rgba(148, 163, 184, ${style.gridOpacity})` }
+                    },
+                    y: {
+                        stacked: variant.stacked,
+                        beginAtZero: true,
+                        ticks: { color: '#1f2937', font: { size: style.fontSize } },
+                        grid: { display: style.showGrid, color: `rgba(148, 163, 184, ${style.gridOpacity})` }
+                    }
+                };
+            } else if (type === 'line') {
+                baseOptions.scales = {
+                    x: {
+                        ticks: { color: '#1f2937', font: { size: style.fontSize } },
+                        grid: { display: style.showGrid, color: `rgba(148, 163, 184, ${style.gridOpacity})` }
+                    },
+                    y: {
+                        stacked: variant.stacked,
+                        beginAtZero: true,
+                        ticks: { color: '#1f2937', font: { size: style.fontSize } },
+                        grid: { display: style.showGrid, color: `rgba(148, 163, 184, ${style.gridOpacity})` }
+                    }
+                };
+            } else if (type === 'radar') {
+                baseOptions.scales = {
+                    r: {
+                        beginAtZero: true,
+                        ticks: { color: '#1f2937', font: { size: style.fontSize } },
+                        grid: { color: `rgba(148, 163, 184, ${style.gridOpacity * 3})` },
+                        pointLabels: { color: '#1f2937', font: { size: style.fontSize, weight: '600' } }
+                    }
+                };
+            }
+            
+            return baseOptions;
+        }
+
+        // ============================================
+        // COLOR UTILITIES
+        // ============================================
+        
+        function generateColors(count) {
+            const baseColors = [
+                '#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', 
+                '#ef4444', '#ec4899', '#06b6d4', '#84cc16'
+            ];
+            return baseColors.slice(0, count);
+        }
+
+        function generateGradientColors(count, startColor, endColor, opacity = 1) {
+            const start = hexToRgb(startColor);
+            const end = hexToRgb(endColor);
+            const colors = [];
+            
+            for (let i = 0; i < count; i++) {
+                const ratio = count > 1 ? i / (count - 1) : 0;
+                const r = Math.round(start.r + (end.r - start.r) * ratio);
+                const g = Math.round(start.g + (end.g - start.g) * ratio);
+                const b = Math.round(start.b + (end.b - start.b) * ratio);
+                colors.push(`rgba(${r}, ${g}, ${b}, ${opacity})`);
+            }
+            
+            return colors;
+        }
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : { r: 139, g: 92, b: 246 };
+        }
+
+        function hexToRgba(hex, alpha) {
+            const rgb = hexToRgb(hex);
+            return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
+        }
+
+        // ============================================
+        // RESET & DOWNLOAD
+        // ============================================
+        
+        function resetChartBuilder() {
+            location.reload();
+        }
+
+        function downloadCustomChart() {
+            if (!customChart) {
+                alert('⚠️ Genera prima un grafico da scaricare');
+                return;
+            }
+            
+            const canvas = document.getElementById('custom-chart-canvas');
+            const link = document.createElement('a');
+            const timestamp = new Date().getTime();
+            link.download = `grafico_${customChartConfig.dimension}_${timestamp}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+    </script>
+</body>
+</html>
