@@ -41,7 +41,7 @@ const MESI_ITALIANI_CAL = [
     'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
 ];
 
-const GIORNI_SETTIMANA = ['LunedÃ¬', 'MartedÃ¬', 'MercoledÃ¬', 'GiovedÃ¬', 'VenerdÃ¬', 'Sabato', 'Domenica'];
+const GIORNI_SETTIMANA = ['Lunedà¬', 'Martedà¬', 'Mercoledà¬', 'Giovedà¬', 'Venerdà¬', 'Sabato', 'Domenica'];
 const GIORNI_SETTIMANA_SHORT = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
 
 // Register Chart.js plugins globally
@@ -160,7 +160,7 @@ const filterConfig = {
     'filter-giorno-settimana': 'Giorno settimana',
     'filter-feriale-weekend': 'Feriale/Weekend',
     'filter-giorno-notte': 'Giorno/Notte',
-    'filter-condizioni-luce': 'Condizioni luce (VisibilitÃ )',
+    'filter-condizioni-luce': 'Condizioni luce (Visibilità )',
     'filter-fascia-4': 'Fascia oraria (4 fasce)',
     'filter-fascia-6': 'Fascia oraria dettagliata (6 fasce)',
     'filter-ora-punta': 'Ora di punta (Picchi di traffico)'
@@ -477,10 +477,10 @@ function openDetailPanel(properties) {
     
     let html = '';
     
-    // Sezione Tipologia e GravitÃ  (ICONA AGGIORNATA)
+    // Sezione Tipologia e Gravità  (ICONA AGGIORNATA)
     html += `
         <div class="detail-section">
-            <h3><i class="fas fa-exclamation-triangle"></i> Tipologia e GravitÃ </h3>
+            <h3><i class="fas fa-exclamation-triangle"></i> Tipologia e Gravità </h3>
             <div class="detail-row">
                 <span class="detail-label">Tipo Incidente</span>
                 <span class="tipo-badge ${properties.Tipologia}">${properties.Tipologia} - ${tipologiaNames[properties.Tipologia]}</span>
@@ -489,7 +489,7 @@ function openDetailPanel(properties) {
     `;
     
     // Sezione Quando (ICONA AGGIORNATA)
-    html += '<div class="detail-section"><h3><i class="fas fa-calendar-alt"></i> Quando Ã¨ Avvenuto</h3>';
+    html += '<div class="detail-section"><h3><i class="fas fa-calendar-alt"></i> Quando è avvenuto</h3>';
     const temporalFields = [
         { key: 'Data', label: 'Data' },
         { key: 'Anno', label: 'Anno' },
@@ -516,11 +516,11 @@ function openDetailPanel(properties) {
     html += '</div>';
     
     // Sezione Dove (ICONA AGGIORNATA)
-    html += '<div class="detail-section"><h3><i class="fas fa-map-marker-alt"></i> Dove Ã¨ Avvenuto</h3>';
+    html += '<div class="detail-section"><h3><i class="fas fa-map-marker-alt"></i> Dove è avvenuto</h3>';
     const locationFields = [
         { key: 'Circoscrizione', label: 'Circoscrizione' },
         { key: 'Quartiere', label: 'Quartiere' },
-        { key: 'UPL', label: 'UnitÃ  di Primo Livello' }
+        { key: 'UPL', label: 'Unità  di Primo Livello' }
     ];
     
     locationFields.forEach(field => {
@@ -551,11 +551,11 @@ function openDetailPanel(properties) {
     
     // Sezione Condizioni Ambientali (ICONA AGGIORNATA)
     html += '<div class="detail-section"><h3><i class="fas fa-cloud-sun"></i> Condizioni Ambientali</h3>';
-    if (properties['Condizioni luce (VisibilitÃ )'] && properties['Condizioni luce (VisibilitÃ )'] !== 'null') {
+    if (properties['Condizioni luce (Visibilità )'] && properties['Condizioni luce (Visibilità )'] !== 'null') {
         html += `
             <div class="detail-row">
                 <span class="detail-label">Condizioni Luce</span>
-                <span class="detail-value">${properties['Condizioni luce (VisibilitÃ )']}</span>
+                <span class="detail-value">${properties['Condizioni luce (Visibilità )']}</span>
             </div>
         `;
     }
@@ -602,7 +602,7 @@ function show2019InfoPopup() {
             </h3>
             <p style="color: #1f2937c9; margin: 0 0 16px 0; font-size: 14px; line-height: 1.6;">
                 Il <strong style="color: #1f2937;">2019</strong> include <strong style="color: #3b82f6;">3.192 incidenti non mappati</strong> 
-                perchÃ© nel dataset non erano presenti le coordinate geografiche.
+                perchà© nel dataset non erano presenti le coordinate geografiche.
             </p>
             <p style="color: #94a3b8; margin: 0 0 20px 0; font-size: 13px; font-style: italic;">
                 Questi incidenti sono conteggiati nelle statistiche ma non visualizzati sulla mappa.
@@ -650,7 +650,7 @@ function show2019InfoPopup() {
 function openTopLuoghiModal() {
     // RIMOSSO questo blocco:
     // if (!showClustering) {
-    //     alert('Attiva prima la modalitÃ  Clustering per visualizzare i Top Luoghi');
+    //     alert('Attiva prima la modalità  Clustering per visualizzare i Top Luoghi');
     //     return;
     // }
     
@@ -1020,9 +1020,9 @@ function addChartDownloadButtons() {
             return;
         }
         
-        // Verifica se ha giÃ  il pulsante
+        // Verifica se ha già  il pulsante
         if (container.querySelector('.chart-download-btn')) {
-            console.log('- Ha giÃ  il pulsante, skip');
+            console.log('- Ha già  il pulsante, skip');
             return;
         }
         
@@ -1804,7 +1804,7 @@ map.addSource('incidenti-cluster', {
     type: 'geojson',
     data: geojson,
     cluster: true,
-    clusterMaxZoom: 15,        // zoom piÃ¹ alto
+    clusterMaxZoom: 15,        // zoom pià¹ alto
     clusterRadius: 40,         // raggio ridotto
     clusterMinPoints: 2        // minimo 2 punti per cluster
 });
@@ -2445,7 +2445,7 @@ function filterByYear(year) {
     // AGGIUNGI/VERIFICA QUESTA PARTE
     const analyticsPanel = document.getElementById('analytics-panel');
     if (analyticsPanel && analyticsPanel.classList.contains('open')) {
-        updateAnalytics();  // Questa chiamata aggiornerÃ  anche updateActiveFiltersDisplay()
+        updateAnalytics();  // Questa chiamata aggiornerà  anche updateActiveFiltersDisplay()
     }
 }
 
@@ -4575,7 +4575,7 @@ analyticsCharts[chartKey] = new Chart(canvas, {
         }
     });
     
-    const giorni = ['LunedÃ¬', 'MartedÃ¬', 'MercoledÃ¬', 'GiovedÃ¬', 'VenerdÃ¬', 'Sabato', 'Domenica'];
+    const giorni = ['Lunedà¬', 'Martedà¬', 'Mercoledà¬', 'Giovedà¬', 'Venerdà¬', 'Sabato', 'Domenica'];
     const giorniCounts = giorni.map(g => giornoData[g] || 0);
     
     const selectedGiorno = currentFilters['filter-giorno-settimana'];
@@ -4830,7 +4830,7 @@ if (calendarioContainer) {
                 const dataCompleta = `${String(giorno).padStart(2, '0')}/${String(mese).padStart(2, '0')}`;
                 const title = count > 0 ? `${giorno} ${mesiCompleti[mese - 1]}: ${count} incidenti\nClicca per filtrare` : `${giorno} ${mesiCompleti[mese - 1]}`;
                 
-                // Verifica se questa cella Ã¨ attiva
+                // Verifica se questa cella à¨ attiva
                 const isActive = currentFilters['filter-data-selezionata'] === dataCompleta + '/' + (currentFilters['filter-anno'] || '2023');
                 
                 html += `<div class="calendar-heatmap-cell ${intensityClass} ${isActive ? 'active' : ''}" 
@@ -4856,7 +4856,7 @@ if (calendarioContainer) {
             const count = parseInt(cell.dataset.count);
             const dataCompleta = cell.dataset.dataCompleta;
             
-            // Filtra anche se count Ã¨ 0 (mostra che non ci sono incidenti quel giorno)
+            // Filtra anche se count à¨ 0 (mostra che non ci sono incidenti quel giorno)
             filterByCalendarioData(mese, giorno, dataCompleta);
         });
     });
@@ -4870,7 +4870,7 @@ function filterByCalendarioData(mese, giorno, dataCompleta) {
     const anno = currentFilters['filter-anno'] || '2023';
     const dataCompletaConAnno = `${dataCompleta}/${anno}`;
     
-    // Toggle: se giÃ  selezionato, deseleziona
+    // Toggle: se già  selezionato, deseleziona
     if (currentFilters['filter-data-selezionata'] === dataCompletaConAnno) {
         delete currentFilters['filter-data-selezionata'];
         delete currentFilters['filter-mese'];
@@ -4993,7 +4993,7 @@ function filterByGiornoSettimana(giorno) {
 
 
 
-// Filter By Giorno Settimana (se non esiste giÃ )
+// Filter By Giorno Settimana (se non esiste già )
 function filterByGiornoSettimana(giorno) {
     const currentGiorno = currentFilters['filter-giorno-settimana'];
     
@@ -5304,7 +5304,7 @@ function updateOrariaCharts(data) {
         }
     });
     
-    const giorni = ['LunedÃ¬', 'MartedÃ¬', 'MercoledÃ¬', 'GiovedÃ¬', 'VenerdÃ¬', 'Sabato', 'Domenica'];
+    const giorni = ['Lunedà¬', 'Martedà¬', 'Mercoledà¬', 'Giovedà¬', 'Venerdà¬', 'Sabato', 'Domenica'];
     const giorniCounts = giorni.map(g => giornoData[g] || 0);
     
     const selectedGiorno = currentFilters['filter-giorno-settimana'];
@@ -5326,7 +5326,7 @@ function updateOrariaCharts(data) {
                 
                 ctx.save();
                 
-                // Disegna area feriali (LunedÃ¬-VenerdÃ¬, indici 0-4)
+                // Disegna area feriali (Lunedà¬-Venerdà¬, indici 0-4)
                 ctx.beginPath();
                 ctx.moveTo(left, bottom);
                 for (let i = 0; i <= 4; i++) {
@@ -5340,7 +5340,7 @@ function updateOrariaCharts(data) {
                 ctx.fillStyle = 'rgba(59, 130, 246, 0.6)';
                 ctx.fill();
                 
-                // Disegna area weekend (VenerdÃ¬-Domenica, indici 4-6)
+                // Disegna area weekend (Venerdà¬-Domenica, indici 4-6)
                 ctx.beginPath();
                 ctx.moveTo(meta.data[4].x, bottom);
                 for (let i = 4; i <= 6; i++) {
@@ -5380,7 +5380,7 @@ function updateOrariaCharts(data) {
                     pointHoverRadius: 8,
                     segment: {
     borderColor: (ctx) => {
-        // Segmento specifico tra venerdÃ¬ (indice 4) e sabato (indice 5)
+        // Segmento specifico tra venerdà¬ (indice 4) e sabato (indice 5)
         if (ctx.p0DataIndex === 4 && ctx.p1DataIndex === 5) {
             return '#ed7c89'; // Colore per la transizione (es. giallo/arancione)
         }
@@ -5388,7 +5388,7 @@ function updateOrariaCharts(data) {
         return ctx.p0DataIndex < 5 ? '#0079c6' : '#ed7c89';
     },
     borderWidth: (ctx) => {
-        // Spessore maggiore per il segmento tra venerdÃ¬ e sabato
+        // Spessore maggiore per il segmento tra venerdà¬ e sabato
         if (ctx.p0DataIndex === 4 && ctx.p1DataIndex === 5) {
             return 4; // Spessore aumentato
         }
@@ -5788,7 +5788,7 @@ function updateInsights(data) {
     
     const condizioneData = {};
     data.forEach(row => {
-        const cond = row['Condizioni luce (VisibilitÃ )'];
+        const cond = row['Condizioni luce (Visibilità )'];
         if (cond) {
             condizioneData[cond] = (condizioneData[cond] || 0) + 1;
         }
