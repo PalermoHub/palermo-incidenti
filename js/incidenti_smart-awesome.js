@@ -160,7 +160,7 @@ const filterConfig = {
     'filter-giorno-settimana': 'Giorno settimana',
     'filter-feriale-weekend': 'Feriale/Weekend',
     'filter-giorno-notte': 'Giorno/Notte',
-    'filter-condizioni-luce': 'Condizioni luce (Visibilità )',
+    'filter-condizioni-luce': 'Condizioni luce (Visibilità)',
     'filter-fascia-4': 'Fascia oraria (4 fasce)',
     'filter-fascia-6': 'Fascia oraria dettagliata (6 fasce)',
     'filter-ora-punta': 'Ora di punta (Picchi di traffico)'
@@ -551,11 +551,11 @@ function openDetailPanel(properties) {
     
     // Sezione Condizioni Ambientali (ICONA AGGIORNATA)
     html += '<div class="detail-section"><h3><i class="fas fa-cloud-sun"></i> Condizioni Ambientali</h3>';
-    if (properties['Condizioni luce (Visibilità )'] && properties['Condizioni luce (Visibilità )'] !== 'null') {
+    if (properties['Condizioni luce (Visibilità)'] && properties['Condizioni luce (Visibilità)'] !== 'null') {
         html += `
             <div class="detail-row">
                 <span class="detail-label">Condizioni Luce</span>
-                <span class="detail-value">${properties['Condizioni luce (Visibilità )']}</span>
+                <span class="detail-value">${properties['Condizioni luce (Visibilità)']}</span>
             </div>
         `;
     }
@@ -5788,7 +5788,7 @@ function updateInsights(data) {
     
     const condizioneData = {};
     data.forEach(row => {
-        const cond = row['Condizioni luce (Visibilità )'];
+        const cond = row['Condizioni luce (Visibilità)'];
         if (cond) {
             condizioneData[cond] = (condizioneData[cond] || 0) + 1;
         }

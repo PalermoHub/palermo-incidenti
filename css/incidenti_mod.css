@@ -15,12 +15,12 @@
   --panel-width: 340px; /* valore di fallback */
 }
 }
-
+/*
 .fa-classic, .fa-regular, .fa-solid, .far, .fas
  {
     font-family: "Font Awesome 6 Free";
     color: #ff9900;
-}
+}*/
 
 * {
     margin: 0;
@@ -932,6 +932,14 @@ background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
     align-items: center;
     gap: 8px;
 }
+
+.detail-section h3 i, .detail-header h2  i {
+    color: #ff9900;
+    font-size: 16px;
+}
+
+
+
 
 .detail-row {
     display: flex;
