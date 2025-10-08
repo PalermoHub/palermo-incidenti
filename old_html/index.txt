@@ -15,12 +15,15 @@
     <link rel="shortcut icon" href="favicon.ico"/> 
     <link rel="icon" href="favicon.png" type="image/png"/> 
     <!-- Font Awesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
-       <link rel="stylesheet" href="css/incidenti_mod.css">
+	<link rel="stylesheet" href="css/incidenti_uni.css"> 
+  
+<!--   <link rel="stylesheet" href="css/incidenti_mod.css">
 	   <link rel="stylesheet" href="css/dataviz_mod.css">
 	  <link rel="stylesheet" href="css/footer-modal-mod.css">
-     <link rel="stylesheet" href="css/chart-builder.css">
+     <link rel="stylesheet" href="css/chart-builder.css"> -->
+	 
     <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -781,11 +784,11 @@
 <!-- Footer Button with Pulse -->
 <button class="footer-info-btn" id="footer-info-btn">
     <span class="pulse-ring"></span>
-    <i class="fas fa-info-circle"></i>
-    Informazioni
+    <i class="fas fa-info-circle"></i>  <span>Informazioni</span>
 </button>
 
 <!-- Footer Modal Panel -->
+
 <div class="footer-modal" id="footer-modal">
     <div class="footer-modal-header">
         <h3><i class="fas fa-chart-bar"></i> Informazioni Dataset</h3>
@@ -1218,7 +1221,7 @@
 <!-- Posiziona PRIMA di </body> e PRIMA di tutti gli script -->
 <!-- ============================================ -->
 
-<!-- Chart Builder Modal -->
+
 <div class="chart-builder-modal" id="chart-builder-modal">
     <div class="chart-builder-content">
         <!-- Header -->
@@ -1415,6 +1418,7 @@
 
 
 <div class="footer-modal-overlay" id="footer-modal-overlay"></div>
+
 <script src="js/incidenti_smart-awesome.js"></script>
 <script src="js/incidenti_final.js"></script>
 <script src="js/footer-modal.js"></script>

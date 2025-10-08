@@ -14,7 +14,7 @@
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 1500;
+    z-index: 1499!important;
     background: linear-gradient(135deg, #ff9900 0%, #ff6600 100%);
     color: white;
     border: none;

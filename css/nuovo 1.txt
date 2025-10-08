@@ -1,0 +1,7 @@
+	.insights-container {display: flex;  flex-direction: column; flex: 1; overflow-y: auto;     }
+	
+	.analytics-content {padding: 5px 2px 8px 2px; }
+	
+	.analytics-tabs {     padding: 12px 12px; flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;

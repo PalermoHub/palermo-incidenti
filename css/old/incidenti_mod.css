@@ -4,6 +4,11 @@
 }
 @import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@700&display=swap');
 
+:root {
+  --sidebar-width: 320px;
+  --panel-width: 340px; /* valore di fallback */
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -112,7 +117,7 @@ cubic-bezier(0.4, 0, 0.2, 1);
 #sidebar.collapsed {
     transform: translateX(-320px);
 }
-
+/*
 #sidebar::-webkit-scrollbar {
     width: 8px;
 }
@@ -128,7 +133,7 @@ cubic-bezier(0.4, 0, 0.2, 1);
 
 #sidebar::-webkit-scrollbar-thumb:hover {
     background: #9ca3af;
-}
+}*/
 
 /* Map */
 #map {
@@ -740,8 +745,8 @@ background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
     box-shadow: 0 8px 32px rgba(0,0,0,0.4);
     position: absolute;
     bottom: 20px;
-    right: 25.5vw;
-    z-index: 1000;
+    right:  calc(var(--panel-width) + 12px);
+    z-index: 2550;
     border: 1px solid rgba(148, 163, 184, 0.2);
     max-width: 200px;
 }
@@ -1597,23 +1602,44 @@ background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
     overflow-x: hidden;
 }
 
+::-webkit-scrollbar {
+  width: 6px; /* larghezza della scrollbar */
+}
+
+::-webkit-scrollbar-track {
+  background: #f9fafb; /* colore dello sfondo della track */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db; /* colore del "pollice" della scrollbar */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af; /* colore quando il mouse è sopra */
+  
+}
+
+
+/*
 #analytics-side-panel::-webkit-scrollbar {
     width: 8px;
 }
 
 #analytics-side-panel::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.6);
+    background: #f9fafb;
     border-radius: 4px;
 }
 
 #analytics-side-panel::-webkit-scrollbar-thumb {
-    background: rgba(59, 130, 246, 0.4);
+    background:#d1d5db;
     border-radius: 4px;
 }
 
 #analytics-side-panel::-webkit-scrollbar-thumb:hover {
-    background: rgba(59, 130, 246, 0.6);
-}
+    background: #9ca3af;
+}*/
 
 .panel-section:hover {
     border-color: rgba(59, 130, 246, 0.4);
@@ -2409,3 +2435,92 @@ position: fixed;
 .stat-item:hover .stat-item-tooltip {
     opacity: 1;
 }
+
+/* Nascondi pulsanti quando un modale è aperto */
+body.modal-open .footer-info-btn,
+body.modal-open .chart-builder-trigger {
+    display: none !important;
+    z-index: 1 !important;
+}
+
+/* Z-index corretto per i pulsanti */
+.footer-info-btn,
+.chart-builder-trigger {
+    z-index: 1499 !important; /* Sotto i modali (z-index 1500+) */
+}
+
+@media (max-width: 768px) {
+    .footer-info-btn,
+    .chart-builder-trigger {
+        position: fixed;
+        bottom: 20px;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: auto !important;
+        z-index: 1499 !important;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: rgba(255, 153, 0, 0.5);
+    }
+    
+    .footer-info-btn {
+        bottom: 40px !important;
+    }
+    
+	    .footer-info-btn span {
+        display: none;
+    }
+	
+  /*  .chart-builder-trigger {
+        bottom: 20px !important;
+    }*/
+}
+
+/* Fix per dispositivi touch */
+@media (hover: none) and (pointer: coarse) {
+    .footer-info-btn,
+    .chart-builder-trigger {
+        min-height: 44px;
+        min-width: 44px;
+        padding: 12px 24px;
+        font-size: 16px;
+    }
+    
+    .chart-builder-modal,
+    .footer-modal {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* Nascondi pulsanti quando analytics-panel è aperto */
+body.analytics-panel-open .footer-info-btn,
+body.analytics-panel-open .chart-builder-trigger {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+/* Nascondi pulsanti quando qualsiasi modale è aperto */
+body.modal-open .footer-info-btn,
+body.modal-open .chart-builder-trigger {
+    z-index: 1 !important;
+    opacity: 0.3 !important;
+    pointer-events: none !important;
+}
+
+@media (max-width: 768px) {
+    /* Fix per pulsanti in mobile con modale aperto */
+    body.analytics-panel-open .footer-info-btn,
+    body.analytics-panel-open .chart-builder-trigger {
+        transform: translateX(-50%) scale(0.8) !important;
+        opacity: 0 !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    /* Assicura che i pulsanti siano sotto il modale */
+    .footer-info-btn,
+    .chart-builder-trigger {
+        will-change: transform, opacity;
+    }
+}
+

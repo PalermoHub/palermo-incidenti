@@ -1,0 +1,769 @@
+// ============================================
+// CHART BUILDER - JAVASCRIPT LOGIC
+// Salva come: js/chart-builder.js
+// ============================================
+
+// Variabili globali per Chart Builder
+let customChart = null;
+let customChartConfig = {
+    type: 'bar',
+    dimension: null,
+    metric: 'count',
+    limit: 10,
+    orientation: 'vertical'
+};
+
+// ============================================
+// INIZIALIZZAZIONE
+// ============================================
+
+// Inizializza subito gli event listener quando il DOM è pronto
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Chart Builder: DOM caricato');
+    
+    // Fix per mobile - previeni doppio evento
+    const triggerBtn = document.getElementById('chart-builder-trigger');
+    if (triggerBtn) {
+        // Rimuovi event listener esistenti
+        const newTrigger = triggerBtn.cloneNode(true);
+        triggerBtn.parentNode.replaceChild(newTrigger, triggerBtn);
+        
+        // Aggiungi event listener ottimizzato
+        newTrigger.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Controlla se un modale è già aperto
+            if (document.body.classList.contains('analytics-panel-open')) {
+                console.log('Analytics panel già aperto');
+                return;
+            }
+            
+            console.log('Chart Builder: Click sul pulsante trigger');
+            openChartBuilder();
+        });
+        
+        // Fix per iOS
+        newTrigger.addEventListener('touchstart', function(e) {
+            // Non prevenire default per permettere il tocco
+        });
+    }
+    
+    // Inizializza il resto quando disponibile
+    setTimeout(() => {
+        initChartBuilder();
+    }, 500);
+});
+// Funzione per inizializzare solo l'UI (non richiede dati)
+function initChartBuilderUI() {
+    console.log('Chart Builder: Inizializzazione UI...');
+    
+    // Event Listeners base
+    const triggerBtn = document.getElementById('chart-builder-trigger');
+    const closeBtn = document.getElementById('chart-builder-close');
+    const modal = document.getElementById('chart-builder-modal');
+    
+    if (!triggerBtn) {
+        console.error('Chart Builder: Pulsante trigger non trovato!');
+        return;
+    }
+    
+    console.log('Chart Builder: Pulsante trigger trovato');
+    
+    // Click sul pulsante principale
+    triggerBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        console.log('Chart Builder: Click sul pulsante trigger');
+        openChartBuilder();
+    });
+    
+    // Click su chiudi
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            closeChartBuilder();
+        });
+    }
+    
+    // Chiudi cliccando fuori
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeChartBuilder();
+            }
+        });
+    }
+    
+    // Inizializza il resto quando disponibile
+    setTimeout(() => {
+        initChartBuilder();
+    }, 500);
+    
+	document.addEventListener('DOMContentLoaded', function() {
+    const triggerBtn = document.getElementById('chart-builder-trigger');
+    
+    if (triggerBtn) {
+        // Rimuovi event listener esistenti
+        triggerBtn.replaceWith(triggerBtn.cloneNode(true));
+        
+        // Aggiungi nuovo event listener
+        const newTrigger = document.getElementById('chart-builder-trigger');
+        newTrigger.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            openChartBuilder();
+        });
+        
+        // Fix per mobile
+        newTrigger.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            this.click();
+        });
+    }
+});
+	
+    console.log('Chart Builder: UI inizializzata');
+}
+
+
+function openChartBuilder() {
+    const modal = document.getElementById('chart-builder-modal');
+    if (modal) {
+        modal.classList.add('show');
+        document.body.classList.add('modal-open'); // Aggiungi stato
+        console.log('Chart Builder aperto');
+    }
+}
+
+function closeChartBuilder() {
+    const modal = document.getElementById('chart-builder-modal');
+    if (modal) {
+        modal.classList.remove('show');
+        document.body.classList.remove('modal-open'); // Rimuovi stato
+        console.log('Chart Builder chiuso');
+    }
+}
+
+// ============================================
+// INIZIALIZZAZIONE CHART BUILDER
+// ============================================
+
+function initChartBuilder() {
+    console.log('Chart Builder: Inizializzazione...');
+    
+    // Event Listeners
+    const triggerBtn = document.getElementById('chart-builder-trigger');
+    const closeBtn = document.getElementById('chart-builder-close');
+    const modal = document.getElementById('chart-builder-modal');
+    
+    if (triggerBtn) {
+        triggerBtn.addEventListener('click', openChartBuilder);
+    }
+    
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeChartBuilder);
+    }
+    
+    // Chiudi cliccando fuori
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeChartBuilder();
+            }
+        });
+    }
+    
+    // Chart Type Selection
+    document.querySelectorAll('.chart-type-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.chart-type-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            customChartConfig.type = this.dataset.type;
+            
+            // Mostra/nascondi opzioni specifiche
+            updateConfigOptions();
+        });
+    });
+    
+    // Dimension Select
+    const dimensionSelect = document.getElementById('dimension-select');
+    if (dimensionSelect) {
+        dimensionSelect.addEventListener('change', (e) => {
+            customChartConfig.dimension = e.target.value;
+        });
+    }
+    
+    // Metric Select
+    const metricSelect = document.getElementById('metric-select');
+    if (metricSelect) {
+        metricSelect.addEventListener('change', (e) => {
+            customChartConfig.metric = e.target.value;
+        });
+    }
+    
+    // Limit Select
+    const limitSelect = document.getElementById('limit-select');
+    if (limitSelect) {
+        limitSelect.addEventListener('change', (e) => {
+            customChartConfig.limit = parseInt(e.target.value);
+        });
+    }
+    
+    // Orientation Select
+    const orientationSelect = document.getElementById('orientation-select');
+    if (orientationSelect) {
+        orientationSelect.addEventListener('change', (e) => {
+            customChartConfig.orientation = e.target.value;
+        });
+    }
+    
+    // Generate Button
+    const generateBtn = document.getElementById('btn-generate-chart');
+    if (generateBtn) {
+        generateBtn.addEventListener('click', generateCustomChart);
+    }
+    
+    // Reset Button
+    const resetBtn = document.getElementById('btn-reset-builder');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', resetChartBuilder);
+    }
+    
+    // Download Button
+    const downloadBtn = document.getElementById('btn-download-custom-chart');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', downloadCustomChart);
+    }
+    
+    console.log('Chart Builder: Inizializzazione completata');
+}
+
+// ============================================
+// FUNZIONI UI
+// ============================================
+
+function openChartBuilder() {
+    console.log('Chart Builder: Apertura modale...');
+    const modal = document.getElementById('chart-builder-modal');
+    
+    if (!modal) {
+        console.error('Chart Builder: Modale non trovata nel DOM!');
+        return;
+    }
+    
+    modal.classList.add('show');
+    console.log('Chart Builder: Modale aperta');
+    
+    // Aggiorna info se disponibili
+    try {
+        updateActiveFiltersDisplay();
+        updateFooterStats();
+    } catch (e) {
+        console.warn('Chart Builder: Dati non ancora disponibili', e);
+    }
+}
+
+function closeChartBuilder() {
+    console.log('Chart Builder: Chiusura modale...');
+    const modal = document.getElementById('chart-builder-modal');
+    if (modal) {
+        modal.classList.remove('show');
+        console.log('Chart Builder: Modale chiusa');
+    }
+}
+
+function updateConfigOptions() {
+    const orientationGroup = document.getElementById('orientation-group');
+    
+    // Mostra orientamento solo per grafici a barre
+    if (orientationGroup) {
+        if (customChartConfig.type === 'bar') {
+            orientationGroup.style.display = 'block';
+        } else {
+            orientationGroup.style.display = 'none';
+        }
+    }
+}
+
+function updateActiveFiltersDisplay() {
+    const container = document.getElementById('custom-chart-filters');
+    if (!container) return;
+    
+    // Usa i filtri globali dall'app principale
+    const activeFilters = [];
+    
+    if (typeof currentFilters !== 'undefined') {
+        Object.entries(currentFilters).forEach(([key, value]) => {
+            if (value && value !== '') {
+                const label = key.replace('filter-', '').replace(/-/g, ' ');
+                activeFilters.push({ label: label, value: value });
+            }
+        });
+    }
+    
+    if (activeFilters.length === 0) {
+        container.innerHTML = '<span class="no-filters">Nessun filtro applicato</span>';
+    } else {
+        container.innerHTML = activeFilters.map(f => 
+            `<span class="filter-badge">
+                <i class="fas fa-filter"></i>
+                ${f.label}: ${f.value}
+            </span>`
+        ).join('');
+    }
+}
+
+function updateFooterStats() {
+    const totalEl = document.getElementById('custom-chart-total');
+    const periodEl = document.getElementById('custom-chart-period');
+    
+    if (!totalEl || !periodEl) return;
+    
+    // Usa getFilteredData dall'app principale
+    const data = typeof getFilteredData !== 'undefined' ? getFilteredData() : [];
+    totalEl.textContent = `${data.length.toLocaleString('it-IT')} incidenti`;
+    
+    // Determina il periodo
+    let period = '2015-2023';
+    if (typeof currentFilters !== 'undefined' && currentFilters['filter-anno']) {
+        period = currentFilters['filter-anno'];
+        if (currentFilters['filter-mese']) {
+            period += ` - ${currentFilters['filter-mese']}`;
+        }
+    }
+    periodEl.textContent = period;
+}
+
+// ============================================
+// GENERAZIONE GRAFICO
+// ============================================
+
+function generateCustomChart() {
+    console.log('Generazione grafico personalizzato...');
+    console.log('Config:', customChartConfig);
+    
+    // Validazione
+    if (!customChartConfig.dimension) {
+        alert('⚠️ Seleziona una dimensione per generare il grafico');
+        return;
+    }
+    
+    // Ottieni dati filtrati
+    const filteredData = typeof getFilteredData !== 'undefined' ? getFilteredData() : allIncidenti;
+    
+    if (filteredData.length === 0) {
+        alert('⚠️ Nessun dato disponibile con i filtri attuali');
+        return;
+    }
+    
+    // Prepara i dati in base alla configurazione
+    const chartData = prepareChartData(filteredData);
+    
+    // Crea il grafico
+    renderCustomChart(chartData);
+}
+
+function prepareChartData(data) {
+    const dimension = customChartConfig.dimension;
+    const metric = customChartConfig.metric;
+    const limit = customChartConfig.limit;
+    
+    console.log('Preparazione dati per dimensione:', dimension);
+    
+    let aggregatedData = {};
+    
+    if (metric === 'count') {
+        // Conteggio semplice
+        data.forEach(row => {
+            const value = row[dimension];
+            if (value && value !== 'null') {
+                aggregatedData[value] = (aggregatedData[value] || 0) + 1;
+            }
+        });
+    } else if (metric === 'tipologia') {
+        // Raggruppa per tipologia
+        const tipologie = ['M', 'R', 'F', 'C'];
+        data.forEach(row => {
+            const value = row[dimension];
+            const tipo = row['Tipologia'];
+            if (value && value !== 'null' && tipo) {
+                if (!aggregatedData[value]) {
+                    aggregatedData[value] = { M: 0, R: 0, F: 0, C: 0 };
+                }
+                aggregatedData[value][tipo]++;
+            }
+        });
+    }
+    
+    // Converti in array e ordina
+    let dataArray = Object.entries(aggregatedData).map(([key, value]) => ({
+        label: key,
+        value: value
+    }));
+    
+    // Ordina per valore (per count) o per totale (per tipologia)
+    if (metric === 'count') {
+        dataArray.sort((a, b) => b.value - a.value);
+    } else {
+        dataArray.sort((a, b) => {
+            const totalA = Object.values(a.value).reduce((sum, v) => sum + v, 0);
+            const totalB = Object.values(b.value).reduce((sum, v) => sum + v, 0);
+            return totalB - totalA;
+        });
+    }
+    
+    // Applica limite
+    if (limit > 0) {
+        dataArray = dataArray.slice(0, limit);
+    }
+    
+    // Ordina in base alla dimensione se necessario
+    dataArray = sortByDimension(dataArray, dimension);
+    
+    console.log('Dati preparati:', dataArray);
+    return dataArray;
+}
+
+function sortByDimension(dataArray, dimension) {
+    // Ordinamenti speciali per alcune dimensioni
+    const monthOrder = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 
+                        'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
+    const dayOrder = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
+    const seasonOrder = ['Primavera', 'Estate', 'Autunno', 'Inverno'];
+    const timeOrder = ['Alba', 'Mattina', 'Pranzo', 'Pomeriggio', 'Sera', 'Notte'];
+    
+    if (dimension === 'Mese') {
+        return dataArray.sort((a, b) => monthOrder.indexOf(a.label) - monthOrder.indexOf(b.label));
+    } else if (dimension === 'Giorno settimana') {
+        return dataArray.sort((a, b) => dayOrder.indexOf(a.label) - dayOrder.indexOf(b.label));
+    } else if (dimension === 'Stagione') {
+        return dataArray.sort((a, b) => seasonOrder.indexOf(a.label) - seasonOrder.indexOf(b.label));
+    } else if (dimension === 'Fascia oraria dettagliata (6 fasce)') {
+        return dataArray.sort((a, b) => timeOrder.indexOf(a.label) - timeOrder.indexOf(b.label));
+    } else if (dimension === 'Anno') {
+        return dataArray.sort((a, b) => parseInt(a.label) - parseInt(b.label));
+    }
+    
+    return dataArray;
+}
+
+function renderCustomChart(data) {
+    const canvas = document.getElementById('custom-chart-canvas');
+    const wrapper = document.getElementById('chart-wrapper-custom');
+    const placeholder = document.querySelector('.preview-placeholder');
+    
+    if (!canvas) return;
+    
+    // Mostra canvas, nascondi placeholder
+    if (wrapper) wrapper.style.display = 'block';
+    if (placeholder) placeholder.style.display = 'none';
+    
+    // Distruggi grafico precedente
+    if (customChart) {
+        customChart.destroy();
+    }
+    
+    // Prepara dataset
+    const chartDatasets = prepareChartDatasets(data);
+    const chartLabels = data.map(d => d.label);
+    
+    // Configurazione grafico
+    const config = {
+        type: customChartConfig.type,
+        data: {
+            labels: chartLabels,
+            datasets: chartDatasets
+        },
+        options: getChartOptions()
+    };
+    
+    // Crea grafico
+    customChart = new Chart(canvas, config);
+    
+    console.log('Grafico personalizzato creato');
+}
+
+function prepareChartDatasets(data) {
+    const metric = customChartConfig.metric;
+    const type = customChartConfig.type;
+    
+    if (metric === 'count') {
+        // Dataset singolo
+        const values = data.map(d => d.value);
+        
+        // Colori dinamici
+        let colors;
+        if (type === 'pie' || type === 'doughnut' || type === 'polarArea') {
+            colors = generateColors(data.length);
+        } else {
+            colors = generateGradientColors(data.length);
+        }
+        
+        return [{
+            label: 'Incidenti',
+            data: values,
+            backgroundColor: colors,
+            borderColor: type === 'line' ? '#8b5cf6' : colors,
+            borderWidth: type === 'line' ? 3 : 1,
+            fill: type === 'line' ? false : true,
+            tension: 0.4
+        }];
+    } else {
+        // Dataset multipli per tipologia
+        const tipologieMap = {
+            'M': { label: 'Mortali', color: '#ef4444' },
+            'R': { label: 'Riserva', color: '#a855f7' },
+            'F': { label: 'Feriti', color: '#f59e0b' },
+            'C': { label: 'Cose', color: '#10b981' }
+        };
+        
+        return ['M', 'R', 'F', 'C'].map(tipo => ({
+            label: tipologieMap[tipo].label,
+            data: data.map(d => d.value[tipo] || 0),
+            backgroundColor: tipologieMap[tipo].color + (type === 'line' ? '33' : 'CC'),
+            borderColor: tipologieMap[tipo].color,
+            borderWidth: type === 'line' ? 2 : 1,
+            fill: type === 'line' ? false : true,
+            tension: 0.4
+        }));
+    }
+}
+
+function getChartOptions() {
+    const type = customChartConfig.type;
+    const orientation = customChartConfig.orientation;
+    
+    const baseOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                    color: '#1f2937',
+                    font: { size: 12, family: 'Titillium Web' },
+                    padding: 15,
+                    usePointStyle: true
+                }
+            },
+            title: {
+                display: true,
+                text: `${customChartConfig.dimension} - Analisi Incidenti`,
+                color: '#1f2937',
+                font: { size: 16, weight: 'bold', family: 'Titillium Web' },
+                padding: 20
+            },
+            tooltip: {
+                backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                padding: 12,
+                titleFont: { size: 13, weight: 'bold' },
+                bodyFont: { size: 12 },
+                callbacks: {
+                    label: function(context) {
+                        let label = context.dataset.label || '';
+                        if (label) {
+                            label += ': ';
+                        }
+                        label += context.parsed.y || context.parsed.r || context.parsed;
+                        return label;
+                    }
+                }
+            },
+            datalabels: {
+                display: type !== 'line' && type !== 'scatter' && type !== 'bubble',
+                color: type === 'pie' || type === 'doughnut' ? '#ffffff' : '#1f2937',
+                font: { weight: 'bold', size: 11 },
+                formatter: (value) => value > 0 ? value : ''
+            }
+        }
+    };
+    
+    // Opzioni specifiche per tipo
+    if (type === 'bar') {
+        baseOptions.indexAxis = orientation === 'horizontal' ? 'y' : 'x';
+        baseOptions.scales = {
+            x: {
+                ticks: { color: '#1f2937', font: { size: 11 } },
+                grid: { color: 'rgba(148, 163, 184, 0.1)' }
+            },
+            y: {
+                beginAtZero: true,
+                ticks: { color: '#1f2937', font: { size: 11 } },
+                grid: { color: 'rgba(148, 163, 184, 0.1)' }
+            }
+        };
+    } else if (type === 'line') {
+        baseOptions.scales = {
+            x: {
+                ticks: { color: '#1f2937', font: { size: 11 } },
+                grid: { color: 'rgba(148, 163, 184, 0.1)' }
+            },
+            y: {
+                beginAtZero: true,
+                ticks: { color: '#1f2937', font: { size: 11 } },
+                grid: { color: 'rgba(148, 163, 184, 0.1)' }
+            }
+        };
+    } else if (type === 'radar') {
+        baseOptions.scales = {
+            r: {
+                beginAtZero: true,
+                ticks: { color: '#1f2937', backdropColor: 'transparent' },
+                grid: { color: 'rgba(148, 163, 184, 0.3)' },
+                angleLines: { color: 'rgba(148, 163, 184, 0.3)' },
+                pointLabels: { color: '#1f2937', font: { size: 11, weight: '600' } }
+            }
+        };
+    }
+    
+    return baseOptions;
+}
+
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
+
+function generateColors(count) {
+    const baseColors = [
+        '#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', 
+        '#ef4444', '#ec4899', '#06b6d4', '#84cc16'
+    ];
+    
+    const colors = [];
+    for (let i = 0; i < count; i++) {
+        colors.push(baseColors[i % baseColors.length]);
+    }
+    return colors;
+}
+
+function generateGradientColors(count) {
+    const colors = [];
+    for (let i = 0; i < count; i++) {
+        const hue = (i * 360 / count) % 360;
+        colors.push(`hsl(${hue}, 70%, 60%)`);
+    }
+    return colors;
+}
+
+function resetChartBuilder() {
+    // Reset config
+    customChartConfig = {
+        type: 'bar',
+        dimension: null,
+        metric: 'count',
+        limit: 10,
+        orientation: 'vertical'
+    };
+    
+    // Reset UI
+    document.querySelectorAll('.chart-type-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.type === 'bar') {
+            btn.classList.add('active');
+        }
+    });
+    
+    const dimensionSelect = document.getElementById('dimension-select');
+    if (dimensionSelect) dimensionSelect.value = '';
+    
+    const metricSelect = document.getElementById('metric-select');
+    if (metricSelect) metricSelect.value = 'count';
+    
+    const limitSelect = document.getElementById('limit-select');
+    if (limitSelect) limitSelect.value = '10';
+    
+    const orientationSelect = document.getElementById('orientation-select');
+    if (orientationSelect) orientationSelect.value = 'vertical';
+    
+    // Distruggi grafico
+    if (customChart) {
+        customChart.destroy();
+        customChart = null;
+    }
+    
+    // Mostra placeholder
+    const wrapper = document.getElementById('chart-wrapper-custom');
+    const placeholder = document.querySelector('.preview-placeholder');
+    if (wrapper) wrapper.style.display = 'none';
+    if (placeholder) placeholder.style.display = 'block';
+    
+    console.log('Chart Builder resettato');
+}
+
+// ============================================
+// DOWNLOAD GRAFICO
+// ============================================
+
+function downloadCustomChart() {
+    if (!customChart) {
+        alert('⚠️ Genera prima un grafico da scaricare');
+        return;
+    }
+    
+    const canvas = document.getElementById('custom-chart-canvas');
+    if (!canvas) return;
+    
+    // Crea un canvas temporaneo più grande
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    
+    // Dimensioni finali
+    const width = 1200;
+    const height = 800;
+    tempCanvas.width = width;
+    tempCanvas.height = height;
+    
+    // Sfondo bianco
+    tempCtx.fillStyle = '#ffffff';
+    tempCtx.fillRect(0, 0, width, height);
+    
+    // Header
+    tempCtx.fillStyle = '#1f2937';
+    tempCtx.font = 'bold 24px Titillium Web';
+    tempCtx.textAlign = 'left';
+    tempCtx.fillText('Dashboard Incidenti Palermo - Grafico Personalizzato', 40, 45);
+    
+    // Info filtri
+    tempCtx.font = '14px Titillium Web';
+    tempCtx.fillStyle = '#6b7280';
+    const filterText = typeof currentFilters !== 'undefined' && Object.keys(currentFilters).length > 0 
+        ? 'Filtri applicati' 
+        : 'Tutti gli incidenti (2015-2023)';
+    tempCtx.fillText(filterText, 40, 70);
+    
+    // Linea separatrice
+    tempCtx.strokeStyle = '#e5e7eb';
+    tempCtx.lineWidth = 2;
+    tempCtx.beginPath();
+    tempCtx.moveTo(40, 85);
+    tempCtx.lineTo(width - 40, 85);
+    tempCtx.stroke();
+    
+    // Disegna il grafico
+    const chartHeight = height - 180;
+    tempCtx.drawImage(canvas, 40, 100, width - 80, chartHeight);
+    
+    // Footer
+    tempCtx.strokeStyle = '#e5e7eb';
+    tempCtx.beginPath();
+    tempCtx.moveTo(40, height - 70);
+    tempCtx.lineTo(width - 40, height - 70);
+    tempCtx.stroke();
+    
+    tempCtx.font = '12px Titillium Web';
+    tempCtx.fillStyle = '#6b7280';
+    tempCtx.fillText('Fonte: dati.gov.it - Rielaborazione: opendatasicilia.it', 40, height - 45);
+    tempCtx.fillText('https://opendatasicilia.github.io/incidenti_palermo/', 40, height - 25);
+    
+    // Download
+    const link = document.createElement('a');
+    const timestamp = new Date().getTime();
+    link.download = `grafico_personalizzato_${timestamp}.png`;
+    link.href = tempCanvas.toDataURL('image/png');
+    link.click();
+    
+    console.log('Download grafico completato');
+}
+
+console.log('Chart Builder script caricato');

@@ -9,6 +9,13 @@
   --panel-width: 340px; /* valore di fallback */
 }
 
+@media (max-width: 768px) {
+:root {
+  --sidebar-width: 0px;
+  --panel-width: 340px; /* valore di fallback */
+}
+}
+
 * {
     margin: 0;
     padding: 0;
