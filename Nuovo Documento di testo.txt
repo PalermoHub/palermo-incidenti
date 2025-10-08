@@ -1,3 +1,1 @@
-In modalità mobile i filtri sugli anni delle statistiche non funzionano
-
-analizza in dettaglio i file e verifica se ci sono conflitti che impediscono di fare aprire in mobile i modali di 'chart-builder' e 'footer-modal'
+Per realizzare i grafici, i filtri degli anni e in generale tutti i filtri devono cambiare in tempo reale nel pannello 'chart-builde'
