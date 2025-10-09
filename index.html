@@ -879,12 +879,12 @@
     
     <div class="footer-modal-tabs">
         <button class="footer-tab active" data-tab="dataset">Dataset e Analisi</button>
-        <button class="footer-tab" data-tab="fonte">Fonte Dati</button>
-        <button class="footer-tab" data-tab="licenza">Licenza</button>
-	 <button class="footer-tab" data-tab="tecnologie">Tecnologie</button>
-	 <button class="footer-tab" data-tab="chart-builder">Crea il tuo DataViz</button>
+	    <button class="footer-tab" data-tab="tecnologie">Tecnologie</button>
+	    <button class="footer-tab" data-tab="chart-builder">Crea il tuo DataViz</button>
+		<button class="footer-tab" data-tab="condividi">Condividi & Seguici</button>
         <button class="footer-tab" data-tab="crediti">Crediti</button>
-		
+		<button class="footer-tab" data-tab="fonte">Fonte Dati</button>
+		<button class="footer-tab" data-tab="licenza">Licenza</button>
     </div>
     
     <div class="footer-modal-content">
@@ -1712,8 +1712,112 @@
             <p><strong class="doppia-sottolineatura">Il Chart Builder trasforma dati complessi in storie visive comprensibili.</strong><br><br>
             Che tu sia un amministratore pubblico, un ricercatore, un giornalista o un cittadino curioso, questo strumento ti permette di esplorare 28.239 incidenti da infinite angolazioni, creando visualizzazioni professionali in pochi clic. Nessun software esterno, nessuna competenza di programmazione richiesta - solo dati, filtri e creatività.</p>
         </div>
-
     </div>
+
+
+<!-- Tab Condividi & Seguici -->
+<div class="footer-tab-content" id="tab-condividi">
+    <div class="info-card">
+        <h4><i class="fas fa-share-nodes"></i> Condividi questa Visualizzazione</h4>
+        <p>Condividi la vista attuale con tutti i filtri e la posizione della mappa:</p>
+        
+        <div class="share-url-section" style="margin-top: 1rem;">
+            <div class="share-url-container" style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                <input type="text" 
+                       id="footer-share-url-input" 
+                       class="share-url-input" 
+                       readonly 
+                       placeholder="Generando link..."
+                       style="flex: 1; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-family: monospace; font-size: 0.85rem;">
+<button id="footer-copy-share-url" 
+        class="copy-btn" 
+        title="Copia negli appunti" 
+        onclick="copyFooterShareUrl(); return false;"
+        style="padding: 0.75rem 1rem; background: #ff9900; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s;">
+    <i class="fas fa-copy"></i>
+</button>
+            </div>
+            <div id="footer-copy-feedback" class="copy-feedback" style="font-size: 0.85rem; margin-top: 0.5rem;"></div>
+        </div>
+        
+        <div class="share-social-section" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;">
+            <p><strong>Condividi su:</strong></p>
+            <div class="share-social-buttons" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-top: 1rem;">
+                
+                <button class="share-social-btn telegram" onclick="shareOnSocial('telegram')" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; background: white; cursor: pointer; font-weight: 600; transition: all 0.3s;">
+                    <i class="fab fa-telegram" style="font-size: 1.25rem; color: #0088cc;"></i>
+                    <span>Telegram</span>
+                </button>
+                
+                <button class="share-social-btn whatsapp" onclick="shareOnSocial('whatsapp')" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; background: white; cursor: pointer; font-weight: 600; transition: all 0.3s;">
+                    <i class="fab fa-whatsapp" style="font-size: 1.25rem; color: #25d366;"></i>
+                    <span>WhatsApp</span>
+                </button>
+                
+                <button class="share-social-btn facebook" onclick="shareOnSocial('facebook')" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; background: white; cursor: pointer; font-weight: 600; transition: all 0.3s;">
+                    <i class="fab fa-facebook-f" style="font-size: 1.25rem; color: #1877f2;"></i>
+                    <span>Facebook</span>
+                </button>
+                
+                <button class="share-social-btn twitter" onclick="shareOnSocial('twitter')" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; background: white; cursor: pointer; font-weight: 600; transition: all 0.3s;">
+                    <i class="fab fa-x-twitter" style="font-size: 1.25rem; color: #000000;"></i>
+                    <span>X (Twitter)</span>
+                </button>
+                
+                <button class="share-social-btn bluesky" onclick="shareOnSocial('bluesky')" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; background: white; cursor: pointer; font-weight: 600; transition: all 0.3s;">
+                    <svg width="20" height="20" viewBox="0 0 568 501" fill="#00d4ff" xmlns="http://www.w3.org/2000/svg" style="min-width: 20px;">
+                        <path d="M123.121 33.6637C188.241 82.5526 258.281 181.681 284 234.873C309.719 181.681 379.759 82.5526 444.879 33.6637C491.866 -1.61183 568 -28.9064 568 57.9464C568 75.2916 558.055 203.659 552.222 224.501C531.947 296.954 458.067 315.434 392.347 304.249C507.222 323.8 536.444 388.56 473.333 453.32C353.473 576.312 301.061 422.461 287.631 383.039C285.169 375.812 284.017 372.431 284 375.306C283.983 372.431 282.831 375.812 280.369 383.039C266.939 422.461 214.527 576.312 94.6667 453.32C31.5556 388.56 60.7778 323.8 175.653 304.249C109.933 315.434 36.0535 296.954 15.7778 224.501C9.94525 203.659 0 75.2916 0 57.9464C0 -28.9064 76.1345 -1.61183 123.121 33.6637Z" fill="currentColor"/>
+                    </svg>
+                    <span>Bluesky</span>
+                </button>
+                
+                <button class="share-social-btn email" onclick="shareOnSocial('email')" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; background: white; cursor: pointer; font-weight: 600; transition: all 0.3s;">
+                    <i class="fas fa-envelope" style="font-size: 1.25rem; color: #ff9900;"></i>
+                    <span>Email</span>
+                </button>
+                
+            </div>
+        </div>
+    </div>
+    
+    <div class="info-card" style="margin-top: 1.5rem;">
+        <h4><i class="fas fa-users"></i> Seguici sui Social</h4>
+        <p>Resta aggiornato sulle novità di OpenDataSicilia:</p>
+        <div class="social-follow-buttons" style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem;">
+            
+            <a href="https://opendatasicilia.it" target="_blank" rel="noopener" class="social-follow-btn" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; background: #f3f4f6; border-radius: 8px; text-decoration: none; color: #374151; font-weight: 600; transition: all 0.3s;">
+                <i class="fas fa-globe" style="color: #ff9900; font-size: 1.1rem;"></i>
+                <span>Sito Web</span>
+            </a>
+            
+            <a href="https://www.facebook.com/groups/opendatasicilia" target="_blank" rel="noopener" class="social-follow-btn" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; background: #f3f4f6; border-radius: 8px; text-decoration: none; color: #374151; font-weight: 600; transition: all 0.3s;">
+                <i class="fab fa-facebook-f" style="color: #1877f2; font-size: 1.1rem;"></i>
+                <span>Facebook</span>
+            </a>
+            
+            <a href="https://x.com/opendatasicilia" target="_blank" rel="noopener" class="social-follow-btn" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; background: #f3f4f6; border-radius: 8px; text-decoration: none; color: #374151; font-weight: 600; transition: all 0.3s;">
+                <i class="fab fa-x-twitter" style="color: #000000; font-size: 1.1rem;"></i>
+                <span>X (Twitter)</span>
+            </a>
+            
+            <a href="https://t.me/opendatasicilia" target="_blank" rel="noopener" class="social-follow-btn" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; background: #f3f4f6; border-radius: 8px; text-decoration: none; color: #374151; font-weight: 600; transition: all 0.3s;">
+                <i class="fab fa-telegram" style="color: #0088cc; font-size: 1.1rem;"></i>
+                <span>Telegram</span>
+            </a>
+            
+            <a href="https://groups.google.com/g/opendatasicilia?pli=1" target="_blank" rel="noopener" class="social-follow-btn" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; background: #f3f4f6; border-radius: 8px; text-decoration: none; color: #374151; font-weight: 600; transition: all 0.3s;">
+                <i class="fas fa-envelope" style="color: #ea4335; font-size: 1.1rem;"></i>
+                <span>Mailing List</span>
+            </a>
+            
+            <a href="https://github.com/SiciliaHub/palermohub" target="_blank" rel="noopener" class="social-follow-btn" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; background: #f3f4f6; border-radius: 8px; text-decoration: none; color: #374151; font-weight: 600; transition: all 0.3s;">
+                <i class="fab fa-github" style="color: #000000; font-size: 1.1rem;"></i>
+                <span>GitHub</span>
+            </a>
+            
+        </div>
+    </div>
+</div>
 
 
         <!-- Tab Crediti -->

@@ -383,6 +383,16 @@
         
         // Re-inizializza tooltips
         setTimeout(initializeTooltips, 100);
+		
+		// Genera URL se il tab condividi è già attivo
+    setTimeout(() => {
+        const activeTab = document.querySelector('.footer-tab.active');
+        if (activeTab && activeTab.dataset.tab === 'condividi') {
+            generateShareUrl();
+            console.log('✅ URL generato all\'apertura del modal (tab condividi attivo)');
+        }
+    }, 500);
+		
     }
     
     function closeModal() {
@@ -423,43 +433,56 @@
         console.log('Footer Modal: Modale chiusa');
     }
     
-    function switchTab(tabName) {
-        console.log('Footer Modal: Switch tab:', tabName);
-        
-        document.querySelectorAll('.footer-tab').forEach(tab => {
-            tab.classList.remove('active');
+	
+function switchTab(tabName) {
+    console.log('Footer Modal: Switch tab:', tabName);
+    
+    document.querySelectorAll('.footer-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    document.querySelectorAll('.footer-tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    const selectedTab = document.querySelector(`[data-tab="${tabName}"]`);
+    const selectedContent = document.getElementById(`tab-${tabName}`);
+    
+    if (selectedTab) selectedTab.classList.add('active');
+    if (selectedContent) selectedContent.classList.add('active');
+    
+    closeTooltip();
+    
+    const modalContent = document.querySelector('.footer-modal-content');
+    if (modalContent) {
+        modalContent.scrollTo({
+            top: 0,
+            behavior: 'smooth'
         });
-        
-        document.querySelectorAll('.footer-tab-content').forEach(content => {
-            content.classList.remove('active');
-        });
-        
-        const selectedTab = document.querySelector(`[data-tab="${tabName}"]`);
-        const selectedContent = document.getElementById(`tab-${tabName}`);
-        
-        if (selectedTab) selectedTab.classList.add('active');
-        if (selectedContent) selectedContent.classList.add('active');
-        
-        closeTooltip();
-        
-        const modalContent = document.querySelector('.footer-modal-content');
-        if (modalContent) {
-            modalContent.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        }
-        
-        setTimeout(initializeTooltips, 100);
     }
     
-    // Esponi funzioni globalmente per debugging
+    setTimeout(initializeTooltips, 100);
+    
+    // ✅ AGGIUNGI QUESTO: Genera URL quando si apre il tab condividi
+    if (tabName === 'condividi') {
+        setTimeout(() => {
+            generateShareUrl();
+            console.log('✅ URL generato per tab condividi');
+        }, 200);
+    }
+}
+  
+// Esponi funzioni globalmente
     window.footerModalDebug = {
         isOpen: () => isModalOpen,
         open: openModal,
         close: closeModal,
         toggle: toggleModal
     };
+    
+    // ✅ AGGIUNGI QUESTE RIGHE
+    window.copyFooterShareUrl = copyFooterShareUrl;
+    window.generateShareUrl = generateShareUrl;
     
     // Initialize on DOM ready
     if (document.readyState === 'loading') {
@@ -469,4 +492,253 @@
     }
     
     console.log('Footer Modal script caricato e inizializzato');
+	
+	
+	// ========================================
+    // SISTEMA CONDIVISIONE
+    // ========================================
+   
+function initShareSystem() {
+    console.log('🚀 Inizializzazione sistema condivisione');
+    
+    const shareUrlInput = document.getElementById('footer-share-url-input');
+    const copyBtn = document.getElementById('footer-copy-share-url');
+    
+    if (shareUrlInput && copyBtn) {
+        // Rimuovi listener esistenti
+        const newCopyBtn = copyBtn.cloneNode(true);
+        copyBtn.parentNode.replaceChild(newCopyBtn, copyBtn);
+        
+        // Aggiungi nuovo listener
+        newCopyBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            copyFooterShareUrl();
+        });
+        
+        console.log('✅ Event listener copia URL aggiunto');
+    } else {
+        console.error('❌ Elementi condivisione non trovati:', {
+            input: !!shareUrlInput,
+            button: !!copyBtn
+        });
+    }
+    
+    // Genera URL quando si clicca sul tab
+    const condividiTab = document.querySelector('[data-tab="condividi"]');
+    if (condividiTab) {
+        condividiTab.addEventListener('click', () => {
+            setTimeout(generateShareUrl, 300);
+        });
+        console.log('✅ Event listener tab condividi aggiunto');
+    }
+}
+	
+function generateShareUrl() {
+    console.log('🔗 generateShareUrl chiamata');
+    
+    const shareUrlInput = document.getElementById('footer-share-url-input');
+    if (!shareUrlInput) {
+        console.error('❌ Input URL non trovato');
+        return;
+    }
+    
+    const params = new URLSearchParams();
+    let hasFilters = false;
+    
+    // Raccogli tutti i filtri attivi da currentFilters (globale)
+    if (typeof currentFilters !== 'undefined' && currentFilters) {
+        console.log('📊 currentFilters trovato:', currentFilters);
+        
+        Object.entries(currentFilters).forEach(([key, value]) => {
+            if (value && value !== '' && value !== null) {
+                // Rimuovi 'filter-' dal nome del parametro
+                const paramName = key.replace('filter-', '');
+                params.set(paramName, value);
+                hasFilters = true;
+                console.log(`  ✓ Aggiunto filtro: ${paramName} = ${value}`);
+            }
+        });
+    } else {
+        console.warn('⚠️ currentFilters non trovato');
+    }
+    
+    // Aggiungi posizione e zoom della mappa
+    if (typeof map !== 'undefined' && map) {
+        try {
+            const center = map.getCenter();
+            const zoom = map.getZoom();
+            params.set('lat', center.lat.toFixed(6));
+            params.set('lng', center.lng.toFixed(6));
+            params.set('zoom', zoom.toFixed(2));
+            console.log(`📍 Mappa: lat=${center.lat.toFixed(6)}, lng=${center.lng.toFixed(6)}, zoom=${zoom.toFixed(2)}`);
+        } catch (e) {
+            console.error('❌ Errore nel recupero posizione mappa:', e);
+        }
+    } else {
+        console.warn('⚠️ Oggetto map non trovato');
+    }
+    
+    // Aggiungi timestamp per rendere l'URL unico
+    params.set('shared', Date.now().toString(36));
+    
+    const baseUrl = window.location.origin + window.location.pathname;
+    const fullUrl = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
+    
+    console.log('✅ URL generato:', fullUrl);
+    console.log('📝 Parametri:', params.toString());
+    
+    shareUrlInput.value = fullUrl;
+    shareUrlInput.placeholder = hasFilters ? 'URL con filtri attivi' : 'URL della vista corrente';
+}
+	
+	async function copyFooterShareUrl() {
+    console.log('📋 Tentativo di copia URL');
+    
+    const urlInput = document.getElementById('footer-share-url-input');
+    const copyBtn = document.getElementById('footer-copy-share-url');
+    const feedback = document.getElementById('footer-copy-feedback');
+    
+    if (!urlInput) {
+        console.error('❌ Input URL non trovato');
+        return;
+    }
+    
+    if (!urlInput.value || urlInput.value === '' || urlInput.value === 'Generando link...') {
+        console.warn('⚠️ Nessun URL da copiare, genero prima l\'URL');
+        generateShareUrl();
+        
+        // Aspetta che l'URL sia generato
+        setTimeout(() => copyFooterShareUrl(), 100);
+        return;
+    }
+    
+    console.log('📝 URL da copiare:', urlInput.value);
+    
+    try {
+        // Metodo 1: Clipboard API (moderno)
+        if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(urlInput.value);
+            console.log('✅ Copiato con Clipboard API');
+        } 
+        // Metodo 2: execCommand (fallback)
+        else {
+            urlInput.select();
+            urlInput.setSelectionRange(0, 99999); // Per mobile
+            const success = document.execCommand('copy');
+            console.log('✅ Copiato con execCommand:', success);
+            
+            if (!success) {
+                throw new Error('execCommand failed');
+            }
+        }
+        
+        // Feedback visivo sul pulsante
+        if (copyBtn) {
+            const originalHTML = copyBtn.innerHTML;
+            const originalBg = copyBtn.style.background;
+            
+            copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+            copyBtn.style.background = '#10b981';
+            copyBtn.disabled = true;
+            
+            setTimeout(() => {
+                copyBtn.innerHTML = originalHTML;
+                copyBtn.style.background = originalBg;
+                copyBtn.disabled = false;
+            }, 2000);
+        }
+        
+        // Feedback testuale
+        if (feedback) {
+            feedback.textContent = '✅ Link copiato negli appunti!';
+            feedback.style.color = '#10b981';
+            feedback.style.fontWeight = '600';
+            feedback.style.opacity = '1';
+            
+            setTimeout(() => {
+                feedback.style.opacity = '0';
+                setTimeout(() => {
+                    feedback.textContent = '';
+                }, 300);
+            }, 3000);
+        }
+        
+    } catch (err) {
+        console.error('❌ Errore nella copia:', err);
+        
+        // Fallback: mostra messaggio per copia manuale
+        if (feedback) {
+            feedback.textContent = '⚠️ Seleziona il testo e premi CTRL+C (o CMD+C su Mac)';
+            feedback.style.color = '#ff9900';
+            feedback.style.fontWeight = '600';
+            feedback.style.opacity = '1';
+            
+            // Seleziona automaticamente il testo per facilitare la copia manuale
+            urlInput.focus();
+            urlInput.select();
+            urlInput.setSelectionRange(0, 99999);
+            
+            setTimeout(() => {
+                feedback.style.opacity = '0';
+                setTimeout(() => {
+                    feedback.textContent = '';
+                }, 300);
+            }, 5000);
+        }
+    }
+}
+
+	
+    window.shareOnSocial = function(platform) {
+        generateShareUrl();
+        
+        const urlInput = document.getElementById('footer-share-url-input');
+        if (!urlInput || !urlInput.value) return;
+        
+        const shareUrl = urlInput.value;
+        const title = 'Incidenti Stradali Palermo 2015-2023 - Dashboard Interattiva';
+        
+        let socialUrl;
+        switch (platform) {
+            case 'facebook':
+                socialUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(title)}`;
+                break;
+            case 'twitter':
+                socialUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(title)}&hashtags=OpenData,Palermo,Sicilia`;
+                break;
+            case 'telegram':
+                socialUrl = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(title)}`;
+                break;
+            case 'whatsapp':
+                socialUrl = `https://wa.me/?text=${encodeURIComponent(title + ' ' + shareUrl)}`;
+                break;
+            case 'bluesky':
+                const blueskyText = `${title} ${shareUrl}`;
+                socialUrl = `https://bsky.app/intent/compose?text=${encodeURIComponent(blueskyText)}`;
+                break;
+            case 'email':
+                const emailSubject = encodeURIComponent(title);
+                const emailBody = encodeURIComponent(`Ciao,\n\nHo trovato questa dashboard interattiva sugli incidenti stradali a Palermo che volevo condividere con te:\n\n${shareUrl}\n\nBuona esplorazione!`);
+                socialUrl = `mailto:?subject=${emailSubject}&body=${emailBody}`;
+                break;
+            default:
+                return;
+        }
+        
+        if (platform === 'email') {
+            window.location.href = socialUrl;
+        } else {
+            window.open(socialUrl, '_blank', 'width=600,height=400');
+        }
+    };
+    
+    // Esponi funzioni globalmente
+    window.footerModalDebug = {
+        isOpen: () => isModalOpen,
+        open: openModal,
+        close: closeModal,
+        toggle: toggleModal
+    };
+	
 })();

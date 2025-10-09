@@ -2674,3 +2674,38 @@ body.analytics-panel-open .chart-builder-trigger {
 .chart-builder-modal {
     z-index: 10000 !important;
 }
+
+
+/* pulsanti social*/
+.share-social-btn:hover,
+.social-follow-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background: #e5e7eb !important;
+}
+
+.copy-feedback {
+    transition: opacity 0.3s ease;
+    opacity: 0;
+    min-height: 20px;
+}
+
+.share-url-input:focus {
+    outline: 2px solid #ff9900;
+    outline-offset: 2px;
+}
+
+.copy-btn:hover {
+    background: #e68900 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(255, 153, 0, 0.3);
+}
+
+.copy-btn:active {
+    transform: translateY(0);
+}
+
+.copy-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
