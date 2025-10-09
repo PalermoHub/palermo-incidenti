@@ -1,6 +1,6 @@
 // ============================================
 // CHART BUILDER - JAVASCRIPT COMPLETO
-// Versione: 3.0 - Con Grafici Combinati
+// Versione: 2.2 - Con Titolo Personalizzato
 // ============================================
 
 let customChart = null;
@@ -11,15 +11,7 @@ let customChartConfig = {
     tipologieSelezionate: [],
     limit: 10,
     orientation: 'vertical',
-    customTitle: '',
-    // ✅ NUOVO: Configurazione grafici combinati
-    mixed: {
-        enabled: false,
-        primaryType: 'bar',
-        secondaryType: 'line',
-        primaryDatasets: [],  // indici dei dataset per tipo primario
-        secondaryDatasets: [] // indici dei dataset per tipo secondario
-    },
+    customTitle: '',  // ✅ NUOVO: Titolo personalizzato
     colors: {
         mode: 'auto',
         primary: '#3b82f6',
@@ -43,8 +35,7 @@ let customChartConfig = {
         stacked: false,
         horizontal: false,
         showValues: true,
-        animation: true,
-        showLabelsOnLines: false  // ✅ NUOVO: etichette su linee/scatter nei mixed
+        animation: true
     }
 };
 
@@ -88,15 +79,18 @@ function initChartBuilderUI() {
     
     if (!triggerBtn || !modal) return;
     
+    // Rimuovi listener esistenti
     const newTrigger = triggerBtn.cloneNode(true);
     triggerBtn.parentNode.replaceChild(newTrigger, triggerBtn);
     
+    // Click desktop
     newTrigger.addEventListener('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
         openChartBuilder();
     });
     
+    // Touch mobile
     let touchStartTime = 0;
     let touchMoved = false;
     
@@ -118,6 +112,7 @@ function initChartBuilderUI() {
         }
     }, { passive: false });
     
+    // Pulsante chiusura
     if (closeBtn) {
         const newCloseBtn = closeBtn.cloneNode(true);
         closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
@@ -129,6 +124,7 @@ function initChartBuilderUI() {
         }, { passive: false });
     }
     
+    // Chiudi cliccando fuori
     modal.addEventListener('click', function(e) {
         if (e.target === modal) {
             closeChartBuilder();
@@ -184,16 +180,6 @@ function initChartBuilder() {
             document.querySelectorAll('.chart-type-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             customChartConfig.type = this.dataset.type;
-            
-            // ✅ NUOVO: Gestione tipo mixed
-            if (this.dataset.type === 'mixed') {
-                customChartConfig.mixed.enabled = true;
-                showMixedControls();
-            } else {
-                customChartConfig.mixed.enabled = false;
-                hideMixedControls();
-            }
-            
             updateConfigOptions();
         });
     });
@@ -206,7 +192,7 @@ function initChartBuilder() {
         });
     }
     
-    // Custom Title Input
+    // ✅ NUOVO: Custom Title Input
     const customTitleInput = document.getElementById('custom-title-input');
     if (customTitleInput) {
         customTitleInput.addEventListener('input', (e) => {
@@ -225,9 +211,6 @@ function initChartBuilder() {
     
     // Tipologie Checkboxes
     initTipologieCheckboxes();
-    
-    // ✅ NUOVO: Mixed Chart Controls
-    initMixedChartControls();
     
     // Limit Select
     const limitSelect = document.getElementById('limit-select');
@@ -293,39 +276,6 @@ function initChartBuilder() {
             updateFooterStats();
         }
     });
-}
-
-// ============================================
-// ✅ NUOVO: MIXED CHART CONTROLS
-// ============================================
-function initMixedChartControls() {
-    const primaryTypeSelect = document.getElementById('mixed-primary-type');
-    if (primaryTypeSelect) {
-        primaryTypeSelect.addEventListener('change', (e) => {
-            customChartConfig.mixed.primaryType = e.target.value;
-        });
-    }
-    
-    const secondaryTypeSelect = document.getElementById('mixed-secondary-type');
-    if (secondaryTypeSelect) {
-        secondaryTypeSelect.addEventListener('change', (e) => {
-            customChartConfig.mixed.secondaryType = e.target.value;
-        });
-    }
-}
-
-function showMixedControls() {
-    const mixedGroup = document.getElementById('mixed-config-group');
-    if (mixedGroup) {
-        mixedGroup.style.display = 'block';
-    }
-}
-
-function hideMixedControls() {
-    const mixedGroup = document.getElementById('mixed-config-group');
-    if (mixedGroup) {
-        mixedGroup.style.display = 'none';
-    }
 }
 
 // ============================================
@@ -406,6 +356,7 @@ function updateChartColors() {
     
     const textColor = customChartConfig.colors.text;
     
+    // Aggiorna colori testo nel grafico esistente
     if (customChart.options.plugins.title) {
         customChart.options.plugins.title.color = textColor;
     }
@@ -493,19 +444,10 @@ function initVariantCheckboxes() {
         });
     }
     
-    // ✅ NUOVO: Variant Checkboxes con opzioni per mixed
     const showValuesCb = document.getElementById('show-values');
     if (showValuesCb) {
         showValuesCb.addEventListener('change', (e) => {
             customChartConfig.variant.showValues = e.target.checked;
-        });
-    }
-    
-    // ✅ NUOVO: Etichette su linee nei mixed
-    const showLabelsOnLinesCb = document.getElementById('show-labels-on-lines');
-    if (showLabelsOnLinesCb) {
-        showLabelsOnLinesCb.addEventListener('change', (e) => {
-            customChartConfig.variant.showLabelsOnLines = e.target.checked;
         });
     }
     
@@ -551,7 +493,7 @@ function updateConfigOptions() {
     
     const stackedGroup = document.getElementById('stacked-group');
     if (stackedGroup) {
-        stackedGroup.style.display = ['bar', 'line', 'mixed'].includes(type) ? 'block' : 'none';
+        stackedGroup.style.display = ['bar', 'line'].includes(type) ? 'block' : 'none';
     }
     
     const horizontalGroup = document.getElementById('horizontal-group');
@@ -561,17 +503,17 @@ function updateConfigOptions() {
     
     const fillGroup = document.getElementById('fill-group');
     if (fillGroup) {
-        fillGroup.style.display = ['line', 'mixed'].includes(type) ? 'block' : 'none';
+        fillGroup.style.display = type === 'line' ? 'block' : 'none';
     }
     
     const tensionGroup = document.getElementById('tension-group');
     if (tensionGroup) {
-        tensionGroup.style.display = ['line', 'radar', 'mixed'].includes(type) ? 'block' : 'none';
+        tensionGroup.style.display = ['line', 'radar'].includes(type) ? 'block' : 'none';
     }
     
     const pointGroup = document.getElementById('point-group');
     if (pointGroup) {
-        pointGroup.style.display = ['line', 'scatter', 'mixed'].includes(type) ? 'block' : 'none';
+        pointGroup.style.display = ['line', 'scatter'].includes(type) ? 'block' : 'none';
     }
 }
 
@@ -617,6 +559,7 @@ function applyStylePreset(preset) {
     if (presets[preset]) {
         Object.assign(customChartConfig.style, presets[preset]);
         
+        // Update UI
         const updateInput = (id, value, displayId, suffix = '') => {
             const input = document.getElementById(id);
             const display = document.getElementById(displayId);
@@ -819,11 +762,8 @@ function renderCustomChart(data) {
     const chartDatasets = prepareChartDatasets(data);
     const chartLabels = data.map(d => d.label);
     
-    // ✅ NUOVO: Per grafici mixed, il tipo del config è 'bar' o 'line' ma i dataset hanno il loro tipo
-    const chartType = customChartConfig.mixed.enabled ? 'bar' : customChartConfig.type;
-    
     const config = {
-        type: chartType,
+        type: customChartConfig.type,
         data: {
             labels: chartLabels,
             datasets: chartDatasets
@@ -834,15 +774,11 @@ function renderCustomChart(data) {
     customChart = new Chart(canvas, config);
 }
 
-// ============================================
-// ✅ NUOVO: PREPARE DATASETS CON SUPPORTO MIXED
-// ============================================
 function prepareChartDatasets(data) {
     const metric = customChartConfig.metric;
     const type = customChartConfig.type;
     const style = customChartConfig.style;
     const colors = customChartConfig.colors;
-    const mixed = customChartConfig.mixed;
     
     if (metric === 'count') {
         const values = data.map(d => d.value);
@@ -865,40 +801,20 @@ function prepareChartDatasets(data) {
             }
         }
         
-        const dataset = {
+        return [{
             label: 'Incidenti',
             data: values,
             backgroundColor: bgColors,
             borderColor: borderColors,
             borderWidth: style.borderWidth,
+            fill: type === 'line' ? style.fill : true,
             tension: style.tension,
+            pointRadius: style.pointRadius,
+            pointHoverRadius: style.pointRadius + 2,
             pointBackgroundColor: borderColors,
             pointBorderColor: '#fff',
             pointBorderWidth: 1
-        };
-        
-        // ✅ Configurazione specifica per tipo
-        const actualType = mixed.enabled ? mixed.primaryType : type;
-        
-        if (actualType === 'line') {
-            dataset.fill = style.fill;
-            dataset.pointRadius = style.pointRadius;
-            dataset.pointHoverRadius = style.pointRadius + 2;
-        } else if (actualType === 'scatter') {
-            dataset.pointRadius = style.pointRadius + 2;
-            dataset.pointHoverRadius = style.pointRadius + 4;
-        } else if (actualType === 'area') {
-            dataset.type = 'line';
-            dataset.fill = true;
-            dataset.pointRadius = style.pointRadius;
-            dataset.pointHoverRadius = style.pointRadius + 2;
-            dataset.backgroundColor = bgColors.map(c => c.replace(/[\d.]+\)/, '0.3)'));
-        } else {
-            dataset.fill = true;
-            dataset.pointRadius = 0;
-        }
-        
-        return [dataset];
+        }];
     } else {
         const tipologieMap = {
             'M': { label: 'Mortali', color: '#ef4444' },
@@ -912,73 +828,40 @@ function prepareChartDatasets(data) {
             ? customChartConfig.tipologieSelezionate 
             : ['M', 'R', 'F', 'C', 'TOTAL'];
         
-        return tipiDaVisualizzare.map((tipo, index) => {
-            // ✅ Determina il tipo di grafico per questo dataset
-            let datasetType = type;
-            let yAxisID = 'y';
-            
-            if (mixed.enabled) {
-                // Logica per assegnare tipo primario/secondario
-                // Se abbiamo 5 tipologie, mettiamo le prime 3 sul tipo primario e le ultime 2 sul secondario
-                // Oppure possiamo usare una logica diversa (es: TOTAL sempre su linea)
-                if (tipo === 'TOTAL') {
-                    datasetType = mixed.secondaryType;
-                    yAxisID = 'y1';
-                } else {
-                    datasetType = mixed.primaryType;
-                    yAxisID = 'y';
-                }
-            }
-            
-            const dataset = {
-                label: tipologieMap[tipo].label,
-                type: mixed.enabled ? datasetType : undefined, // ✅ Specifica tipo per mixed
-                data: data.map(d => d.value[tipo] || 0),
-                backgroundColor: hexToRgba(tipologieMap[tipo].color, style.opacity),
-                borderColor: tipologieMap[tipo].color,
-                borderWidth: style.borderWidth,
-                yAxisID: mixed.enabled ? yAxisID : undefined, // ✅ Asse Y separato
-                tension: style.tension,
-                pointBackgroundColor: tipologieMap[tipo].color,
-                pointBorderColor: '#fff',
-                pointBorderWidth: 1
-            };
-            
-            // ✅ Configurazione specifica per tipo
-            if (datasetType === 'line' || type === 'line') {
-                dataset.fill = style.fill;
-                dataset.pointRadius = style.pointRadius;
-            } else if (datasetType === 'scatter') {
-                dataset.pointRadius = style.pointRadius + 2; // Punti più grandi per scatter
-                dataset.pointHoverRadius = style.pointRadius + 4;
-            } else if (datasetType === 'area') {
-                dataset.type = 'line'; // Area è una line con fill:true
-                dataset.fill = true;
-                dataset.pointRadius = style.pointRadius;
-                dataset.backgroundColor = hexToRgba(tipologieMap[tipo].color, 0.3); // Più trasparente
-            } else {
-                dataset.pointRadius = 0; // Barre non hanno punti
-            }
-            
-            return dataset;
-        });
+        return tipiDaVisualizzare.map(tipo => ({
+            label: tipologieMap[tipo].label,
+            data: data.map(d => d.value[tipo] || 0),
+            backgroundColor: hexToRgba(tipologieMap[tipo].color, style.opacity),
+            borderColor: tipologieMap[tipo].color,
+            borderWidth: style.borderWidth,
+            fill: type === 'line' ? style.fill : true,
+            tension: style.tension,
+            pointRadius: style.pointRadius,
+            pointBackgroundColor: tipologieMap[tipo].color,
+            pointBorderColor: '#fff',
+            pointBorderWidth: 1
+        }));
     }
 }
 
 // ============================================
-// ✅ CHART OPTIONS CON SUPPORTO DOPPIO ASSE Y
+// CHART OPTIONS CON TITOLO PERSONALIZZATO
 // ============================================
+
 function getChartOptions() {
     const type = customChartConfig.type;
     const style = customChartConfig.style;
     const variant = customChartConfig.variant;
     const dimension = customChartConfig.dimension;
     const textColor = customChartConfig.colors.text;
-    const mixed = customChartConfig.mixed;
     
+    // ✅ Costruisci titolo: usa customTitle se presente, altrimenti dimension
     let chartTitle = customChartConfig.customTitle || dimension;
     
+    // ✅ LEGGI TUTTI I FILTRI ATTIVI
     const filters = [];
+    
+    // Mappa dei nomi friendly per i filtri
     const filterLabels = {
         'filter-anno': 'Anno',
         'filter-mese': 'Mese',
@@ -996,6 +879,7 @@ function getChartOptions() {
         'filter-tipologia': 'Tipo'
     };
     
+    // Mappa per tipologie
     const tipoNames = { 
         M: 'Mortali', 
         R: 'Riserva', 
@@ -1003,12 +887,15 @@ function getChartOptions() {
         C: 'Cose' 
     };
     
+    // Metodo 1: Prova con currentFilters (se esiste)
     if (typeof currentFilters !== 'undefined' && currentFilters) {
         Object.entries(currentFilters).forEach(([key, value]) => {
             if (value && value !== '') {
+                // Per tipologia usa il nome friendly
                 if (key === 'filter-tipologia' && tipoNames[value]) {
                     filters.push(tipoNames[value]);
                 } else if (filterLabels[key]) {
+                    // Evita di ripetere la dimensione nel titolo
                     const isDimensionValue = value === dimension;
                     if (!isDimensionValue) {
                         filters.push(value);
@@ -1016,13 +903,57 @@ function getChartOptions() {
                 }
             }
         });
+    } else {
+        // Metodo 2: Fallback - leggi direttamente dal DOM
+        const filterIds = [
+            'filter-anno',
+            'filter-mese', 
+            'filter-stagione',
+            'filter-giorno-settimana',
+            'filter-feriale-weekend',
+            'filter-giorno-notte',
+            'filter-condizioni-luce',
+            'filter-fascia-4',
+            'filter-fascia-6',
+            'filter-ora-punta',
+            'filter-circoscrizione',
+            'filter-quartiere',
+            'filter-upl',
+            'filter-tipologia'
+        ];
+        
+        filterIds.forEach(id => {
+            const select = document.getElementById(id);
+            if (select && select.value && select.value !== '') {
+                const value = select.value;
+                
+                // Per tipologia usa il nome friendly
+                if (id === 'filter-tipologia' && tipoNames[value]) {
+                    filters.push(tipoNames[value]);
+                } else {
+                    // Evita di ripetere la dimensione nel titolo
+                    const isDimensionValue = value === dimension;
+                    if (!isDimensionValue) {
+                        // Per le select, usa il testo visualizzato
+                        const selectedOption = select.options[select.selectedIndex];
+                        const displayText = selectedOption ? selectedOption.text : value;
+                        filters.push(displayText);
+                    }
+                }
+            }
+        });
     }
     
+    // Rimuovi duplicati
     const uniqueFilters = [...new Set(filters)];
     
+    // Aggiungi filtri al titolo
     if (uniqueFilters.length > 0) {
         chartTitle += ' - ' + uniqueFilters.join(' • ');
     }
+    
+    console.log('📊 Titolo grafico:', chartTitle);
+    console.log('🔍 Filtri trovati:', uniqueFilters);
     
     const baseOptions = {
         responsive: true,
@@ -1056,54 +987,41 @@ function getChartOptions() {
             },
             datalabels: {
                 display: function(context) {
-                    const datasetType = context.dataset.type || type;
-                    
-                    // ✅ Se è un grafico MIXED
-                    if (mixed.enabled) {
-                        // Barre: mostra se showValues è true
-                        if (datasetType === 'bar') {
-                            return variant.showValues;
-                        }
-                        // Linee/Scatter/Area: mostra solo se showLabelsOnLines è true
-                        if (['line', 'scatter', 'area'].includes(datasetType)) {
-                            return variant.showLabelsOnLines;
-                        }
+                    if (['line', 'scatter', 'bubble'].includes(type)) {
+                        return false;
                     }
-                    
-                    // ✅ Logica per grafici NORMALI (non-mixed)
-                    // Tutti i tipi rispettano showValues
                     return variant.showValues;
                 },
                 color: textColor,
                 anchor: function(context) {
-                    const datasetType = context.dataset.type || type;
-                    // ✅ Linee: etichette sopra i punti
-                    if (['line', 'scatter', 'area'].includes(datasetType)) {
+                    if (['pie', 'doughnut', 'polarArea'].includes(type)) {
                         return 'end';
                     }
-                    // ✅ Barre: dentro o sopra in base al valore
+                    if (type === 'radar') {
+                        return 'end';
+                    }
                     const value = context.dataset.data[context.dataIndex];
                     const max = Math.max(...context.dataset.data);
                     return value > max * 0.2 ? 'center' : 'end';
                 },
                 align: function(context) {
-                    const datasetType = context.dataset.type || type;
-                    // ✅ Linee: allineamento sopra
-                    if (['line', 'scatter', 'area'].includes(datasetType)) {
-                        return 'top';
+                    if (['pie', 'doughnut', 'polarArea'].includes(type)) {
+                        return 'end';
                     }
-                    // ✅ Barre: logica normale
+                    if (type === 'radar') {
+                        return 'end';
+                    }
                     const value = context.dataset.data[context.dataIndex];
                     const max = Math.max(...context.dataset.data);
                     return value > max * 0.2 ? 'center' : 'end';
                 },
                 offset: function(context) {
-                    const datasetType = context.dataset.type || type;
-                    // ✅ Linee: offset maggiore per non sovrapporsi ai punti
-                    if (['line', 'scatter', 'area'].includes(datasetType)) {
-                        return 8;
+                    if (['pie', 'doughnut', 'polarArea'].includes(type)) {
+                        return 10;
                     }
-                    // ✅ Barre: offset normale
+                    if (type === 'radar') {
+                        return 10;
+                    }
                     const value = context.dataset.data[context.dataIndex];
                     const max = Math.max(...context.dataset.data);
                     return value > max * 0.2 ? 0 : 4;
@@ -1114,24 +1032,16 @@ function getChartOptions() {
                     family: 'Titillium Web'
                 },
                 borderRadius: 4,
-                padding: { top: 3, right: 5, bottom: 3, left: 5 },
-                backgroundColor: function(context) {
-                    const datasetType = context.dataset.type || type;
-                    // ✅ Linee: sfondo semi-trasparente per leggibilità
-                    if (['line', 'scatter', 'area'].includes(datasetType)) {
-                        return 'rgba(255, 255, 255, 0.8)';
-                    }
-                    return 'transparent';
-                }
+                padding: { top: 3, right: 5, bottom: 3, left: 5 }
             }
         }
     };
     
-    // ✅ SCALES CON SUPPORTO DOPPIO ASSE Y PER MIXED
-    if (type === 'bar' || type === 'line' || mixed.enabled) {
-        const scales = {
+    if (type === 'bar') {
+        baseOptions.indexAxis = variant.horizontal || customChartConfig.orientation === 'horizontal' ? 'y' : 'x';
+        baseOptions.scales = {
             x: {
-                stacked: variant.stacked && !mixed.enabled,
+                stacked: variant.stacked,
                 ticks: { 
                     color: textColor, 
                     font: { size: style.fontSize } 
@@ -1142,10 +1052,7 @@ function getChartOptions() {
                 }
             },
             y: {
-                type: 'linear',
-                display: true,
-                position: 'left',
-                stacked: variant.stacked && !mixed.enabled,
+                stacked: variant.stacked,
                 beginAtZero: true,
                 ticks: { 
                     color: textColor, 
@@ -1157,29 +1064,31 @@ function getChartOptions() {
                 }
             }
         };
-        
-        // ✅ Aggiungi secondo asse Y se mixed è abilitato
-        if (mixed.enabled) {
-            scales.y1 = {
-                type: 'linear',
-                display: true,
-                position: 'right',
+    } else if (type === 'line') {
+        baseOptions.scales = {
+            x: {
+                ticks: { 
+                    color: textColor, 
+                    font: { size: style.fontSize } 
+                },
+                grid: { 
+                    display: style.showGrid, 
+                    color: `rgba(148, 163, 184, ${style.gridOpacity})` 
+                }
+            },
+            y: {
+                stacked: variant.stacked,
                 beginAtZero: true,
                 ticks: { 
                     color: textColor, 
                     font: { size: style.fontSize } 
                 },
                 grid: { 
-                    drawOnChartArea: false // Non sovrapporre la griglia
+                    display: style.showGrid, 
+                    color: `rgba(148, 163, 184, ${style.gridOpacity})` 
                 }
-            };
-        }
-        
-        baseOptions.scales = scales;
-        
-        if (type === 'bar') {
-            baseOptions.indexAxis = variant.horizontal || customChartConfig.orientation === 'horizontal' ? 'y' : 'x';
-        }
+            }
+        };
     } else if (type === 'radar') {
         baseOptions.scales = {
             r: {
@@ -1215,6 +1124,7 @@ function getChartOptions() {
     
     return baseOptions;
 }
+
 
 // ============================================
 // COLOR UTILITIES
@@ -1268,14 +1178,7 @@ function resetChartBuilder() {
         tipologieSelezionate: [],
         limit: 10,
         orientation: 'vertical',
-        customTitle: '',
-        mixed: {
-            enabled: false,
-            primaryType: 'bar',
-            secondaryType: 'line',
-            primaryDatasets: [],
-            secondaryDatasets: []
-        },
+        customTitle: '',  // ✅ Reset anche customTitle
         colors: {
             mode: 'auto',
             primary: '#3b82f6',
@@ -1299,23 +1202,23 @@ function resetChartBuilder() {
             stacked: false,
             horizontal: false,
             showValues: true,
-            animation: true,
-            showLabelsOnLines: false  // ✅ Reset anche questo
+            animation: true
         }
     };
     
+    // Reset UI
     document.querySelectorAll('.chart-type-btn').forEach(btn => {
         btn.classList.remove('active');
         if (btn.dataset.type === 'bar') btn.classList.add('active');
     });
     
-    const selects = ['dimension-select', 'metric-select', 'limit-select', 'orientation-select', 
-                     'color-mode-select', 'mixed-primary-type', 'mixed-secondary-type'];
+    const selects = ['dimension-select', 'metric-select', 'limit-select', 'orientation-select', 'color-mode-select'];
     selects.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.selectedIndex = 0;
     });
     
+    // ✅ Reset campo titolo personalizzato
     const customTitleInput = document.getElementById('custom-title-input');
     if (customTitleInput) customTitleInput.value = '';
     
@@ -1336,7 +1239,6 @@ function resetChartBuilder() {
     const textColor = document.getElementById('text-color');
     if (textColor) textColor.value = '#1f2937';
     
-    hideMixedControls();
     applyStylePreset('default');
     
     if (customChart) {
@@ -1350,6 +1252,9 @@ function resetChartBuilder() {
     if (placeholder) placeholder.style.display = 'flex';
 }
 
+// ============================================
+// DOWNLOAD CON TITOLO PERSONALIZZATO
+// ============================================
 async function downloadCustomChart() {
     if (!customChart) {
         alert('⚠️ Genera prima un grafico da scaricare');
@@ -1376,45 +1281,82 @@ async function downloadCustomChart() {
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, targetWidth, targetHeight);
     
-    const textColor = customChartConfig.colors.text;
-    ctx.fillStyle = textColor;
-    ctx.font = 'bold 22px Titillium Web, Arial, sans-serif';
-    ctx.textAlign = 'left';
-    
-    const baseTitle = customChartConfig.customTitle || customChartConfig.dimension || 'Grafico Analytics';
-    let downloadTitle = baseTitle;
-    
-    const filters = [];
-    const tipoNames = { 
-        M: 'Mortali', 
-        R: 'Riserva', 
-        F: 'Feriti', 
-        C: 'Cose' 
-    };
-    
-    if (typeof currentFilters !== 'undefined' && currentFilters) {
-        Object.entries(currentFilters).forEach(([key, value]) => {
-            if (value && value !== '') {
-                if (key === 'filter-tipologia' && tipoNames[value]) {
-                    filters.push(tipoNames[value]);
-                } else {
-                    const isDimensionValue = value === customChartConfig.dimension;
-                    if (!isDimensionValue) {
-                        filters.push(value);
-                    }
+// HEADER
+const textColor = customChartConfig.colors.text;
+ctx.fillStyle = textColor;
+ctx.font = 'bold 22px Titillium Web, Arial, sans-serif';
+ctx.textAlign = 'left';
+
+// ✅ Costruzione titolo completo
+const baseTitle = customChartConfig.customTitle || customChartConfig.dimension || 'Grafico Analytics';
+let downloadTitle = baseTitle;
+
+const filters = [];
+
+// Mappa per tipologie
+const tipoNames = { 
+    M: 'Mortali', 
+    R: 'Riserva', 
+    F: 'Feriti', 
+    C: 'Cose' 
+};
+
+// Prova con currentFilters
+if (typeof currentFilters !== 'undefined' && currentFilters) {
+    Object.entries(currentFilters).forEach(([key, value]) => {
+        if (value && value !== '') {
+            if (key === 'filter-tipologia' && tipoNames[value]) {
+                filters.push(tipoNames[value]);
+            } else {
+                const isDimensionValue = value === customChartConfig.dimension;
+                if (!isDimensionValue) {
+                    filters.push(value);
                 }
             }
-        });
-    }
+        }
+    });
+} else {
+    // Fallback: leggi dal DOM
+    const filterIds = [
+        'filter-anno', 'filter-mese', 'filter-stagione',
+        'filter-giorno-settimana', 'filter-feriale-weekend',
+        'filter-giorno-notte', 'filter-condizioni-luce',
+        'filter-fascia-4', 'filter-fascia-6', 'filter-ora-punta',
+        'filter-circoscrizione', 'filter-quartiere', 'filter-upl',
+        'filter-tipologia'
+    ];
     
-    const uniqueFilters = [...new Set(filters)];
-    
-    if (uniqueFilters.length > 0) {
-        downloadTitle += ' - ' + uniqueFilters.join(' • ');
-    }
-    
-    ctx.fillText(downloadTitle, 40, 35);
-    
+    filterIds.forEach(id => {
+        const select = document.getElementById(id);
+        if (select && select.value && select.value !== '') {
+            const value = select.value;
+            
+            if (id === 'filter-tipologia' && tipoNames[value]) {
+                filters.push(tipoNames[value]);
+            } else {
+                const isDimensionValue = value === customChartConfig.dimension;
+                if (!isDimensionValue) {
+                    const selectedOption = select.options[select.selectedIndex];
+                    const displayText = selectedOption ? selectedOption.text : value;
+                    filters.push(displayText);
+                }
+            }
+        }
+    });
+}
+
+// Rimuovi duplicati
+const uniqueFilters = [...new Set(filters)];
+
+if (uniqueFilters.length > 0) {
+    downloadTitle += ' - ' + uniqueFilters.join(' • ');
+}
+
+console.log('📥 Titolo download:', downloadTitle);
+
+ctx.fillText(downloadTitle, 40, 35); 
+ 
+    // Filtri
     ctx.font = '13px Titillium Web, Arial, sans-serif';
     const activeFilters = document.getElementById('custom-chart-filters');
     let filtersText = 'Chart Builder - Grafico Personalizzato';
@@ -1438,6 +1380,7 @@ async function downloadCustomChart() {
     ctx.lineTo(targetWidth - 40, headerHeight - 15);
     ctx.stroke();
     
+    // GRAFICO
     const chartCanvas = document.createElement('canvas');
     const chartWidth = targetWidth - 80;
     const chartHeight = chartAreaHeight;
@@ -1452,6 +1395,7 @@ async function downloadCustomChart() {
     
     ctx.drawImage(chartCanvas, 40, headerHeight);
     
+    // FOOTER
     ctx.strokeStyle = '#d1d5db';
     ctx.beginPath();
     ctx.moveTo(40, targetHeight - footerHeight + 10);
@@ -1463,6 +1407,7 @@ async function downloadCustomChart() {
     ctx.fillText('Fonte: dati.gov.it - Rielaborazione: opendatasicilia.it', 40, targetHeight - 40);
     ctx.fillText('https://opendatasicilia.github.io/incidenti_palermo/', 40, targetHeight - 20);
     
+    // Logo
     try {
         const logo = new Image();
         logo.crossOrigin = 'anonymous';
@@ -1479,6 +1424,7 @@ async function downloadCustomChart() {
         }
     } catch (e) {}
     
+    // Download
     const dataURL = finalCanvas.toDataURL('image/png');
     const link = document.createElement('a');
     const safeFilename = (customChartConfig.customTitle || customChartConfig.dimension || 'grafico').replace(/[^a-z0-9]/gi, '_').toLowerCase();
