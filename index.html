@@ -865,6 +865,7 @@
         <button class="footer-tab" data-tab="fonte">Fonte Dati</button>
         <button class="footer-tab" data-tab="licenza">Licenza</button>
 	 <button class="footer-tab" data-tab="tecnologie">Tecnologie</button>
+	 <button class="footer-tab" data-tab="chart-builder">Crea il tuo DataViz</button>
         <button class="footer-tab" data-tab="crediti">Crediti</button>
 		
     </div>
@@ -1239,6 +1240,464 @@
 <p>È essenzialmente una <strong>Progressive Web App</strong> che sfrutta le capacità moderne dei browser per elaborare e visualizzare grandi dataset senza server.</p>
             </div>
         </div>
+
+
+ <!-- Chart Builder Guide -->
+        <div class="footer-tab-content" id="tab-chart-builder">
+ <!-- Introduzione -->
+        <div class="info-card">
+            <h4><i class="fas fa-chart-pie"></i> Chart Builder: Crea i Tuoi Grafici Personalizzati</h4>
+            <p class="subtitle">Un potente strumento interattivo che trasforma i dati sugli incidenti stradali di Palermo in visualizzazioni personalizzate. Scegli dimensioni, metriche, stili e colori per creare il grafico perfetto per la tua analisi.</p>
+            
+            <p>Il <strong>Chart Builder</strong> è stato progettato per offrire la massima flessibilità nell'analisi dei dati. Con pochi clic puoi generare grafici professionali che riflettono esattamente le informazioni che stai cercando, applicando automaticamente tutti i filtri attivi nella dashboard.</p>
+        </div>
+
+        <!-- Come Accedere -->
+        <div class="info-card">
+            <h2>Come Accedere al Chart Builder</h2>
+            
+            <p>Per aprire il Chart Builder, cerca il pulsante <strong style="color: #ff9900;">"Crea il tuo DataViz"</strong> nella parte alta della schermata. Un badge viola lampeggiante ti guiderà verso questa funzionalità innovativa.</p>
+            
+            <div class="info-note">
+                <strong><i class="fas fa-lightbulb"></i> Suggerimento Rapido</strong>
+                <p>Il Chart Builder si integra perfettamente con i filtri della dashboard. Prima di aprirlo, applica i filtri che ti interessano (anno, mese, circoscrizione, ecc.) e questi verranno automaticamente considerati nel grafico.</p>
+            </div>
+        </div>
+
+        <!-- Anatomia del Chart Builder -->
+        <div class="info-card">
+            <h2>Anatomia del Chart Builder</h2>
+            
+            <p>L'interfaccia è divisa in <strong>due sezioni principali</strong>:</p>
+            
+            <h3><i class="fas fa-1"></i> Pannello di Configurazione (Sinistra)</h3>
+            <p>Qui si trovano tutti i controlli per personalizzare il grafico:</p>
+            
+            <ul>
+                <li><strong>Tipo di Grafico:</strong> 8 tipologie disponibili (barre, linea, torta, ciambella, radar, polare, scatter, bubble)</li>
+                <li><strong>Configurazione Dati:</strong> dimensione, metrica, titolo personalizzato, limiti</li>
+                <li><strong>Colori:</strong> modalità automatica, colore singolo o gradiente personalizzato</li>
+                <li><strong>Stile:</strong> spessore bordi, opacità, dimensioni testo, preset rapidi</li>
+                <li><strong>Varianti:</strong> orientamento, impilamento, animazioni, griglia</li>
+            </ul>
+            
+            <h3><i class="fas fa-2"></i> Anteprima Grafico (Destra)</h3>
+            <p>Mostra il risultato in tempo reale. Una volta generato, il grafico può essere scaricato come immagine PNG ad alta risoluzione (800×600px) con intestazione, filtri applicati e crediti.</p>
+        </div>
+
+        <!-- Guida Passo-Passo -->
+        <div class="info-card">
+            <h2>Guida Passo-Passo: Crea il Tuo Primo Grafico</h2>
+            
+            <div class="highlight-box">
+                <p><strong><i class="fas fa-bullseye"></i> Obiettivo:</strong> Creare un grafico a barre che mostri gli incidenti per giorno della settimana nel 2023</p>
+            </div>
+            
+            <h3>Step 1: Applica i Filtri nella Dashboard</h3>
+            <p>Prima di aprire il Chart Builder, imposta i filtri nella sidebar sinistra:</p>
+            <ul>
+                <li>Seleziona <strong>Anno: 2023</strong> dal filtro temporale</li>
+                <li>Eventuali altri filtri desiderati (circoscrizione, tipologia, ecc.)</li>
+            </ul>
+            
+            <h3>Step 2: Apri il Chart Builder</h3>
+            <p>Clicca sul pulsante <strong>"Crea il tuo DataViz"</strong> in basso a destra. Il modal si aprirà mostrando i filtri attivi nella sezione "Filtri Attivi".</p>
+            
+            <h3>Step 3: Scegli il Tipo di Grafico</h3>
+            <p>Nella sezione "Tipo di Grafico", clicca sull'icona <strong>Barre</strong> (già selezionata di default). Sono disponibili 8 tipologie:</p>
+            
+            <div class="category-list">
+                <ul>
+                    <li><strong>Barre:</strong> ideale per confronti tra categorie</li>
+                    <li><strong>Linea:</strong> perfetto per trend temporali</li>
+                    <li><strong>Torta:</strong> visualizza proporzioni percentuali</li>
+                    <li><strong>Ciambella:</strong> come la torta, ma più moderno</li>
+                    <li><strong>Radar:</strong> confronta multiple variabili</li>
+                    <li><strong>Polare:</strong> visualizzazione circolare elegante</li>
+                    <li><strong>Scatter:</strong> mostra correlazioni</li>
+                    <li><strong>Bubble:</strong> aggiunge una terza dimensione</li>
+                </ul>
+            </div>
+            
+            <h3>Step 4: Configura i Dati</h3>
+            <p>Nella sezione "Configurazione Dati":</p>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Dimensione Principale</span>
+                    <span class="info-value">Giorno Settimana</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Metrica</span>
+                    <span class="info-value">Conteggio Incidenti</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Limita Risultati</span>
+                    <span class="info-value">Tutti</span>
+                </div>
+            </div>
+            
+            <p><strong><i class="fas fa-lightbulb"></i> Titolo Personalizzato (Opzionale):</strong> Inserisci un titolo custom come <em>"Analisi Settimanale Incidenti 2023"</em>. Se lasci vuoto, verrà usata la dimensione selezionata. I filtri attivi verranno aggiunti automaticamente al titolo.</p>
+            
+            <h3>Step 5: Personalizza lo Stile</h3>
+            <p>Scegli tra 4 preset rapidi o personalizza manualmente:</p>
+            
+            <ul>
+                <li><strong>Minimal:</strong> design pulito e discreto</li>
+                <li><strong>Default:</strong> bilanciamento perfetto (consigliato)</li>
+                <li><strong>Bold:</strong> impatto visivo massimo</li>
+                <li><strong>Clean:</strong> eleganza senza bordi</li>
+            </ul>
+            
+            <h3>Step 6: Genera e Scarica</h3>
+            <p>Clicca <strong>"Genera Grafico"</strong> e il risultato apparirà nell'anteprima. Soddisfatto? Usa il pulsante <strong>"PNG"</strong> per scaricare l'immagine ad alta qualità.</p>
+        </div>
+
+        <!-- Dimensioni Disponibili -->
+        <div class="info-card">
+            <h2>Le 13 Dimensioni di Analisi</h2>
+            
+            <p>Ogni dimensione offre una prospettiva unica sui dati. Ecco la lista completa con esempi d'uso:</p>
+            
+            <h3><i class="fas fa-calendar-alt"></i> Dimensioni Temporali</h3>
+            <div class="category-list">
+                <ul>
+                    <li><strong>Anno:</strong> Evoluzione dal 2015 al 2023 - <em>Esempio: "Come sono variati gli incidenti negli anni?"</em></li>
+                    <li><strong>Mese:</strong> Stagionalità mensile - <em>Esempio: "Quali mesi sono più pericolosi?"</em></li>
+                    <li><strong>Giorno Settimana:</strong> Pattern settimanali - <em>Esempio: "Weekend vs giorni feriali"</em></li>
+                    <li><strong>Stagione:</strong> Confronto primavera/estate/autunno/inverno</li>
+                    <li><strong>Feriale/Weekend:</strong> Semplice dicotomia giorni lavorativi vs riposo</li>
+                </ul>
+            </div>
+            
+            <h3><i class="fas fa-clock"></i> Dimensioni Orarie</h3>
+            <div class="category-list">
+                <ul>
+                    <li><strong>Giorno/Notte:</strong> Visibilità e illuminazione naturale</li>
+                    <li><strong>Fascia Oraria (4 fasce):</strong> Divisione grossolana della giornata</li>
+                    <li><strong>Fascia Oraria (6 fasce):</strong> Alba, Mattina, Pranzo, Pomeriggio, Sera, Notte</li>
+                    <li><strong>Condizioni Luce:</strong> Visibilità dettagliata (luce naturale, crepuscolo, buio)</li>
+                    <li><strong>Ora di Punta:</strong> Picchi di traffico pendolare</li>
+                </ul>
+            </div>
+            
+            <h3><i class="fas fa-map-marker-alt"></i> Dimensioni Territoriali</h3>
+            <div class="category-list">
+                <ul>
+                    <li><strong>Circoscrizione:</strong> Prima suddivisione amministrativa di Palermo</li>
+                    <li><strong>Quartiere:</strong> Livello intermedio di dettaglio territoriale</li>
+                    <li><strong>UPL:</strong> Unità di Primo Livello - granularità massima</li>
+                </ul>
+            </div>
+            
+            <h3><i class="fas fa-exclamation-triangle"></i> Dimensione Tipologica</h3>
+            <p><strong>Tipologia Incidente:</strong> Mortale, Riserva, Feriti, Cose - l'indicatore di gravità più importante</p>
+        </div>
+
+        <!-- Metriche -->
+        <div class="info-card">
+            <h2>Le Due Metriche Principali</h2>
+            
+            <h3><i class="fas fa-calculator"></i> Conteggio Incidenti (Default)</h3>
+            <p>Conta semplicemente il numero totale di incidenti per ogni categoria della dimensione scelta. È la metrica più diretta e immediata.</p>
+            
+            <div class="info-note">
+                <strong><i class="fas fa-chart-bar"></i> Esempio Pratico</strong>
+                <p>Dimensione: <strong>Mese</strong> | Metrica: <strong>Conteggio</strong><br>
+                Risultato: Un grafico che mostra quanti incidenti sono avvenuti in Gennaio, Febbraio, Marzo, ecc.</p>
+            </div>
+            
+            <h3><i class="fas fa-layer-group"></i> Raggruppa per Tipologia</h3>
+            <p>Suddivide i dati in base alla gravità dell'incidente (M, R, F, C, TOTAL). Crea dataset multipli colorati per confrontare le diverse tipologie.</p>
+            
+            <div class="info-note">
+                <strong><i class="fas fa-layer-group"></i> Esempio Pratico</strong>
+                <p>Dimensione: <strong>Giorno Settimana</strong> | Metrica: <strong>Raggruppa per Tipologia</strong><br>
+                Risultato: Un grafico con 5 linee/barre separate che mostrano, per ogni giorno, quanti incidenti mortali (rosso), con riserva (viola), con feriti (arancio), con cose (verde) e totali (blu) sono avvenuti.</p>
+            </div>
+            
+            <p>Quando selezioni <strong>"Raggruppa per Tipologia"</strong>, appare una sezione con checkbox per scegliere quali tipologie visualizzare. Se non selezioni nulla, vengono mostrate tutte.</p>
+        </div>
+
+        <!-- Colori e Stili -->
+        <div class="info-card">
+            <h2>Sistema Colori Avanzato</h2>
+            
+            <p>Il Chart Builder offre <strong>tre modalità colore</strong> per adattarsi a ogni esigenza:</p>
+            
+            <h3><i class="fas fa-palette"></i> Modalità Automatica (Consigliata)</h3>
+            <p>Usa una palette intelligente che si adatta al tipo di grafico:</p>
+            <ul>
+                <li><strong>Grafici circolari</strong> (torta, ciambella, polare): palette multicolore vivace</li>
+                <li><strong>Grafici lineari/barre</strong>: gradiente blu-viola elegante</li>
+                <li><strong>Tipologie</strong>: colori semantici (rosso=mortali, arancio=feriti, verde=cose)</li>
+            </ul>
+            
+            <h3><i class="fas fa-square"></i> Colore Singolo</h3>
+            <p>Tutte le barre/punti dello stesso colore che scegli tu. Perfetto per grafici minimalisti o quando vuoi enfatizzare l'uniformità dei dati.</p>
+            
+            <h3><i class="fas fa-gradient"></i> Gradiente Personalizzato</h3>
+            <p>Scegli due colori (inizio e fine) e il sistema genera automaticamente una transizione fluida. Ideale per evidenziare progressioni (es: dal più basso al più alto).</p>
+            
+            <div class="highlight-box">
+                <p><strong><i class="fas fa-sparkles"></i> Novità: Colore Testo Personalizzato</strong><br>
+                Puoi ora cambiare il colore di <em>tutti</em> gli elementi testuali (titolo, assi, etichette, legenda) per adattare il grafico al tuo brand o documento. Default: grigio scuro (#1f2937).</p>
+            </div>
+        </div>
+
+        <!-- Titolo Personalizzato -->
+        <div class="info-card">
+            <h2>Titolo Personalizzato + Filtri Automatici</h2>
+            
+            <p>Una delle funzionalità più potenti del Chart Builder è il <strong>sistema di titolazione intelligente</strong>:</p>
+            
+            <h3>Come Funziona</h3>
+            <ol style="padding-left: 20px; color: #374151; line-height: 1.8;">
+                <li><strong>Senza titolo personalizzato:</strong> Usa il nome della dimensione come titolo base (es: "Mese")</li>
+                <li><strong>Con titolo personalizzato:</strong> Usa il tuo testo custom (es: "Analisi Mensile Traffico Urbano")</li>
+                <li><strong>Filtri automatici:</strong> Aggiunge automaticamente tutti i filtri attivi dopo il titolo, separati da " • "</li>
+            </ol>
+            
+            <div class="info-note">
+                <strong><i class="fas fa-magic"></i> Esempio Completo</strong>
+                <p><strong>Titolo inserito:</strong> "Analisi Incidenti Urbani"<br>
+                <strong>Filtri attivi:</strong> Anno 2023, Mese Gennaio, Circoscrizione 1<br>
+                <strong>Risultato finale:</strong> "Analisi Incidenti Urbani - 2023 • Gennaio • Circoscrizione 1"</p>
+            </div>
+            
+            <p>Questo sistema garantisce che ogni grafico sia <strong>auto-documentante</strong>: guardandolo, si capisce immediatamente quali dati rappresenta e con quali filtri è stato generato.</p>
+        </div>
+
+        <!-- Controlli Stile -->
+        <div class="info-card">
+            <h2>Controlli di Stile Professionali</h2>
+            
+            <p>Oltre ai 4 preset rapidi (Minimal, Default, Bold, Clean), puoi personalizzare ogni aspetto visivo:</p>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Spessore Bordi</span>
+                    <span class="info-value">0-10px</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Opacità</span>
+                    <span class="info-value">0-100%</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Dimensione Testo</span>
+                    <span class="info-value">8-20px</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Dimensione Titolo</span>
+                    <span class="info-value">12-32px</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Dimensione Legenda</span>
+                    <span class="info-value">8-18px</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Opacità Griglia</span>
+                    <span class="info-value">0-100%</span>
+                </div>
+            </div>
+            
+            <h3>Controlli Specifici per Tipo di Grafico</h3>
+            <p>Alcune opzioni appaiono solo con determinati tipi di grafico:</p>
+            
+            <ul>
+                <li><strong>Curvatura Linee:</strong> Solo per grafici line/radar - rende le linee più morbide</li>
+                <li><strong>Dimensione Punti:</strong> Solo per grafici line/scatter - controlla i marker</li>
+                <li><strong>Orientamento:</strong> Solo per grafici a barre - verticale vs orizzontale</li>
+                <li><strong>Impilamento:</strong> Solo per barre/linee - somma i valori verticalmente</li>
+                <li><strong>Riempi Area:</strong> Solo per grafici a linea - colora l'area sotto la curva</li>
+            </ul>
+        </div>
+
+        <!-- Varianti e Opzioni -->
+        <div class="info-card">
+            <h2>Varianti e Opzioni Avanzate</h2>
+            
+            <h3><i class="fas fa-check-square"></i> Checkbox Disponibili</h3>
+            
+            <div class="category-list">
+                <ul>
+                    <li><strong>Grafico Impilato (Stacked):</strong> Somma i valori verticalmente - utile per vedere totali compositi</li>
+                    <li><strong>Orientamento Orizzontale:</strong> Ruota il grafico a barre di 90° - meglio per etichette lunghe</li>
+                    <li><strong>Riempi Area sotto la Linea:</strong> Aggiunge colore sotto le curve - maggiore impatto visivo</li>
+                    <li><strong>Mostra Valori sul Grafico:</strong> Etichette numeriche su ogni barra/punto - massima precisione</li>
+                    <li><strong>Mostra Griglia:</strong> Linee di riferimento sugli assi - facilita la lettura</li>
+                    <li><strong>Mostra Legenda:</strong> Box esplicativo dei colori - essenziale con multiple serie</li>
+                    <li><strong>Abilita Animazioni:</strong> Transizioni fluide all'apertura - più elegante ma più lento</li>
+                </ul>
+            </div>
+            
+            <div class="info-note">
+                <strong><i class="fas fa-info-circle"></i> Nota sulle Etichette Valori</strong>
+                <p>Le etichette si posizionano intelligentemente: dentro le barre se c'è spazio, fuori se sono troppo piccole. Per grafici circolari, le etichette sono sempre esterne per massima leggibilità.</p>
+            </div>
+        </div>
+
+        <!-- Download e Export -->
+        <div class="info-card">
+            <h2>Download e Export Professionale</h2>
+            
+            <p>Il pulsante <strong>"PNG"</strong> non genera semplicemente uno screenshot, ma crea un'immagine professionale con:</p>
+            
+            <h3><i class="fas fa-file-image"></i> Struttura del File Esportato</h3>
+            
+            <ol style="padding-left: 20px; color: #374151; line-height: 1.8;">
+                <li><strong>Header (100px):</strong>
+                    <ul style="margin-top: 8px;">
+                        <li>Titolo principale con filtri in grassetto 22px</li>
+                        <li>Sottotitolo "Chart Builder - Grafico Personalizzato"</li>
+                        <li>Info sui filtri attivi</li>
+                        <li>Linea separatrice</li>
+                    </ul>
+                </li>
+                <li><strong>Area Grafico:</strong> Il tuo grafico renderizzato in alta qualità</li>
+                <li><strong>Footer (70px):</strong>
+                    <ul style="margin-top: 8px;">
+                        <li>Fonte dati: dati.gov.it</li>
+                        <li>Rielaborazione: opendatasicilia.it</li>
+                        <li>URL completo del progetto</li>
+                        <li>Logo OpenDataSicilia (se disponibile)</li>
+                    </ul>
+                </li>
+            </ol>
+            
+            <div class="highlight-box">
+                <p><strong><i class="fas fa-ruler-combined"></i> Risoluzione:</strong> 800×600px minimo (si adatta automaticamente all'aspect ratio del grafico)<br>
+                <strong><i class="fas fa-folder"></i> Formato:</strong> PNG con sfondo bianco<br>
+                <strong><i class="fas fa-file-signature"></i> Naming:</strong> Il filename usa il titolo personalizzato (o dimensione) + dimensioni</p>
+            </div>
+        </div>
+
+        <!-- Casi d'Uso -->
+        <div class="info-card">
+            <h2>5 Casi d'Uso Pratici</h2>
+            
+            <h3><i class="fas fa-file-alt"></i> Report Annuale per Ente Pubblico</h3>
+            <p><strong>Obiettivo:</strong> Creare grafici per un documento ufficiale</p>
+            <ul>
+                <li>Tipo: Barre verticali</li>
+                <li>Dimensione: Mese</li>
+                <li>Metrica: Raggruppa per Tipologia (solo Mortali e Feriti)</li>
+                <li>Stile: Bold con colori automatici</li>
+                <li>Titolo: "Incidenti Gravi - Report Annuale 2023"</li>
+            </ul>
+            
+            <h3><i class="fas fa-presentation"></i> Presentazione per Consiglio Comunale</h3>
+            <p><strong>Obiettivo:</strong> Evidenziare zone critiche della città</p>
+            <ul>
+                <li>Filtri: Anno 2023</li>
+                <li>Tipo: Barre orizzontali</li>
+                <li>Dimensione: Circoscrizione</li>
+                <li>Limita: Top 10</li>
+                <li>Stile: Clean con gradiente rosso-arancio</li>
+                <li>Titolo: "Circoscrizioni con Più Incidenti"</li>
+            </ul>
+            
+            <h3><i class="fas fa-graduation-cap"></i> Studio Accademico di Stagionalità</h3>
+            <p><strong>Obiettivo:</strong> Paper scientifico su pattern temporali</p>
+            <ul>
+                <li>Tipo: Linea con area riempita</li>
+                <li>Dimensione: Mese</li>
+                <li>Stile: Minimal, griglia visibile</li>
+                <li>Colori: Singolo blu accademico</li>
+                <li>Titolo: "Trend Mensile Incidentalità 2015-2023"</li>
+            </ul>
+            
+            <h3><i class="fas fa-share-alt"></i> Infografica per Social Media</h3>
+            <p><strong>Obiettivo:</strong> Post Instagram coinvolgente</p>
+            <ul>
+                <li>Tipo: Ciambella o Torta</li>
+                <li>Dimensione: Giorno Settimana</li>
+                <li>Stile: Bold, colori vivaci, etichette grandi</li>
+                <li>Colore testo: Bianco (per sfondo scuro)</li>
+                <li>Titolo: "Quando Palermo è Più Pericolosa?"</li>
+            </ul>
+            
+            <h3><i class="fas fa-shield-alt"></i> Dashboard Interna Polizia Municipale</h3>
+            <p><strong>Obiettivo:</strong> Monitoraggio operativo giornaliero</p>
+            <ul>
+                <li>Filtri: Ultime 24 ore (se disponibile) o giorno specifico</li>
+                <li>Tipo: Radar</li>
+                <li>Dimensione: Fascia Oraria (6 fasce)</li>
+                <li>Metrica: Raggruppa per Tipologia</li>
+                <li>Titolo: "Distribuzione Oraria Incidenti di Oggi"</li>
+            </ul>
+        </div>
+
+        <!-- Tips & Tricks -->
+        <div class="info-card">
+            <h2>Tips & Tricks per Grafici Efficaci</h2>
+            
+            <div class="category-list">
+                <ul>
+                    <li><strong><i class="fas fa-chart-bar"></i> Meno è Meglio:</strong> Limita i dati a Top 10-15 per grafici leggibili. Troppi elementi creano confusione.</li>
+                    <li><strong><i class="fas fa-palette"></i> Coerenza Cromatica:</strong> Se crei più grafici per lo stesso documento, usa la stessa palette colori.</li>
+                    <li><strong><i class="fas fa-heading"></i> Titoli Descrittivi:</strong> Un buon titolo risponde a "Cosa?" e "Quando?". Esempio: "Incidenti per Quartiere - Estate 2023"</li>
+                    <li><strong><i class="fas fa-sync-alt"></i> Sfrutta i Filtri:</strong> Invece di creare 12 grafici diversi manualmente, applica filtri diversi e rigenera lo stesso tipo di grafico.</li>
+                    <li><strong><i class="fas fa-arrows-alt-h"></i> Orientamento Intelligente:</strong> Usa barre orizzontali quando le etichette sono lunghe (es: nomi di vie o quartieri).</li>
+                    <li><strong><i class="fas fa-rainbow"></i> Evita Arcobaleni:</strong> Più di 5-6 colori diversi rendono il grafico caotico. Usa "Raggruppa per Tipologia" solo se necessario.</li>
+                    <li><strong><i class="fas fa-bolt"></i> Preset per Velocità:</strong> I 4 preset (Minimal/Default/Bold/Clean) coprono il 90% delle esigenze. Personalizza solo se strettamente necessario.</li>
+                    <li><strong><i class="fas fa-mobile-alt"></i> Mobile-First:</strong> Se il grafico sarà visto su smartphone, aumenta dimensioni testo e riduci elementi.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Limitazioni e Note Tecniche -->
+        <div class="info-card">
+            <h2>Limitazioni e Note Tecniche</h2>
+            
+            <div class="license-box">
+                <strong><i class="fas fa-exclamation-triangle"></i> Cosa Non Puoi Fare (Per Ora)</strong>
+                <ul style="margin: 12px 0;">
+                    <li><strong>Export multi-formato:</strong> Solo PNG disponibile (no SVG, PDF, Excel)</li>
+                    <li><strong>Grafici combinati:</strong> Non puoi sovrapporre più tipi (es: barre + linea)</li>
+                    <li><strong>Drill-down interattivo:</strong> Il grafico è statico, non cliccabile</li>
+                    <li><strong>Serie temporali continue:</strong> Non puoi visualizzare tutti i giorni dell'anno in sequenza</li>
+                    <li><strong>Mappe integrate:</strong> Non ci sono grafici geografici (usa la mappa principale per quello)</li>
+                </ul>
+            </div>
+            
+            <div class="info-note">
+                <strong><i class="fas fa-code"></i> Tecnologia Sottostante</strong>
+                <p>Il Chart Builder usa <strong>Chart.js 4.4.0</strong> con plugin DataLabels per le etichette. Tutti i calcoli avvengono client-side nel browser, nessun dato viene inviato a server esterni. I grafici sono renderizzati su Canvas HTML5.</p>
+            </div>
+        </div>
+
+        <!-- FAQ Rapide -->
+        <div class="info-card">
+            <h2>Domande Frequenti (FAQ)</h2>
+            
+            <h3><i class="fas fa-question-circle"></i> Il grafico non mostra nulla dopo "Genera Grafico"</h3>
+            <p><strong>Soluzione:</strong> Verifica di aver selezionato una <em>Dimensione Principale</em>. Se i filtri attivi escludono tutti i dati, il grafico sarà vuoto. Prova a rimuovere alcuni filtri.</p>
+            
+            <h3><i class="fas fa-question-circle"></i> I colori del grafico non corrispondono a quelli scelti</h3>
+            <p><strong>Causa:</strong> Hai probabilmente selezionato "Modalità Colore: Automatica". Cambia in "Colore Singolo" o "Gradiente" per usare i tuoi colori personalizzati.</p>
+            
+            <h3><i class="fas fa-question-circle"></i> Le etichette dei valori si sovrappongono</h3>
+            <p><strong>Soluzione:</strong> Riduci il numero di elementi con "Limita Risultati" (es: Top 10 invece di Tutti), oppure disabilita "Mostra Valori sul Grafico".</p>
+            
+            <h3><i class="fas fa-question-circle"></i> Il download PNG ha qualità bassa</h3>
+            <p><strong>Nota:</strong> L'immagine è 800×600px, ottimale per documenti digitali. Per stampe professionali, considera di aumentare la risoluzione usando strumenti esterni di upscaling.</p>
+            
+            <h3><i class="fas fa-question-circle"></i> Posso salvare le configurazioni del grafico?</h3>
+            <p><strong>Non ancora:</strong> Attualmente non c'è un sistema di salvataggio preset. Ogni volta devi riconfigurare. Suggerimento: segna le impostazioni su un file di testo se devi ricreare lo stesso grafico.</p>
+            
+            <h3><i class="fas fa-question-circle"></i> I filtri non vengono mostrati nel titolo</h3>
+            <p><strong>Verifica:</strong> I filtri devono essere <em>attivi nella dashboard</em> prima di aprire il Chart Builder. Se modifichi i filtri con il Chart Builder già aperto, chiudi e riapri il modal.</p>
+        </div>
+
+        <!-- Conclusione -->
+        <div class="highlight-box">
+            <p><strong class="doppia-sottolineatura">Il Chart Builder trasforma dati complessi in storie visive comprensibili.</strong><br><br>
+            Che tu sia un amministratore pubblico, un ricercatore, un giornalista o un cittadino curioso, questo strumento ti permette di esplorare 28.239 incidenti da infinite angolazioni, creando visualizzazioni professionali in pochi clic. Nessun software esterno, nessuna competenza di programmazione richiesta - solo dati, filtri e creatività.</p>
+        </div>
+
+    </div>
+
 
         <!-- Tab Crediti -->
         <div class="footer-tab-content" id="tab-crediti">
