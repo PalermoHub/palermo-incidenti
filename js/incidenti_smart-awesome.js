@@ -841,17 +841,24 @@ function downloadTopLuoghiCSV() {
     document.body.removeChild(link);
 }
 
-// Analytics Functions
+// Analytics Functions - VERSIONE CORRETTA CON TIMEOUT
 function openAnalytics() {
     const panel = document.getElementById('analytics-panel');
     if (panel) {
         panel.classList.add('open');
-        document.body.classList.add('analytics-panel-open'); // Aggiungi classe al body
-        document.body.classList.add('modal-open'); // Aggiungi classe generica
-        updateActiveFiltersDisplay();
-        updateAnalytics();
+        document.body.classList.add('analytics-panel-open');
+        document.body.classList.add('modal-open');
+        
+        // ✅ IMPORTANTE: Aspetta che il DOM sia renderizzato
+        setTimeout(() => {
+            console.log('🎯 openAnalytics - chiamata updateActiveFiltersDisplay');
+            console.log('📦 currentFilters:', currentFilters);
+            updateActiveFiltersDisplay();
+            updateAnalytics();
+        }, 200); // Aumentato da 100 a 200ms
     }
 }
+
 
 function closeAnalytics() {
     const panel = document.getElementById('analytics-panel');
@@ -863,32 +870,53 @@ function closeAnalytics() {
 }
 
 function updateActiveFiltersDisplay() {
+    console.log('\n🔍 === updateActiveFiltersDisplay chiamata ===');
+    
+    // Verifica immediata elemento
+    const activeFiltersText = document.getElementById('active-filters-text');
+    console.log('🎯 Elemento trovato subito:', activeFiltersText ? '✅ SÌ' : '❌ NO');
+    
+    if (!activeFiltersText) {
+        console.error('❌ ELEMENTO active-filters-text NON TROVATO!');
+        console.log('🔍 Cerco nel DOM...');
+        const allElements = document.querySelectorAll('*[id]');
+        console.log('📋 Tutti gli ID nel DOM:', Array.from(allElements).map(el => el.id));
+        return;
+    }
+    
     const filteredData = getFilteredData();
     const totalData = allIncidenti.length;
+    
+    console.log('📊 Dati:', filteredData.length, 'di', totalData);
+    console.log('🔧 currentFilters:', JSON.stringify(currentFilters, null, 2));
     
     let filterText = [];
     
     // Data specifica
     if (currentFilters['filter-data-selezionata']) {
         filterText.push(`Data: ${currentFilters['filter-data-selezionata']}`);
+        console.log('➕ Aggiunto filtro: Data');
     }
     
     // Anno
     if (currentFilters['filter-anno']) {
         filterText.push(`Anno: ${currentFilters['filter-anno']}`);
+        console.log('➕ Aggiunto filtro: Anno');
     }
     
     // Mese
     if (currentFilters['filter-mese']) {
         filterText.push(`Mese: ${currentFilters['filter-mese']}`);
+        console.log('➕ Aggiunto filtro: Mese');
     }
     
     // Giorno settimana
     if (currentFilters['filter-giorno-settimana']) {
         filterText.push(`Giorno: ${currentFilters['filter-giorno-settimana']}`);
+        console.log('➕ Aggiunto filtro: Giorno settimana');
     }
     
-    // *** NUOVO: Tipologia (dalle stat-grid) ***
+    // Tipologia
     if (currentFilters['filter-tipologia']) {
         const tipologiaNames = {
             'M': 'Mortale',
@@ -897,71 +925,89 @@ function updateActiveFiltersDisplay() {
             'C': 'Cose'
         };
         filterText.push(`Tipologia: ${tipologiaNames[currentFilters['filter-tipologia']]}`);
+        console.log('➕ Aggiunto filtro: Tipologia');
     }
     
     // Circoscrizione
     if (currentFilters['filter-circoscrizione']) {
         filterText.push(`Circoscrizione: ${currentFilters['filter-circoscrizione']}`);
+        console.log('➕ Aggiunto filtro: Circoscrizione');
     }
     
     // Quartiere
     if (currentFilters['filter-quartiere']) {
         filterText.push(`Quartiere: ${currentFilters['filter-quartiere']}`);
+        console.log('➕ Aggiunto filtro: Quartiere');
     }
     
     // UPL
     if (currentFilters['filter-upl']) {
         filterText.push(`UPL: ${currentFilters['filter-upl']}`);
+        console.log('➕ Aggiunto filtro: UPL');
     }
     
     // Giorno/Notte
     if (currentFilters['filter-giorno-notte']) {
         filterText.push(`${currentFilters['filter-giorno-notte']}`);
+        console.log('➕ Aggiunto filtro: Giorno/Notte');
     }
     
     // Stagione
     if (currentFilters['filter-stagione']) {
         filterText.push(`Stagione: ${currentFilters['filter-stagione']}`);
+        console.log('➕ Aggiunto filtro: Stagione');
     }
     
     // Feriale/Weekend
     if (currentFilters['filter-feriale-weekend']) {
         filterText.push(`${currentFilters['filter-feriale-weekend']}`);
+        console.log('➕ Aggiunto filtro: Feriale/Weekend');
     }
     
     // Condizioni luce
     if (currentFilters['filter-condizioni-luce']) {
         filterText.push(`Luce: ${currentFilters['filter-condizioni-luce']}`);
+        console.log('➕ Aggiunto filtro: Condizioni luce');
     }
     
     // Fascia oraria 4
     if (currentFilters['filter-fascia-4']) {
         filterText.push(`Fascia: ${currentFilters['filter-fascia-4']}`);
+        console.log('➕ Aggiunto filtro: Fascia 4');
     }
     
     // Fascia oraria 6
     if (currentFilters['filter-fascia-6']) {
         filterText.push(`Fascia: ${currentFilters['filter-fascia-6']}`);
+        console.log('➕ Aggiunto filtro: Fascia 6');
     }
     
     // Ora di punta
     if (currentFilters['filter-ora-punta']) {
         filterText.push(`${currentFilters['filter-ora-punta']}`);
+        console.log('➕ Aggiunto filtro: Ora di punta');
     }
+    
+    console.log('🏷️ Totale filtri trovati:', filterText.length);
+    console.log('📝 Filtri:', filterText);
     
     let displayHTML = '';
     
     if (filterText.length === 0) {
-        displayHTML = `Tutti gli incidenti (2015-2023)  • ${totalData.toLocaleString('it-IT')} incidenti totali`;
+        displayHTML = `Tutti gli incidenti (2015-2023) • ${totalData.toLocaleString('it-IT')} incidenti totali`;
+        console.log('ℹ️ Nessun filtro attivo, mostro messaggio default');
     } else {
-        displayHTML = `${filteredData.length.toLocaleString('it-IT')} di ${totalData.toLocaleString('it-IT')} incidenti  • `;
+        displayHTML = `${filteredData.length.toLocaleString('it-IT')} di ${totalData.toLocaleString('it-IT')} incidenti • `;
         displayHTML += filterText.map(f => `<span class="filter-badge">${f}</span>`).join('');
+        console.log('✅ HTML costruito con filtri');
     }
     
-    const activeFiltersText = document.getElementById('active-filters-text');
-    if (activeFiltersText) {
-        activeFiltersText.innerHTML = displayHTML;
-    }
+    console.log('📝 HTML finale:', displayHTML.substring(0, 100) + '...');
+    
+    activeFiltersText.innerHTML = displayHTML;
+    console.log('✅ HTML inserito nell\'elemento');
+    console.log('🎯 Contenuto finale elemento:', activeFiltersText.innerHTML.substring(0, 100) + '...');
+    console.log('=== Fine updateActiveFiltersDisplay ===\n');
 }
 
 function switchAnalyticsTab(tabName) {
@@ -988,7 +1034,9 @@ function switchAnalyticsTab(tabName) {
 function updateAnalytics() {
     const filteredData = getFilteredData();
     
-    updateActiveFiltersDisplay();  // ✅ SPOSTA/AGGIUNGI QUESTA RIGA ALL'INIZIO
+    // ✅ Chiama updateActiveFiltersDisplay() SEMPRE come prima cosa
+    updateActiveFiltersDisplay();
+    
     updateSerieStoricaChart();
     updatePanoramicaCharts(filteredData);
     updateTemporaleCharts(filteredData);
@@ -5749,12 +5797,24 @@ function filterByFasciaOraria(fascia) {
 
 
 // Update Insights
+// Update Insights - VERSIONE CORRETTA CHE POPOLA SOLO I VALORI
 function updateInsights(data) {
+    // ========================================
+    // STATISTICHE IN TEMPO REALE
+    // ========================================
     const totalIncidenti = data.length;
-    const totalFeriti = data.filter(r => r.Tipologia === 'F' || r.Tipologia === 'R' || r.Tipologia === 'M').length;
+    
+    // Feriti (F + R)
+    const totalFeriti = data.filter(r => r.Tipologia === 'F' || r.Tipologia === 'R').length;
     const percentualeFeriti = totalIncidenti > 0 ? ((totalFeriti / totalIncidenti) * 100).toFixed(1) : 0;
     const mediaFeriti = totalIncidenti > 0 ? (totalFeriti / totalIncidenti).toFixed(2) : 0;
     
+    // Deceduti (solo M)
+    const totalMorti = data.filter(r => r.Tipologia === 'M').length;
+    const percentualeMorti = totalIncidenti > 0 ? ((totalMorti / totalIncidenti) * 100).toFixed(1) : 0;
+    const mediaMorti = totalIncidenti > 0 ? (totalMorti / totalIncidenti).toFixed(2) : 0;
+    
+    // ✅ AGGIORNA DIRETTAMENTE GLI ELEMENTI CON GLI ID
     const realtimeTotal = document.getElementById('realtime-total');
     const realtimeFeriti = document.getElementById('realtime-feriti');
     const realtimePercentuale = document.getElementById('realtime-percentuale');
@@ -5765,12 +5825,24 @@ function updateInsights(data) {
     if (realtimePercentuale) realtimePercentuale.textContent = percentualeFeriti + '%';
     if (realtimeMedia) realtimeMedia.textContent = mediaFeriti;
     
+    // ✅ NUOVI ELEMENTI DECEDUTI
+    const realtimeMorti = document.getElementById('realtime-morti');
+    const realtimePercentualeMorti = document.getElementById('realtime-percentuale-morti');
+    const realtimeMediaMorti = document.getElementById('realtime-media-morti');
+    
+    if (realtimeMorti) realtimeMorti.textContent = totalMorti.toLocaleString('it-IT');
+    if (realtimePercentualeMorti) realtimePercentualeMorti.textContent = percentualeMorti + '%';
+    if (realtimeMediaMorti) realtimeMediaMorti.textContent = mediaMorti;
+    
+    // ========================================
+    // INSIGHTS AUTOMATICI
+    // ========================================
+    
+    // Giorno più pericoloso
     const giornoData = {};
     data.forEach(row => {
         const giorno = row['Giorno settimana'];
-        if (giorno) {
-            giornoData[giorno] = (giornoData[giorno] || 0) + 1;
-        }
+        if (giorno) giornoData[giorno] = (giornoData[giorno] || 0) + 1;
     });
     const giornoPericoloso = Object.entries(giornoData).sort((a, b) => b[1] - a[1])[0];
     const insightGiorno = document.getElementById('insight-giorno');
@@ -5778,12 +5850,11 @@ function updateInsights(data) {
         insightGiorno.textContent = giornoPericoloso ? `${giornoPericoloso[0]} (${giornoPericoloso[1]} incidenti)` : '-';
     }
     
+    // Fascia oraria più critica
     const fasciaData = {};
     data.forEach(row => {
         const fascia = row['Fascia oraria dettagliata (6 fasce)'];
-        if (fascia) {
-            fasciaData[fascia] = (fasciaData[fascia] || 0) + 1;
-        }
+        if (fascia) fasciaData[fascia] = (fasciaData[fascia] || 0) + 1;
     });
     const fasciaCritica = Object.entries(fasciaData).sort((a, b) => b[1] - a[1])[0];
     const insightFascia = document.getElementById('insight-fascia');
@@ -5791,12 +5862,11 @@ function updateInsights(data) {
         insightFascia.textContent = fasciaCritica ? `${fasciaCritica[0]} (${fasciaCritica[1]} incidenti)` : '-';
     }
     
+    // Stagione più rischiosa
     const stagioneData = {};
     data.forEach(row => {
         const stagione = row.Stagione;
-        if (stagione) {
-            stagioneData[stagione] = (stagioneData[stagione] || 0) + 1;
-        }
+        if (stagione) stagioneData[stagione] = (stagioneData[stagione] || 0) + 1;
     });
     const stagioneRischiosa = Object.entries(stagioneData).sort((a, b) => b[1] - a[1])[0];
     const insightStagione = document.getElementById('insight-stagione');
@@ -5804,17 +5874,88 @@ function updateInsights(data) {
         insightStagione.textContent = stagioneRischiosa ? `${stagioneRischiosa[0]} (${stagioneRischiosa[1]} incidenti)` : '-';
     }
     
+    // Condizione luce più pericolosa
     const condizioneData = {};
     data.forEach(row => {
         const cond = row['Condizioni luce (Visibilità)'];
-        if (cond) {
-            condizioneData[cond] = (condizioneData[cond] || 0) + 1;
-        }
+        if (cond) condizioneData[cond] = (condizioneData[cond] || 0) + 1;
     });
     const condizionePericolosa = Object.entries(condizioneData).sort((a, b) => b[1] - a[1])[0];
     const insightCondizione = document.getElementById('insight-condizione');
     if (insightCondizione) {
         insightCondizione.textContent = condizionePericolosa ? `${condizionePericolosa[0]} (${condizionePericolosa[1]} incidenti)` : '-';
+    }
+    
+    // ✅ NUOVI INSIGHTS
+    
+    // Mese con più incidenti
+    const meseData = {};
+    data.forEach(row => {
+        const mese = row.Mese;
+        if (mese) meseData[mese] = (meseData[mese] || 0) + 1;
+    });
+    const mesePericoloso = Object.entries(meseData).sort((a, b) => b[1] - a[1])[0];
+    const insightMese = document.getElementById('insight-mese');
+    if (insightMese) {
+        insightMese.textContent = mesePericoloso ? `${mesePericoloso[0]} (${mesePericoloso[1]} incidenti)` : '-';
+    }
+    
+    // Circoscrizione con più incidenti
+    const circoscrizioneData = {};
+    data.forEach(row => {
+        const circ = row.Circoscrizione;
+        if (circ && circ !== 'null') circoscrizioneData[circ] = (circoscrizioneData[circ] || 0) + 1;
+    });
+    const circoscrizionePericolosa = Object.entries(circoscrizioneData).sort((a, b) => b[1] - a[1])[0];
+    const insightCircoscrizione = document.getElementById('insight-circoscrizione');
+    if (insightCircoscrizione) {
+        insightCircoscrizione.textContent = circoscrizionePericolosa ? `${circoscrizionePericolosa[0]} (${circoscrizionePericolosa[1]} incidenti)` : '-';
+    }
+    
+    // Quartiere con più incidenti
+    const quartiereData = {};
+    data.forEach(row => {
+        const quart = row.Quartiere;
+        if (quart && quart !== 'null') quartiereData[quart] = (quartiereData[quart] || 0) + 1;
+    });
+    const quartierePericoloso = Object.entries(quartiereData).sort((a, b) => b[1] - a[1])[0];
+    const insightQuartiere = document.getElementById('insight-quartiere');
+    if (insightQuartiere) {
+        insightQuartiere.textContent = quartierePericoloso ? `${quartierePericoloso[0]} (${quartierePericoloso[1]} incidenti)` : '-';
+    }
+    
+    // UPL con più incidenti
+    const uplData = {};
+    data.forEach(row => {
+        const upl = row.UPL;
+        if (upl && upl !== 'null') uplData[upl] = (uplData[upl] || 0) + 1;
+    });
+    const uplPericolosa = Object.entries(uplData).sort((a, b) => b[1] - a[1])[0];
+    const insightUpl = document.getElementById('insight-upl');
+    if (insightUpl) {
+        insightUpl.textContent = uplPericolosa ? `${uplPericolosa[0]} (${uplPericolosa[1]} incidenti)` : '-';
+    }
+    
+    // Strada con più incidenti
+    const stradaData = {};
+    data.forEach(row => {
+        const strada = row.Indirizzo;
+        if (strada && strada !== 'null' && strada !== 'Non specificato') {
+            stradaData[strada] = (stradaData[strada] || 0) + 1;
+        }
+    });
+    const stradaPericolosa = Object.entries(stradaData).sort((a, b) => b[1] - a[1])[0];
+    const insightStrada = document.getElementById('insight-strada');
+    if (insightStrada) {
+        if (stradaPericolosa) {
+            const nomeStrada = stradaPericolosa[0];
+            const nomeBreve = nomeStrada.length > 40 ? nomeStrada.substring(0, 37) + '...' : nomeStrada;
+            insightStrada.textContent = `${nomeBreve} (${stradaPericolosa[1]} incidenti)`;
+            insightStrada.title = `${nomeStrada} - ${stradaPericolosa[1]} incidenti`;
+        } else {
+            insightStrada.textContent = '-';
+            insightStrada.title = '';
+        }
     }
 }
 

@@ -154,7 +154,7 @@ function continueOpenChartBuilder() {
     ModalManager.open('chart-builder');
     
     try {
-        updateActiveFiltersDisplay();
+        updateChartBuilderFiltersDisplay();
         updateFooterStats();
     } catch (e) {
         console.warn('Errore aggiornamento dati:', e);
@@ -263,7 +263,7 @@ function initChartBuilder() {
     // Listener per aggiornamento filtri
     window.addEventListener('filtersUpdated', () => {
         if (document.getElementById('chart-builder-modal').classList.contains('show')) {
-            updateActiveFiltersDisplay();
+            updateChartBuilderFiltersDisplay();
             updateFooterStats();
         }
     });
@@ -547,7 +547,10 @@ function applyStylePreset(preset) {
 // ============================================
 // FILTERS DISPLAY
 // ============================================
-function updateActiveFiltersDisplay() {
+// ============================================
+// FILTERS DISPLAY - RINOMINATA PER EVITARE CONFLITTI
+// ============================================
+function updateChartBuilderFiltersDisplay() {  // ✅ RINOMINATA
     const container = document.getElementById('custom-chart-filters');
     if (!container) return;
     

@@ -682,67 +682,135 @@
     </div>
 </div>
 
-            <!-- Insights Tab -->
-            <div class="analytics-tab-content" id="tab-insights">
-                <div class="insights-container">
-                    <div class="stats-realtime">
-                        <h3><i class="fas fa-chart-bar"></i> Statistiche in Tempo Reale</h3>
-                        <div class="stats-realtime-grid">
-                            <div class="stat-realtime-item">
-                                <div class="stat-realtime-label">Totale Incidenti</div>
-                                <div class="stat-realtime-value" id="realtime-total">0</div>
-                            </div>
-                            <div class="stat-realtime-item">
-                                <div class="stat-realtime-label">Totale Feriti</div>
-                                <div class="stat-realtime-value" id="realtime-feriti">0</div>
-                            </div>
-                            <div class="stat-realtime-item">
-                                <div class="stat-realtime-label">% con Feriti</div>
-                                <div class="stat-realtime-value" id="realtime-percentuale">0%</div>
-                            </div>
-                            <div class="stat-realtime-item">
-                                <div class="stat-realtime-label">Media Feriti</div>
-                                <div class="stat-realtime-value" id="realtime-media">0</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="insights-auto">
-                        <h3><i class="fas fa-lightbulb"></i> Insights Automatici</h3>
-                        <div class="insight-item">
-                            <div class="insight-icon"><i class="fas fa-calendar-day"></i></div>
-                            <div class="insight-content">
-                                <div class="insight-label">Giorno più pericoloso</div>
-                                <div class="insight-value" id="insight-giorno">-</div>
-                            </div>
-                        </div>
-                        <div class="insight-item">
-                            <div class="insight-icon"><i class="fas fa-clock"></i></div>
-                            <div class="insight-content">
-                                <div class="insight-label">Fascia oraria critica</div>
-                                <div class="insight-value" id="insight-fascia">-</div>
-                            </div>
-                        </div>
-                        <div class="insight-item">
-                            <div class="insight-icon"><i class="fas fa-leaf"></i></div>
-                            <div class="insight-content">
-                                <div class="insight-label">Stagione più rischiosa</div>
-                                <div class="insight-value" id="insight-stagione">-</div>
-                            </div>
-                        </div>
-                        <div class="insight-item">
-                            <div class="insight-icon"><i class="fas fa-moon"></i></div>
-                            <div class="insight-content">
-                                <div class="insight-label">Condizione più pericolosa</div>
-                                <div class="insight-value" id="insight-condizione">-</div>
-                            </div>
-                        </div>
-                    </div>
+<!-- Insights Tab - VERSIONE CON GRAFICA ORIGINALE -->
+<div class="analytics-tab-content" id="tab-insights">
+    <div class="insights-container">
+        
+        <!-- Statistiche in Tempo Reale -->
+        <div class="stats-realtime">
+            <h3><i class="fas fa-chart-bar"></i> Statistiche in Tempo Reale</h3>
+            <div class="stats-realtime-grid">
+                <!-- ESISTENTI -->
+                <div class="stat-realtime-item">
+                    <div class="stat-realtime-label">Totale Incidenti</div>
+                    <div class="stat-realtime-value" id="realtime-total">0</div>
+                </div>
+                
+                <div class="stat-realtime-item">
+                    <div class="stat-realtime-label">Totale Feriti</div>
+                    <div class="stat-realtime-value" id="realtime-feriti">0</div>
+                </div>
+                
+                <div class="stat-realtime-item">
+                    <div class="stat-realtime-label">% con Feriti</div>
+                    <div class="stat-realtime-value" id="realtime-percentuale">0%</div>
+                </div>
+                
+                <div class="stat-realtime-item">
+                    <div class="stat-realtime-label">Media Feriti</div>
+                    <div class="stat-realtime-value" id="realtime-media">0</div>
+                </div>
+                
+                <!-- ✅ NUOVI: DECEDUTI -->
+                <div class="stat-realtime-item">
+                    <div class="stat-realtime-label">Totale Deceduti</div>
+                    <div class="stat-realtime-value" id="realtime-morti">0</div>
+                </div>
+                
+                <div class="stat-realtime-item">
+                    <div class="stat-realtime-label">% con Deceduti</div>
+                    <div class="stat-realtime-value" id="realtime-percentuale-morti">0%</div>
+                </div>
+                
+                <div class="stat-realtime-item">
+                    <div class="stat-realtime-label">Media Deceduti</div>
+                    <div class="stat-realtime-value" id="realtime-media-morti">0</div>
                 </div>
             </div>
         </div>
+
+        <!-- Insights Automatici -->
+        <div class="insights-auto">
+            <h3><i class="fas fa-lightbulb"></i> Insights Automatici</h3>
+            
+            <!-- ESISTENTI -->
+            <div class="insight-item">
+                <div class="insight-icon"><i class="fas fa-calendar-day"></i></div>
+                <div class="insight-content">
+                    <div class="insight-label">Giorno più pericoloso</div>
+                    <div class="insight-value" id="insight-giorno">-</div>
+                </div>
+            </div>
+            
+            <div class="insight-item">
+                <div class="insight-icon"><i class="fas fa-clock"></i></div>
+                <div class="insight-content">
+                    <div class="insight-label">Fascia oraria critica</div>
+                    <div class="insight-value" id="insight-fascia">-</div>
+                </div>
+            </div>
+            
+            <div class="insight-item">
+                <div class="insight-icon"><i class="fas fa-leaf"></i></div>
+                <div class="insight-content">
+                    <div class="insight-label">Stagione più rischiosa</div>
+                    <div class="insight-value" id="insight-stagione">-</div>
+                </div>
+            </div>
+            
+            <div class="insight-item">
+                <div class="insight-icon"><i class="fas fa-moon"></i></div>
+                <div class="insight-content">
+                    <div class="insight-label">Condizione più pericolosa</div>
+                    <div class="insight-value" id="insight-condizione">-</div>
+                </div>
+            </div>
+            
+            <!-- ✅ NUOVI INSIGHTS -->
+            <div class="insight-item">
+                <div class="insight-icon"><i class="fas fa-calendar-alt"></i></div>
+                <div class="insight-content">
+                    <div class="insight-label">Mese con più incidenti</div>
+                    <div class="insight-value" id="insight-mese">-</div>
+                </div>
+            </div>
+            
+            <div class="insight-item">
+                <div class="insight-icon"><i class="fas fa-map-marked-alt"></i></div>
+                <div class="insight-content">
+                    <div class="insight-label">Circoscrizione più colpita</div>
+                    <div class="insight-value" id="insight-circoscrizione">-</div>
+                </div>
+            </div>
+            
+            <div class="insight-item">
+                <div class="insight-icon"><i class="fas fa-city"></i></div>
+                <div class="insight-content">
+                    <div class="insight-label">Quartiere più colpito</div>
+                    <div class="insight-value" id="insight-quartiere">-</div>
+                </div>
+            </div>
+            
+            <div class="insight-item">
+                <div class="insight-icon"><i class="fas fa-map-pin"></i></div>
+                <div class="insight-content">
+                    <div class="insight-label">UPL con più incidenti</div>
+                    <div class="insight-value" id="insight-upl">-</div>
+                </div>
+            </div>
+            
+            <div class="insight-item">
+                <div class="insight-icon"><i class="fas fa-road"></i></div>
+                <div class="insight-content">
+                    <div class="insight-label">Strada più pericolosa</div>
+                    <div class="insight-value" id="insight-strada">-</div>
+                </div>
+            </div>
+        </div>
+        
     </div>
-	
+</div>
+
 	
 <!-- Top Luoghi Modal -->
 <div class="modal" id="top-luoghi-modal">
