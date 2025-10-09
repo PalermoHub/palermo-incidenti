@@ -237,10 +237,10 @@
 /* Info Cards */
 .info-card {
     background: #ffffff;
-    padding: 24px;
-    margin-bottom: 24px;
-    border-radius: 12px;
-   /* border: 2px solid #e5e7eb;
+    padding: 2px;
+    margin-bottom: 2px;
+    /*  border-radius: 12px;
+  border: 2px solid #e5e7eb;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);*/
 }
 
