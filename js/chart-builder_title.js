@@ -1,6 +1,6 @@
 // ============================================
 // CHART BUILDER - JAVASCRIPT COMPLETO
-// Versione: 2.2 - Con Titolo Personalizzato
+// Versione: 2.1 - Con Totale e Colore Testo
 // ============================================
 
 let customChart = null;
@@ -11,7 +11,7 @@ let customChartConfig = {
     tipologieSelezionate: [],
     limit: 10,
     orientation: 'vertical',
-    customTitle: '',  // ✅ NUOVO: Titolo personalizzato
+	customTitle: '',
     colors: {
         mode: 'auto',
         primary: '#3b82f6',
@@ -192,14 +192,14 @@ function initChartBuilder() {
         });
     }
     
-    // ✅ NUOVO: Custom Title Input
-    const customTitleInput = document.getElementById('custom-title-input');
-    if (customTitleInput) {
-        customTitleInput.addEventListener('input', (e) => {
-            customChartConfig.customTitle = e.target.value.trim();
-        });
-    }
-    
+	// Custom Title Input
+const customTitleInput = document.getElementById('custom-title-input');
+if (customTitleInput) {
+    customTitleInput.addEventListener('input', (e) => {
+        customChartConfig.customTitle = e.target.value.trim();
+    });
+}
+	
     // Metric Select
     const metricSelect = document.getElementById('metric-select');
     if (metricSelect) {
@@ -331,10 +331,12 @@ function initColorPickers() {
         });
     }
     
+    // Color Picker per testo con aggiornamento automatico
     const textColor = document.getElementById('text-color');
     if (textColor) {
         textColor.addEventListener('input', (e) => {
             customChartConfig.colors.text = e.target.value;
+            // Aggiorna automaticamente se il grafico esiste
             if (customChart) {
                 updateChartColors();
             }
@@ -349,31 +351,6 @@ function updateColorControls() {
     
     if (singleGroup) singleGroup.style.display = mode === 'single' ? 'block' : 'none';
     if (gradientGroup) gradientGroup.style.display = mode === 'gradient' ? 'block' : 'none';
-}
-
-function updateChartColors() {
-    if (!customChart) return;
-    
-    const textColor = customChartConfig.colors.text;
-    
-    // Aggiorna colori testo nel grafico esistente
-    if (customChart.options.plugins.title) {
-        customChart.options.plugins.title.color = textColor;
-    }
-    if (customChart.options.plugins.legend) {
-        customChart.options.plugins.legend.labels.color = textColor;
-    }
-    if (customChart.options.plugins.datalabels) {
-        customChart.options.plugins.datalabels.color = textColor;
-    }
-    if (customChart.options.scales) {
-        Object.values(customChart.options.scales).forEach(scale => {
-            if (scale.ticks) scale.ticks.color = textColor;
-            if (scale.pointLabels) scale.pointLabels.color = textColor;
-        });
-    }
-    
-    customChart.update();
 }
 
 // ============================================
@@ -579,7 +556,10 @@ function applyStylePreset(preset) {
 // ============================================
 // FILTERS DISPLAY
 // ============================================
-function updateChartBuilderFiltersDisplay() {
+// ============================================
+// FILTERS DISPLAY - RINOMINATA PER EVITARE CONFLITTI
+// ============================================
+function updateChartBuilderFiltersDisplay() {  // ✅ RINOMINATA
     const container = document.getElementById('custom-chart-filters');
     if (!container) return;
     
@@ -590,6 +570,7 @@ function updateChartBuilderFiltersDisplay() {
             if (value && value !== '') {
                 let label = key.replace('filter-', '').replace(/-/g, ' ');
                 
+                // Nomi più friendly
                 const friendlyNames = {
                     'data selezionata': 'Data',
                     'anno': 'Anno',
@@ -685,9 +666,11 @@ function prepareChartData(data) {
                 if (!aggregatedData[value]) {
                     aggregatedData[value] = { M: 0, R: 0, F: 0, C: 0, TOTAL: 0 };
                 }
+                // Incrementa la tipologia specifica
                 if (tipo && ['M', 'R', 'F', 'C'].includes(tipo)) {
                     aggregatedData[value][tipo]++;
                 }
+                // Incrementa sempre il totale
                 aggregatedData[value].TOTAL++;
             }
         });
@@ -791,6 +774,7 @@ function prepareChartDatasets(data) {
             bgColors = generateGradientColors(data.length, colors.primary, colors.secondary, style.opacity);
             borderColors = bgColors.map(c => c.replace(/[\d.]+\)$/g, '1)'));
         } else {
+            // Usa colori di default come analytics
             if (['pie', 'doughnut', 'polarArea'].includes(type)) {
                 const baseColors = generateColors(data.length);
                 bgColors = baseColors.map(c => hexToRgba(c, style.opacity));
@@ -816,6 +800,7 @@ function prepareChartDatasets(data) {
             pointBorderWidth: 1
         }];
     } else {
+        // Metric tipologia
         const tipologieMap = {
             'M': { label: 'Mortali', color: '#ef4444' },
             'R': { label: 'Riserva', color: '#a855f7' },
@@ -844,9 +829,6 @@ function prepareChartDatasets(data) {
     }
 }
 
-// ============================================
-// CHART OPTIONS CON TITOLO PERSONALIZZATO
-// ============================================
 
 function getChartOptions() {
     const type = customChartConfig.type;
@@ -855,105 +837,22 @@ function getChartOptions() {
     const dimension = customChartConfig.dimension;
     const textColor = customChartConfig.colors.text;
     
-    // ✅ Costruisci titolo: usa customTitle se presente, altrimenti dimension
-    let chartTitle = customChartConfig.customTitle || dimension;
+    // ✅ Costruisci titolo con titolo personalizzato o dimension
+    let titleText = customChartConfig.customTitle || dimension;
     
-    // ✅ LEGGI TUTTI I FILTRI ATTIVI
-    const filters = [];
-    
-    // Mappa dei nomi friendly per i filtri
-    const filterLabels = {
-        'filter-anno': 'Anno',
-        'filter-mese': 'Mese',
-        'filter-stagione': 'Stagione',
-        'filter-giorno-settimana': 'Giorno',
-        'filter-feriale-weekend': 'Tipo Giorno',
-        'filter-giorno-notte': 'Periodo',
-        'filter-condizioni-luce': 'Luce',
-        'filter-fascia-4': 'Fascia Oraria',
-        'filter-fascia-6': 'Fascia Oraria',
-        'filter-ora-punta': 'Ora di Punta',
-        'filter-circoscrizione': 'Circoscrizione',
-        'filter-quartiere': 'Quartiere',
-        'filter-upl': 'UPL',
-        'filter-tipologia': 'Tipo'
-    };
-    
-    // Mappa per tipologie
-    const tipoNames = { 
-        M: 'Mortali', 
-        R: 'Riserva', 
-        F: 'Feriti', 
-        C: 'Cose' 
-    };
-    
-    // Metodo 1: Prova con currentFilters (se esiste)
-    if (typeof currentFilters !== 'undefined' && currentFilters) {
-        Object.entries(currentFilters).forEach(([key, value]) => {
-            if (value && value !== '') {
-                // Per tipologia usa il nome friendly
-                if (key === 'filter-tipologia' && tipoNames[value]) {
-                    filters.push(tipoNames[value]);
-                } else if (filterLabels[key]) {
-                    // Evita di ripetere la dimensione nel titolo
-                    const isDimensionValue = value === dimension;
-                    if (!isDimensionValue) {
-                        filters.push(value);
-                    }
-                }
-            }
-        });
-    } else {
-        // Metodo 2: Fallback - leggi direttamente dal DOM
-        const filterIds = [
-            'filter-anno',
-            'filter-mese', 
-            'filter-stagione',
-            'filter-giorno-settimana',
-            'filter-feriale-weekend',
-            'filter-giorno-notte',
-            'filter-condizioni-luce',
-            'filter-fascia-4',
-            'filter-fascia-6',
-            'filter-ora-punta',
-            'filter-circoscrizione',
-            'filter-quartiere',
-            'filter-upl',
-            'filter-tipologia'
-        ];
-        
-        filterIds.forEach(id => {
-            const select = document.getElementById(id);
-            if (select && select.value && select.value !== '') {
-                const value = select.value;
-                
-                // Per tipologia usa il nome friendly
-                if (id === 'filter-tipologia' && tipoNames[value]) {
-                    filters.push(tipoNames[value]);
-                } else {
-                    // Evita di ripetere la dimensione nel titolo
-                    const isDimensionValue = value === dimension;
-                    if (!isDimensionValue) {
-                        // Per le select, usa il testo visualizzato
-                        const selectedOption = select.options[select.selectedIndex];
-                        const displayText = selectedOption ? selectedOption.text : value;
-                        filters.push(displayText);
-                    }
-                }
-            }
-        });
+    if (typeof currentFilters !== 'undefined') {
+        const filters = [];
+        if (currentFilters['filter-anno']) filters.push(currentFilters['filter-anno']);
+        if (currentFilters['filter-mese']) filters.push(currentFilters['filter-mese']);
+        if (currentFilters['filter-giorno-settimana']) filters.push(currentFilters['filter-giorno-settimana']);
+        if (currentFilters['filter-tipologia']) {
+            const tipoNames = { M: 'Mortali', R: 'Riserva', F: 'Feriti', C: 'Cose' };
+            filters.push(tipoNames[currentFilters['filter-tipologia']]);
+        }
+        if (filters.length > 0) {
+            titleText += ' - ' + filters.join(' • ');
+        }
     }
-    
-    // Rimuovi duplicati
-    const uniqueFilters = [...new Set(filters)];
-    
-    // Aggiungi filtri al titolo
-    if (uniqueFilters.length > 0) {
-        chartTitle += ' - ' + uniqueFilters.join(' • ');
-    }
-    
-    console.log('📊 Titolo grafico:', chartTitle);
-    console.log('🔍 Filtri trovati:', uniqueFilters);
     
     const baseOptions = {
         responsive: true,
@@ -972,7 +871,7 @@ function getChartOptions() {
             },
             title: {
                 display: true,
-                text: chartTitle,
+                text: titleText,
                 color: textColor,
                 font: { size: style.titleSize, weight: 'bold', family: 'Titillium Web' },
                 padding: 20
@@ -1126,6 +1025,7 @@ function getChartOptions() {
 }
 
 
+
 // ============================================
 // COLOR UTILITIES
 // ============================================
@@ -1178,7 +1078,7 @@ function resetChartBuilder() {
         tipologieSelezionate: [],
         limit: 10,
         orientation: 'vertical',
-        customTitle: '',  // ✅ Reset anche customTitle
+		customTitle: '',
         colors: {
             mode: 'auto',
             primary: '#3b82f6',
@@ -1218,15 +1118,12 @@ function resetChartBuilder() {
         if (el) el.selectedIndex = 0;
     });
     
-    // ✅ Reset campo titolo personalizzato
-    const customTitleInput = document.getElementById('custom-title-input');
-    if (customTitleInput) customTitleInput.value = '';
-    
     document.querySelectorAll('.tipologia-checkbox input[type="checkbox"]').forEach(cb => {
         cb.checked = false;
         cb.closest('.tipologia-checkbox').classList.remove('checked');
     });
     
+    // Reset color pickers
     const primaryColor = document.getElementById('primary-color');
     if (primaryColor) primaryColor.value = '#3b82f6';
     
@@ -1252,9 +1149,6 @@ function resetChartBuilder() {
     if (placeholder) placeholder.style.display = 'flex';
 }
 
-// ============================================
-// DOWNLOAD CON TITOLO PERSONALIZZATO
-// ============================================
 async function downloadCustomChart() {
     if (!customChart) {
         alert('⚠️ Genera prima un grafico da scaricare');
@@ -1272,90 +1166,39 @@ async function downloadCustomChart() {
     const footerHeight = 70;
     const chartAreaHeight = targetHeight - headerHeight - footerHeight;
     
+    // Canvas finale
     const finalCanvas = document.createElement('canvas');
     const ctx = finalCanvas.getContext('2d');
     
     finalCanvas.width = targetWidth;
     finalCanvas.height = targetHeight;
     
+    // Sfondo bianco
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, targetWidth, targetHeight);
     
-// HEADER
-const textColor = customChartConfig.colors.text;
-ctx.fillStyle = textColor;
-ctx.font = 'bold 22px Titillium Web, Arial, sans-serif';
-ctx.textAlign = 'left';
-
-// ✅ Costruzione titolo completo
-const baseTitle = customChartConfig.customTitle || customChartConfig.dimension || 'Grafico Analytics';
-let downloadTitle = baseTitle;
-
-const filters = [];
-
-// Mappa per tipologie
-const tipoNames = { 
-    M: 'Mortali', 
-    R: 'Riserva', 
-    F: 'Feriti', 
-    C: 'Cose' 
-};
-
-// Prova con currentFilters
-if (typeof currentFilters !== 'undefined' && currentFilters) {
-    Object.entries(currentFilters).forEach(([key, value]) => {
-        if (value && value !== '') {
-            if (key === 'filter-tipologia' && tipoNames[value]) {
-                filters.push(tipoNames[value]);
-            } else {
-                const isDimensionValue = value === customChartConfig.dimension;
-                if (!isDimensionValue) {
-                    filters.push(value);
-                }
-            }
-        }
-    });
-} else {
-    // Fallback: leggi dal DOM
-    const filterIds = [
-        'filter-anno', 'filter-mese', 'filter-stagione',
-        'filter-giorno-settimana', 'filter-feriale-weekend',
-        'filter-giorno-notte', 'filter-condizioni-luce',
-        'filter-fascia-4', 'filter-fascia-6', 'filter-ora-punta',
-        'filter-circoscrizione', 'filter-quartiere', 'filter-upl',
-        'filter-tipologia'
-    ];
+    // HEADER - USA IL COLORE DEL TESTO PERSONALIZZATO
+    const textColor = customChartConfig.colors.text;
+    ctx.fillStyle = textColor;
+    ctx.font = 'bold 22px Titillium Web, Arial, sans-serif';
+    ctx.textAlign = 'left';
     
-    filterIds.forEach(id => {
-        const select = document.getElementById(id);
-        if (select && select.value && select.value !== '') {
-            const value = select.value;
-            
-            if (id === 'filter-tipologia' && tipoNames[value]) {
-                filters.push(tipoNames[value]);
-            } else {
-                const isDimensionValue = value === customChartConfig.dimension;
-                if (!isDimensionValue) {
-                    const selectedOption = select.options[select.selectedIndex];
-                    const displayText = selectedOption ? selectedOption.text : value;
-                    filters.push(displayText);
-                }
-            }
+    // ✅ COSTRUZIONE TITOLO - UNA SOLA VOLTA
+    const baseTitle = customChartConfig.customTitle || customChartConfig.dimension || 'Grafico Analytics';
+    let finalTitle = baseTitle;
+    
+    if (typeof currentFilters !== 'undefined') {
+        const filters = [];
+        if (currentFilters['filter-anno']) filters.push(currentFilters['filter-anno']);
+        if (currentFilters['filter-mese']) filters.push(currentFilters['filter-mese']);
+        if (currentFilters['filter-giorno-settimana']) filters.push(currentFilters['filter-giorno-settimana']);
+        if (filters.length > 0) {
+            finalTitle += ' - ' + filters.join(' • ');
         }
-    });
-}
-
-// Rimuovi duplicati
-const uniqueFilters = [...new Set(filters)];
-
-if (uniqueFilters.length > 0) {
-    downloadTitle += ' - ' + uniqueFilters.join(' • ');
-}
-
-console.log('📥 Titolo download:', downloadTitle);
-
-ctx.fillText(downloadTitle, 40, 35); 
- 
+    }
+    
+    ctx.fillText(finalTitle, 40, 35);
+    
     // Filtri
     ctx.font = '13px Titillium Web, Arial, sans-serif';
     const activeFilters = document.getElementById('custom-chart-filters');
@@ -1395,7 +1238,7 @@ ctx.fillText(downloadTitle, 40, 35);
     
     ctx.drawImage(chartCanvas, 40, headerHeight);
     
-    // FOOTER
+    // FOOTER - USA IL COLORE DEL TESTO PERSONALIZZATO
     ctx.strokeStyle = '#d1d5db';
     ctx.beginPath();
     ctx.moveTo(40, targetHeight - footerHeight + 10);
