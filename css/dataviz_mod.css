@@ -289,20 +289,24 @@
 
 .stats-realtime,
 .insights-auto {
-    background: rgba(30, 41, 59, 0.6);
+     background: #f9fafb;
     backdrop-filter: blur(10px);
     border-radius: 16px;
     padding: 24px;
-    border: 1px solid rgba(148, 163, 184, 0.2);
+    border: 1px solid #e5e7eb;
 }
 
 .stats-realtime h3,
 .insights-auto h3 {
-    color: #f1f5f9;
+    color: #1f2937;
     font-size: 18px;
     font-weight: 700;
     margin-bottom: 20px;
 }
+
+.stats-realtime h3 i,
+.insights-auto h3 i { color: #ff9900; }
+
 
 .stats-realtime-grid {
     display: grid;
@@ -311,16 +315,16 @@
 }
 
 .stat-realtime-item {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
     padding: 20px;
     border-radius: 4px;
     text-align: center;
-    border: 1px solid rgba(148, 163, 184, 0.2);
+    border: 2px solid #ff9900;
 }
 
 .stat-realtime-label {
     font-size: 12px;
-    color: #94a3b8;
+    color: #1f2937;
     text-transform: uppercase;
     font-weight: 700;
     letter-spacing: 1px;
@@ -330,7 +334,7 @@
 .stat-realtime-value {
     font-size: 32px;
     font-weight: 800;
-    color: #f1f5f9;
+    color: #1f2937;
     text-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
@@ -339,16 +343,16 @@
     align-items: center;
     gap: 16px;
     padding: 16px;
-    background: rgba(15, 23, 42, 0.5);
+   background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
     border-radius: 4px;
     margin-bottom: 16px;
-    border: 1px solid rgba(148, 163, 184, 0.1);
+   border: 1px solid #ff9900;
 }
 
 .insight-icon {
     width: 50px;
     height: 50px;
-    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, #ff9900 0%, #ff6600 100%);
     border-radius: 4px;
     display: flex;
     align-items: center;
@@ -357,13 +361,15 @@
     flex-shrink: 0;
 }
 
+.insight-icon i {color: #ffffff; }
+
 .insight-content {
     flex: 1;
 }
 
 .insight-label {
     font-size: 12px;
-    color: #94a3b8;
+    color: #1f2937;
     text-transform: uppercase;
     font-weight: 700;
     letter-spacing: 0.5px;
@@ -372,7 +378,7 @@
 
 .insight-value {
     font-size: 18px;
-    color: #f1f5f9;
+    color:#1f2937;
     font-weight: 700;
 }
 

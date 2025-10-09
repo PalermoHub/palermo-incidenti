@@ -1033,89 +1033,64 @@ background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
     display: flex;
 }
 
-/* ============================================
-   FIX: Nascondere modali inizialmente
-   ============================================ */
-
-/* Footer Modal - nascosto per default */
-.footer-modal {
-    display: none;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    position: fixed;
-    top: 0;
-    left: 0;
+.modal-content {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 600px;
     width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: 10000 !important;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    position: relative;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h3 {
+    color: #1f2937;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.modal-close {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid #ef4444;
+    color: #ef4444;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
+    font-size: 20px;
+    transition: all 0.3s ease;
 }
 
-/* Footer Modal - visibile quando aperto */
-.footer-modal.open {
-    display: flex !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
+.modal-close:hover {
+    background: rgba(239, 68, 68, 0.3);
+    transform: rotate(90deg);
 }
 
-/* Chart Builder Modal - nascosto per default */
-.chart-builder-modal {
-    display: none;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: 10000;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
+.modal-body {
+    color: #1f2937;
+    font-size: 14px;
+    line-height: 1.8;
+    background-image: url('../img/strade.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
 
-/* Chart Builder Modal - visibile quando aperto */
-.chart-builder-modal.open,
-.chart-builder-modal.show {
-    display: flex !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-}
-
-/* Overlay modali - nascosto per default */
-.footer-modal-overlay,
-.chart-builder-overlay {
-    display: none;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 9999 !important;
-    transition: opacity 0.3s ease;
-}
-
-/* Overlay - visibile quando attivo */
-.footer-modal-overlay.active,
-.chart-builder-overlay.active {
-    display: block !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
+.modal-body p {
+    margin-bottom: 16px;
 }
 
 /* Data Table */
@@ -2591,4 +2566,111 @@ body.analytics-panel-open .chart-builder-trigger {
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
+}
+
+
+/* ============================================
+   FIX: Nascondere modali inizialmente - SOLO MOBILE
+   ============================================ */
+
+/* Desktop - comportamento normale (nessuna modifica) */
+@media (min-width: 769px) {
+    .footer-modal,
+    .chart-builder-modal {
+        /* Sul desktop mantiene il comportamento originale */
+        position: fixed;
+        z-index: 10000;
+    }
+}
+
+/* Mobile - fix visibilità */
+@media (max-width: 768px) {
+    /* Footer Modal - nascosto per default */
+    .footer-modal {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 10000 !important;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    /* Footer Modal - visibile quando aperto */
+    .footer-modal.open {
+        display: flex !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+    }
+
+    /* Chart Builder Modal - nascosto per default */
+    .chart-builder-modal {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 10000;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    /* Chart Builder Modal - visibile quando aperto */
+    .chart-builder-modal.open,
+    .chart-builder-modal.show {
+        display: flex !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+    }
+
+    /* Overlay modali - nascosto per default */
+    .footer-modal-overlay,
+    .chart-builder-overlay {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+
+    /* Overlay - visibile quando attivo */
+    .footer-modal-overlay.active,
+    .chart-builder-overlay.active {
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+    }
+}
+
+/* ============================================
+   Z-index footer modal - TUTTE LE RISOLUZIONI
+   ============================================ */
+
+.footer-modal {
+    z-index: 10000 !important;
+}
+
+.footer-modal-overlay {
+    z-index: 9999 !important;
+}
+
+.chart-builder-modal {
+    z-index: 10000 !important;
 }
