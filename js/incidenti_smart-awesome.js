@@ -181,6 +181,7 @@ const filterDependencies = {
 // ==========================================
 
 // Initialization
+
 async function init() {
     try {
         console.log('Inizio caricamento CSV...');
@@ -199,6 +200,11 @@ async function init() {
         
         calculateTopLuoghi();
         
+        // ✅ AGGIUNGI QUESTA RIGA - Carica filtri dall'URL
+        setTimeout(() => {
+            loadFiltersFromUrl();
+        }, 1000);
+        
     } catch (error) {
         console.error('Errore inizializzazione:', error);
         document.getElementById('loading').innerHTML = '<div>Errore caricamento</div><small>' + error.message + '</small>';
@@ -207,6 +213,139 @@ async function init() {
         }, 2000);
     }
 }
+
+// ==========================================
+// GESTIONE URL BROWSER - SYNC CON FILTRI
+// ==========================================
+
+// Aggiorna URL del browser con i filtri correnti
+function updateBrowserUrl() {
+    const params = new URLSearchParams();
+    let hasFilters = false;
+    
+    // Aggiungi tutti i filtri attivi
+    Object.entries(currentFilters).forEach(([key, value]) => {
+        if (value && value !== '' && value !== null) {
+            const paramName = key.replace('filter-', '');
+            params.set(paramName, value);
+            hasFilters = true;
+        }
+    });
+    
+    // Aggiungi posizione mappa (già gestita da map.hash, ma possiamo sincronizzarla)
+    if (map) {
+        try {
+            const center = map.getCenter();
+            const zoom = map.getZoom();
+            params.set('lat', center.lat.toFixed(6));
+            params.set('lng', center.lng.toFixed(6));
+            params.set('zoom', zoom.toFixed(2));
+        } catch (e) {
+            console.warn('Errore nel recupero posizione mappa:', e);
+        }
+    }
+    
+    // Aggiorna URL senza ricaricare la pagina
+    const newUrl = params.toString() 
+        ? `${window.location.pathname}?${params.toString()}` 
+        : window.location.pathname;
+    
+    // Usa replaceState per non aggiungere alla cronologia ad ogni filtro
+    window.history.replaceState({ filters: currentFilters }, '', newUrl);
+    
+    console.log('✅ URL browser aggiornato:', newUrl);
+}
+
+// Carica filtri dall'URL al caricamento della pagina
+function loadFiltersFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    
+    console.log('🔍 Caricamento filtri da URL...');
+    
+    let filtersLoaded = false;
+    
+    // Mappa dei parametri URL ai nomi dei filtri
+    const urlParamMap = {
+        'anno': 'filter-anno',
+        'mese': 'filter-mese',
+        'tipologia': 'filter-tipologia',
+        'circoscrizione': 'filter-circoscrizione',
+        'quartiere': 'filter-quartiere',
+        'upl': 'filter-upl',
+        'stagione': 'filter-stagione',
+        'giorno-settimana': 'filter-giorno-settimana',
+        'feriale-weekend': 'filter-feriale-weekend',
+        'giorno-notte': 'filter-giorno-notte',
+        'condizioni-luce': 'filter-condizioni-luce',
+        'fascia-4': 'filter-fascia-4',
+        'fascia-6': 'filter-fascia-6',
+        'ora-punta': 'filter-ora-punta',
+        'data-selezionata': 'filter-data-selezionata'
+    };
+    
+    // Applica ogni parametro trovato
+    params.forEach((value, key) => {
+        // Salta parametri di mappa (gestiti da maplibre)
+        if (key === 'lat' || key === 'lng' || key === 'zoom' || key === 'shared') {
+            return;
+        }
+        
+        const filterKey = urlParamMap[key];
+        if (filterKey) {
+            currentFilters[filterKey] = value;
+            
+            // Aggiorna anche la select corrispondente
+            const selectElement = document.getElementById(filterKey);
+            if (selectElement) {
+                selectElement.value = value;
+            }
+            
+            filtersLoaded = true;
+            console.log(`  ✓ Filtro caricato: ${key} = ${value}`);
+        }
+    });
+    
+    if (filtersLoaded) {
+        console.log('✅ Filtri caricati da URL:', currentFilters);
+        
+        // Aggiorna tutto dopo aver caricato i filtri
+        setTimeout(() => {
+            updateAllFilters();
+            updateMapData();
+            updateStats();
+            updateYearStats();
+            updateLegendChart();
+            updatePeriodSwitches();
+            updateMonthlyInjuriesChart();
+            updateMonthlyAreaChart();
+            calculateTopLuoghi();
+            
+            // Aggiorna calendario se necessario
+            if (currentFilters['filter-anno']) {
+                customCalendarState.currentYear = parseInt(currentFilters['filter-anno']);
+                customCalendarState.selectedYear = parseInt(currentFilters['filter-anno']);
+                renderCalendarYear();
+                renderCalendarMonths();
+            }
+            
+            if (currentFilters['filter-mese']) {
+                customCalendarState.selectedMonth = currentFilters['filter-mese'];
+                const monthIndex = MESI_ITALIANI.indexOf(currentFilters['filter-mese']);
+                if (monthIndex >= 0) {
+                    renderCalendarDays(monthIndex);
+                }
+            }
+            
+            updateCalendarSummary();
+        }, 500);
+    } else {
+        console.log('ℹ️ Nessun filtro trovato nell\'URL');
+    }
+    
+    return filtersLoaded;
+}
+
+
 
 // CSV Loading
 async function loadCSV() {
@@ -2228,6 +2367,7 @@ function populateFilters() {
 }
 
 // Handle Filter Change
+
 function handleFilterChange(filterId, value) {
     currentFilters[filterId] = value;
     
@@ -2267,8 +2407,14 @@ function handleFilterChange(filterId, value) {
         updateAnalytics();
     }
     
-    window.dispatchEvent(new Event('filtersUpdated')); // ✅ AGGIUNGI QUESTA RIGA
+    window.dispatchEvent(new Event('filtersUpdated'));
+    
+    // ✅ AGGIUNGI QUESTA RIGA
+    updateBrowserUrl();
+    
+
 }
+
 
 // Update All Filters
 function updateAllFilters() {
@@ -2498,6 +2644,9 @@ function filterByYear(year) {
     }
 	
 	 window.dispatchEvent(new Event('filtersUpdated'));
+    
+    // ✅ AGGIUNGI QUESTA RIGA
+    updateBrowserUrl();
 }
 
 
@@ -2533,6 +2682,9 @@ function filterByTipologia(tipo) {
         updateAnalytics();  // Aggiorna anche il testo dei filtri
     }
 	window.dispatchEvent(new Event('filtersUpdated'));
+    
+    // ✅ AGGIUNGI QUESTA RIGA
+    updateBrowserUrl();
 }
 
 
@@ -2571,6 +2723,9 @@ function filterByQuartiere(quartiere) {
         updateAnalytics();
     }
 	 window.dispatchEvent(new Event('filtersUpdated'));
+    
+    // ✅ AGGIUNGI QUESTA RIGA
+    updateBrowserUrl();
 }
 
 // Filter By Day/Night
@@ -2602,6 +2757,9 @@ function filterByDayNight(periodo) {
         updateAnalytics();
     }
 	window.dispatchEvent(new Event('filtersUpdated'));
+    
+    // ✅ AGGIUNGI QUESTA RIGA
+    updateBrowserUrl();
 }
 
 // Filter By Month
@@ -2643,7 +2801,10 @@ function filterByMonth(mese) {
         updateAnalytics();
     }
     
-    window.dispatchEvent(new Event('filtersUpdated')); // ✅ AGGIUNGI QUESTA RIGA
+    window.dispatchEvent(new Event('filtersUpdated'));
+    
+    // ✅ AGGIUNGI QUESTA RIGA
+    updateBrowserUrl(); // ✅ AGGIUNGI QUESTA RIGA
 }
 
 // Reset Filters
@@ -2690,7 +2851,10 @@ function resetFilters() {
         updateAnalytics();
     }
     
-    window.dispatchEvent(new Event('filtersUpdated')); // ✅ AGGIUNGI QUESTA RIGA
+    window.dispatchEvent(new Event('filtersUpdated'));
+    
+    // ✅ AGGIUNGI QUESTA RIGA
+    updateBrowserUrl(); // ✅ AGGIUNGI QUESTA RIGA
 }
 
 // Reset Charts Filters
@@ -2721,7 +2885,10 @@ function resetChartsFilters() {
         updateAnalytics();
     }
     
-    window.dispatchEvent(new Event('filtersUpdated')); // ✅ AGGIUNGI QUESTA RIGA
+    window.dispatchEvent(new Event('filtersUpdated'));
+    
+    // ✅ AGGIUNGI QUESTA RIGA
+    updateBrowserUrl(); // ✅ AGGIUNGI QUESTA RIGA
 }
 // Update Period Switches (Giorno/Notte)
 function updatePeriodSwitches() {
@@ -4980,6 +5147,9 @@ function filterByCalendarioData(mese, giorno, dataCompleta) {
         closeAnalytics();
     }
 	window.dispatchEvent(new Event('filtersUpdated'));
+    
+    // ✅ AGGIUNGI QUESTA RIGA
+    updateBrowserUrl();
 }
 
 
@@ -5017,6 +5187,9 @@ function filterByStagione(stagione) {
         updateAnalytics();
     }
 	window.dispatchEvent(new Event('filtersUpdated'));
+    
+    // ✅ AGGIUNGI QUESTA RIGA
+    updateBrowserUrl();
 }
 
 // Filter By Giorno Settimana
@@ -5051,6 +5224,9 @@ function filterByGiornoSettimana(giorno) {
         updateAnalytics();
    }
    window.dispatchEvent(new Event('filtersUpdated'));
+    
+    // ✅ AGGIUNGI QUESTA RIGA
+    updateBrowserUrl();
 }
 
 
@@ -5087,6 +5263,9 @@ function filterByGiornoSettimana(giorno) {
         updateAnalytics();
     }
 	window.dispatchEvent(new Event('filtersUpdated'));
+    
+    // ✅ AGGIUNGI QUESTA RIGA
+    updateBrowserUrl();
 }
 
 
@@ -5758,6 +5937,9 @@ function filterByFerialeWeekend(tipo) {
     }
 	
 	window.dispatchEvent(new Event('filtersUpdated'));
+    
+    // ✅ AGGIUNGI QUESTA RIGA
+    updateBrowserUrl();
 }
 
 
@@ -5793,6 +5975,9 @@ function filterByFasciaOraria(fascia) {
         updateAnalytics();
     }
 	window.dispatchEvent(new Event('filtersUpdated'));
+    
+    // ✅ AGGIUNGI QUESTA RIGA
+    updateBrowserUrl();
 }
 
 
