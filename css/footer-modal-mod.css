@@ -487,8 +487,8 @@ h3 {
 }
 
 .category-list ul li {
-    padding: 10px 0;
-    border-bottom: 1px solid #e5e7eb;
+   /* padding: 10px 0;
+    border-bottom: 1px solid #e5e7eb;*/
 }
 
 .category-list ul li:last-child {
