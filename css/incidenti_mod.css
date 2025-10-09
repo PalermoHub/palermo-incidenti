@@ -863,7 +863,7 @@ background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
 .detail-header {
     position: sticky;
     top: 0;
-    background: #ffffff;
+    background: linear-gradient(135deg, #ff9900 0%, #ff6600 100%);
     color: #1f2937;
     padding: 24px;
     z-index: 10;
@@ -877,11 +877,23 @@ background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
     display: flex;
     align-items: center;
     gap: 12px;
+	
+	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7), -1px -1px 2px rgba(255, 255, 255, 0.5);
 }
 
+.detail-header h2 i {
+   color: #ffffff;
+}
+
+
 .detail-header p {
-    font-size: 13px;
-    opacity: 0.9;
+    font-size: 14px;
+	
+	color:#ffffff;
+    opacity: 0.95;
+	    font-weight: 500;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7), -1px -1px 2px rgba(255, 255, 255, 0.5)
+	
 }
 
 .detail-close {
@@ -933,7 +945,7 @@ background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
     gap: 8px;
 }
 
-.detail-section h3 i, .detail-header h2  i {
+.detail-section h3 i {
     color: #ff9900;
     font-size: 16px;
 }
