@@ -200,9 +200,31 @@ async function init() {
         
         calculateTopLuoghi();
         
-        // ✅ AGGIUNGI QUESTA RIGA - Carica filtri dall'URL
+        // ✅ Carica filtri dall'URL (se presenti)
         setTimeout(() => {
-            loadFiltersFromUrl();
+            const hasUrlFilters = loadFiltersFromUrl();
+            
+            // ✅ Se NON ci sono filtri nell'URL, imposta il default 2023 e aggiorna l'URL
+            if (!hasUrlFilters) {
+                console.log('📅 Nessun filtro nell\'URL, applico default anno 2023');
+                currentFilters['filter-anno'] = '2023';
+                
+                // Aggiorna la select
+                const filterAnno = document.getElementById('filter-anno');
+                if (filterAnno) {
+                    filterAnno.value = '2023';
+                }
+                
+                // Aggiorna calendario
+                customCalendarState.selectedYear = 2023;
+                customCalendarState.currentYear = 2023;
+                
+                // ✅ IMPORTANTE: Aggiorna l'URL del browser con il filtro default
+                setTimeout(() => {
+                    updateBrowserUrl();
+                    console.log('✅ URL browser inizializzato con anno=2023');
+                }, 500);
+            }
         }, 1000);
         
     } catch (error) {
@@ -219,6 +241,8 @@ async function init() {
 // ==========================================
 
 // Aggiorna URL del browser con i filtri correnti
+
+// Aggiorna URL del browser con i filtri correnti
 function updateBrowserUrl() {
     const params = new URLSearchParams();
     let hasFilters = false;
@@ -232,7 +256,9 @@ function updateBrowserUrl() {
         }
     });
     
-    // Aggiungi posizione mappa (già gestita da map.hash, ma possiamo sincronizzarla)
+    // ❌ RIMUOVI QUESTA PARTE - MapLibre gestisce già lat/lng/zoom nell'hash
+    // Non serve duplicarli nei query params
+    /*
     if (map) {
         try {
             const center = map.getCenter();
@@ -244,11 +270,15 @@ function updateBrowserUrl() {
             console.warn('Errore nel recupero posizione mappa:', e);
         }
     }
+    */
+    
+    // ✅ PRESERVA L'HASH DI MAPLIBRE
+    const currentHash = window.location.hash;
     
     // Aggiorna URL senza ricaricare la pagina
     const newUrl = params.toString() 
-        ? `${window.location.pathname}?${params.toString()}` 
-        : window.location.pathname;
+        ? `${window.location.pathname}?${params.toString()}${currentHash}` 
+        : `${window.location.pathname}${currentHash}`;
     
     // Usa replaceState per non aggiungere alla cronologia ad ogni filtro
     window.history.replaceState({ filters: currentFilters }, '', newUrl);
@@ -285,10 +315,8 @@ function loadFiltersFromUrl() {
     
     // Applica ogni parametro trovato
     params.forEach((value, key) => {
-        // Salta parametri di mappa (gestiti da maplibre)
-        if (key === 'lat' || key === 'lng' || key === 'zoom' || key === 'shared') {
-            return;
-        }
+        // ✅ SALTA SOLO I PARAMETRI CHE NON SONO FILTRI
+        // (lat/lng/zoom e shared non sono più nei query params)
         
         const filterKey = urlParamMap[key];
         if (filterKey) {
@@ -344,8 +372,6 @@ function loadFiltersFromUrl() {
     
     return filtersLoaded;
 }
-
-
 
 // CSV Loading
 async function loadCSV() {

@@ -543,52 +543,15 @@ function generateShareUrl() {
         return;
     }
     
-    const params = new URLSearchParams();
-    let hasFilters = false;
-    
-    // Raccogli tutti i filtri attivi da currentFilters (globale)
-    if (typeof currentFilters !== 'undefined' && currentFilters) {
-        console.log('📊 currentFilters trovato:', currentFilters);
-        
-        Object.entries(currentFilters).forEach(([key, value]) => {
-            if (value && value !== '' && value !== null) {
-                // Rimuovi 'filter-' dal nome del parametro
-                const paramName = key.replace('filter-', '');
-                params.set(paramName, value);
-                hasFilters = true;
-                console.log(`  ✓ Aggiunto filtro: ${paramName} = ${value}`);
-            }
-        });
-    } else {
-        console.warn('⚠️ currentFilters non trovato');
-    }
-    
-    // Aggiungi posizione e zoom della mappa
-    if (typeof map !== 'undefined' && map) {
-        try {
-            const center = map.getCenter();
-            const zoom = map.getZoom();
-            params.set('lat', center.lat.toFixed(6));
-            params.set('lng', center.lng.toFixed(6));
-            params.set('zoom', zoom.toFixed(2));
-            console.log(`📍 Mappa: lat=${center.lat.toFixed(6)}, lng=${center.lng.toFixed(6)}, zoom=${zoom.toFixed(2)}`);
-        } catch (e) {
-            console.error('❌ Errore nel recupero posizione mappa:', e);
-        }
-    } else {
-        console.warn('⚠️ Oggetto map non trovato');
-    }
-    
-    // Aggiungi timestamp per rendere l'URL unico
-    params.set('shared', Date.now().toString(36));
-    
-    const baseUrl = window.location.origin + window.location.pathname;
-    const fullUrl = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
+    // ✅ USA DIRETTAMENTE L'URL DEL BROWSER (che include già filtri + hash MapLibre)
+    const fullUrl = window.location.href;
     
     console.log('✅ URL generato:', fullUrl);
-    console.log('📝 Parametri:', params.toString());
     
     shareUrlInput.value = fullUrl;
+    
+    // Verifica se ci sono filtri attivi
+    const hasFilters = window.location.search && window.location.search.length > 1;
     shareUrlInput.placeholder = hasFilters ? 'URL con filtri attivi' : 'URL della vista corrente';
 }
 	
